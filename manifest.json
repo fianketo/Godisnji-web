@@ -1,0 +1,13 @@
+{
+  "name": "OdmorPro",
+  "short_name": "OdmorPro",
+  "description": "Sistem za upravljanje odsustvima",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060a14",
+  "theme_color": "#06b6d4",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

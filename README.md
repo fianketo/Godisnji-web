@@ -1,66 +1,58 @@
 # OdmorPro – Evidencija odsustva i rasporeda
 
-Aplikacija je **gotova i proverena** (validna HTML/CSS/JS, radi samostalno u browseru, bez servera — podaci se čuvaju lokalno u browseru preko `localStorage`).
+Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez build koraka. Radi na dva načina:
 
-## Šta aplikacija već radi (sve što si tražio)
+- **Bez podešavanja Firebase-a**: sve radi lokalno u browseru (`localStorage`), kao demo/test režim. Podaci nisu deljeni između uređaja i mogu se izgubiti (svaki uređaj ima svoju kopiju).
+- **Sa podešenim Firebase-om (preporučeno za pravu upotrebu)**: svi zaposleni u firmi dele iste, trajne podatke u oblaku, uživo (real-time) — kad neko prijavi odsustvo ili ga admin odobri, svi ostali to odmah vide, na bilo kom uređaju. Registracija i prijava su prave (Firebase Authentication), lozinke se ne čuvaju u samoj aplikaciji.
 
-- **Jedan Admin nalog** (`admin` / `admin123`) + neograničen broj **korisničkih naloga** koje admin kreira (stranica *Podešavanja* → *Upravljanje korisnicima*, ili *Dodaj zaposlenog* za pun profil sa pozicijom, odeljenjem, brojem dana odmora itd.)
-- **Korisnički profil** – svaki zaposleni ima svoju stranicu *Moj profil* sa ličnim podacima i istorijom odsustava, i stranicu *Moj zahtev* gde **sam prijavljuje odsustvo** (tip, datumi, automatski obračun radnih dana, razlog) — zahtev ide Adminu na odobrenje.
-- **Svi korisnici vide ko je odsutan** – na *Kontrolnoj tabli* je zajednički kalendar (mesečni/nedeljni/dnevni prikaz) sa svim odsustvima, bojama po tipu (godišnji, bolovanje, slobodan dan, porodiljsko...) i statusom (odobreno/na čekanju). Ovo je vidljivo i Adminu i korisnicima.
-- **Pregledna statistika**:
-  - Kartice na vrhu: broj zaposlenih, ko je danas odsutan, broj zahteva na čekanju, prosečan broj preostalih dana.
-  - Admin dodatno ima stranicu *Izveštaji* sa tabelom po zaposlenom i grafikonom, plus izvoz u **CSV i PDF**.
-- **Upravljanje zahtevima** (Admin) – odobravanje/odbijanje pojedinačno ili grupno.
-- **Tamna/svetla tema, izvoz/uvoz svih podataka (JSON), reset podataka.**
+## Šta aplikacija radi
 
-Testirao sam JS kod (sintaksa je validna) — fajl je spreman za upotrebu.
+- **Nalozi** – samostalna registracija je namenjena samo za **jednokratni admin bootstrap** (prva osoba koja se ikad registruje automatski postaje Admin) i skrivena je sa login ekrana (otvara se preko `index.html?register`, pogledaj korak 8 ispod). Ubuduće, admin dodaje sve zaposlene kroz *Dodaj radnika* (puni profil + lozinka koju admin zada).
+- **Korisnički profil** – svaki zaposleni ima *Moj profil* sa ličnim podacima i istorijom odsustava, i *Moj zahtev* gde sam prijavljuje odsustvo (tip, datumi, automatski obračun radnih dana, razlog) — ide Adminu na odobrenje.
+- **Zajednički kalendar** – na *Kontrolnoj tabli* svi vide ko je odsutan (mesečni/nedeljni/dnevni prikaz), boje po tipu odsustva, status (odobreno/na čekanju).
+- **Statistika** – kartice (broj zaposlenih, ko je danas odsutan, zahtevi na čekanju, prosek preostalih dana) + Admin stranica *Izveštaji* sa grafikonom i izvozom u CSV/PDF.
+- **Upravljanje zahtevima** (Admin) – odobravanje/odbijanje.
+- **Godišnji obračun** – 1. januara svako dobija novih 20 dana godišnjeg odmora **plus** ono što mu je ostalo od prethodne godine (ne propada). Slobodni dani se **ne prenose** — svake godine se vraćaju na podrazumevanih 3 (admin može da promeni broj po zaposlenom u *Dodaj radnika*). Ovo se automatski primeni čim neko prvi put otvori aplikaciju posle Nove godine — nema potrebe za ručnim resetom.
+- Tamna/svetla tema (lokalno po uređaju), izvoz/uvoz svih podataka (JSON).
 
-## Deljeni podaci za sve zaposlene (NOVO)
+## Podešavanje Firebase-a (jednom, ~5-10 min, besplatno, bez kartice)
 
-Pošto ti je bitno da **svi zaposleni vide kada je neko označio odsustvo** (i sa različitih uređaja/računara), dodao sam besplatnu **Firebase Firestore** cloud bazu. Kada je podesiš (5 minuta, bez kartice):
-
-- Svaki put kad neko podnese zahtev za odsustvo, doda zaposlenog, ili admin nešto odobri — promena se **odmah, uživo (real-time)** vidi kod svih ostalih korisnika koji imaju sajt otvoren, na bilo kom uređaju.
-- I dalje radi i offline kao rezerva (localStorage cache), ali glavna, deljena "istina" je u Firestore bazi.
-- Besplatni Firebase plan (Spark) je više nego dovoljan za malu firmu (npr. 50.000 čitanja/dan, 20.000 upisa/dan — firma od par desetina ljudi to teško može da potroši).
-
-### Kako da podesiš Firebase (jednom, traje ~5 min)
-
-1. Idi na **https://console.firebase.google.com**, prijavi se Google nalogom, klikni **Add project** (ne treba kartica, besplatno).
-2. U levom meniju: **Build → Firestore Database → Create database**. Izaberi region (npr. najbliži Evropi), pa **Start in test mode** (kasnije po želji možeš pooštriti pravila).
-3. Klikni na zupčanik gore levo → **Project settings**. Skroluj do "Your apps", klikni ikonicu **Web (`</>`)**, daj joj ime (npr. "OdmorPro"), klikni **Register app**. Firebase će ti prikazati kod sa objektom koji izgleda ovako:
-   ```js
-   const firebaseConfig = {
-     apiKey: "AIzaSy...",
-     authDomain: "tvoj-projekat.firebaseapp.com",
-     projectId: "tvoj-projekat",
-     storageBucket: "tvoj-projekat.appspot.com",
-     messagingSenderId: "123456789",
-     appId: "1:123456789:web:abcdef"
-   };
+1. Idi na **https://console.firebase.google.com**, prijavi se Google nalogom, **Add project**.
+2. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable.** Ovo omogućava pravu registraciju/prijavu.
+3. **Build → Realtime Database → Create Database.** Izaberi region (npr. najbliži Evropi), izaberi **"Start in locked mode"**.
+4. Otvori tab **Rules** te baze i zameni sadržaj sa:
+   ```json
+   {
+     "rules": {
+       ".read": "auth != null",
+       ".write": "auth != null"
+     }
+   }
    ```
-4. Otvori `index.html` (npr. preko GitHub-a, dugme "Edit"/olovčica), pronađi na vrhu skripte (blizu početka, posle `<!-- Firebase -->` komentara) isti taj `firebaseConfig` objekat sa placeholder vrednostima (`"UNESI_SVOJ_..."`) i **zameni ih svojim pravim vrednostima** iz koraka 3. Sačuvaj (Commit changes).
-5. To je sve — osveži stranicu i u konzoli (F12) ne bi trebalo više da vidiš upozorenje o Firebase-u. Otvori sajt na dva različita uređaja/browsera i testiraj: kad jedan korisnik prijavi odsustvo, drugi treba odmah da ga vidi na kalendaru/dashboardu.
+   Klikni **Publish**. Ovo znači: samo prijavljeni (registrovani) korisnici mogu da čitaju/pišu podatke — nasumični posetioci sajta ne mogu, čak i ako znaju adresu.
+5. Zupčanik gore levo → **Project settings** → skroluj do "Your apps" → ikonica **Web (`</>`)** → daj ime (npr. "OdmorPro") → **Register app**. Prikazaće se `firebaseConfig` objekat.
+6. Otvori `index.html`, pronađi na vrhu skripte `const FIREBASE_CONFIG = { ... }` (odmah ispod komentara „FIREBASE CONFIG"), i zameni placeholder vrednosti (`"YOUR_API_KEY"` itd.) pravim vrednostima iz koraka 5. Sačuvaj.
+7. **Authentication → Settings → Authorized domains** → dodaj domen na kom će sajt živeti (npr. `tvoje-korisnicko-ime.github.io`). **Bez ovog koraka registracija/prijava neće raditi na živom sajtu** (radiće samo na `localhost` dok testiraš lokalno).
+8. Otvori `index.html?register` (napomena: `?register` na kraju — registracija je namerno skrivena sa običnog login ekrana) i registruj se svojim pravim email-om. Taj nalog (prvi ikad registrovan) automatski postaje Admin. Ubuduće koristi običan `index.html` i dodaj ostale zaposlene kroz *Dodaj radnika* — link za registraciju ostaje skriven za njih.
 
-### Bezbednosna napomena (bitno za malu firmu)
+### Bezbednosna napomena
 
-Test mode u Firestore-u znači da baza **nije zaštićena lozinkom na nivou baze** — svako ko zna tvoj `firebaseConfig` (vidljiv je u izvornom kodu stranice, to je normalno za web app) tehnički može da čita/piše podatke direktno, zaobilazeći login ekran aplikacije. Za malu firmu sa poverljivim timom ovo je uobičajeno i prihvatljivo rešenje (slično kao deljeni Excel fajl). Ako ti zatreba ozbiljnija zaštita (prava autentifikacija, pravila ko šta sme da menja), javi mi — mogu da dodam Firebase Authentication i Firestore security rules.
+Pravila iz koraka 4 (`auth != null`) znače da **bilo koji prijavljeni korisnik može da čita i menja sve podatke** (nema razdvajanja po ulogama na nivou baze — to app radi na UI nivou). Za malu firmu sa poverljivim timom ovo je uobičajeno i prihvatljivo (slično deljenom Excel fajlu koji svi članovi tima mogu da menjaju). Ako ti zatreba stroža podela (npr. da običan zaposleni ne može direktno da piše u bazu mimo aplikacije), to zahteva finije Firebase security rules po ulozi — javi ako ti to zatreba.
 
-Ako ne podesiš Firebase config (ostaviš placeholder vrednosti), aplikacija i dalje radi normalno, samo se vraća na stari režim — svaki uređaj ima svoju lokalnu kopiju podataka.
+Lozinke se **ne čuvaju** u našoj bazi — njima upravlja Firebase Authentication (industrijski standard, hashovano), aplikacija samo čuva ime/email/ulogu/vezu ka profilu zaposlenog.
 
-## Kako da je postaviš na besplatan GitHub domen (GitHub Pages)
+Ako ne podesiš Firebase (ostaviš placeholder vrednosti u `FIREBASE_CONFIG`), aplikacija i dalje radi normalno u lokalnom demo režimu (admin/admin123, podaci samo na tom uređaju).
+
+## Postavljanje na besplatan GitHub Pages
 
 1. Napravi nalog na [github.com](https://github.com) ako ga nemaš.
-2. Klikni **New repository**, daj mu ime npr. `odmorpro`, postavi ga kao **Public**, kreiraj ga.
-3. U repozitorijum otpremi (Upload files) fajl **`index.html`** iz ovog paketa (mora da se zove tačno `index.html`).
-4. Idi na **Settings → Pages** u tom repozitorijumu.
-5. Pod "Build and deployment" izaberi **Deploy from a branch**, granu `main`, folder `/ (root)`, sačuvaj.
-6. Posle 1-2 minuta aplikacija će biti dostupna na adresi:
-   `https://tvoje-korisnicko-ime.github.io/odmorpro/`
-
-To je to — besplatno, bez servera, bez troškova hostinga.
+2. **New repository** → ime npr. `odmorpro` → **Public** → kreiraj.
+3. Otpremi (**Add file → Upload files**) fajl i preimenuj ga tačno u **`index.html`** (GitHub Pages traži baš to ime za početnu stranicu).
+4. **Settings → Pages** → "Build and deployment" → **Deploy from a branch** → grana `main`, folder `/ (root)` → Save.
+5. Posle 1-2 minuta sajt je dostupan na `https://tvoje-korisnicko-ime.github.io/odmorpro/`.
+6. Ne zaboravi korak 7 iz sekcije o Firebase-u iznad (dodaj taj domen u Authorized domains) — inače će registracija/prijava raditi lokalno ali ne i na živom sajtu.
 
 ## Prijava
 
-- Admin: korisničko ime `admin`, lozinka `admin123` (preporučujem da odmah promeniš ili dodaš novog admina pa obrišeš ovaj, iz Podešavanja).
-- Nove korisnike (zaposlene) dodaješ kroz *Dodaj zaposlenog* (admin only) — email zaposlenog služi kao korisničko ime.
-# Godisnji-web
+- **Bez Firebase-a (demo režim)**: `admin` / `admin123`.
+- **Sa Firebase-om**: nema unapred zadatog naloga. Prva registracija (preko `index.html?register`) postaje Admin; sve ostale naloge admin dodaje kroz *Dodaj radnika*.

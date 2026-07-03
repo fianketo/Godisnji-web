@@ -1,0 +1,4419 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OdmorPro – Upravljanje odsustvima</title>
+
+<!-- PWA: lets phones show a real app icon/name when someone taps
+     "Add to Home Screen", instead of a generic browser bookmark. -->
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#06b6d4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OdmorPro">
+
+<!-- ============================================================
+     STYLES
+     ============================================================ -->
+<style>
+/* ---------- CSS Variables & Reset ---------- */
+:root {
+  --bg: #f3f6fb;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text2: #64748b;
+  --text3: #94a3b8;
+  --primary: #06b6d4;
+  --primary-dark: #0891b2;
+  --primary-light: #ecfeff;
+  --success: #22c55e;
+  --success-light: #f0fdf4;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --purple: #8b5cf6;
+  --purple-light: #f5f3ff;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+  --transition: .2s ease;
+  --glass-blur: none;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #060a14;
+  --surface: rgba(255,255,255,.045);
+  --surface2: rgba(255,255,255,.03);
+  --border: rgba(255,255,255,.09);
+  --text: #e8eef7;
+  --text2: #94a3b8;
+  --text3: #56637a;
+  --primary-light: rgba(34,211,238,.14);
+  --success-light: rgba(34,197,94,.14);
+  --warning-light: rgba(245,158,11,.14);
+  --danger-light: rgba(239,68,68,.14);
+  --purple-light: rgba(139,92,246,.14);
+  --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.55);
+  --glass-blur: blur(20px);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+[data-theme="dark"] body {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(6,182,212,.14), transparent 42%),
+    radial-gradient(circle at 88% 18%, rgba(139,92,246,.12), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(34,211,238,.08), transparent 45%),
+    var(--bg);
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ---------- Login / Register Screens ---------- */
+#login-screen,
+#register-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+  background: #060a14;
+  color-scheme: dark;
+}
+
+#register-screen { display: none; }
+
+/* Animated "aurora" background — CSS-only, no video/image assets needed */
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .55;
+  pointer-events: none;
+  will-change: transform;
+}
+.aurora-blob.b1 {
+  width: 480px; height: 480px;
+  top: -140px; left: -120px;
+  background: radial-gradient(circle, #06b6d4, transparent 70%);
+  animation: auroraDrift1 22s ease-in-out infinite;
+}
+.aurora-blob.b2 {
+  width: 440px; height: 440px;
+  bottom: -140px; right: -100px;
+  background: radial-gradient(circle, #8b5cf6, transparent 70%);
+  animation: auroraDrift2 26s ease-in-out infinite;
+}
+.aurora-blob.b3 {
+  width: 360px; height: 360px;
+  top: 45%; left: 58%;
+  background: radial-gradient(circle, #22d3ee, transparent 70%);
+  animation: auroraDrift3 30s ease-in-out infinite;
+}
+.aurora-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at 50% 40%, black, transparent 75%);
+  pointer-events: none;
+}
+
+@keyframes auroraDrift1 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(70px, 90px) scale(1.15); }
+}
+@keyframes auroraDrift2 {
+  0%, 100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(-80px, -60px) scale(1.1); }
+}
+@keyframes auroraDrift3 {
+  0%, 100% { transform: translate(0,0) scale(.95); }
+  50% { transform: translate(-50px, 60px) scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob { animation: none !important; }
+}
+
+.login-card {
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 20px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.14);
+  position: relative;
+  z-index: 1;
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #22d3ee, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.login-logo p {
+  color: #94a3b8;
+  font-size: .875rem;
+  margin-top: .25rem;
+  letter-spacing: .5px;
+}
+
+.login-form .form-group { margin-bottom: 1.25rem; }
+.login-form label {
+  display: block;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin-bottom: .375rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+.login-form input {
+  width: 100%;
+  padding: .75rem 1rem;
+  border: 1.5px solid rgba(255,255,255,.14);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,.06);
+  color: #e8eef7;
+  font-size: .9375rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+}
+.login-form input::placeholder { color: #5b6b85; }
+.login-form input:focus {
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.18);
+}
+
+.login-error {
+  background: rgba(239,68,68,.14);
+  color: #fca5a5;
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1rem;
+  font-size: .875rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.auth-switch-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: .8125rem;
+  color: #94a3b8;
+}
+
+.auth-switch-link a {
+  color: #22d3ee;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.auth-switch-link a:hover { text-decoration: underline; }
+
+/* ---------- App Shell ---------- */
+#app { display: none; height: 100vh; overflow: hidden; }
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  transition: transform var(--transition);
+}
+
+.sidebar-brand {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.sidebar-brand-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.3px;
+  background: linear-gradient(135deg, var(--primary), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem .75rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+
+.nav-section-label {
+  font-size: .6875rem;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: .75rem .75rem .25rem;
+  margin-top: .25rem;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .625rem .875rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: none;
+  color: var(--text2);
+  font-size: .875rem;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all var(--transition);
+  position: relative;
+  will-change: transform;
+}
+
+.nav-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, var(--primary-light), rgba(139,92,246,.08));
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-btn .nav-icon { font-size: 1.05rem; width: 20px; text-align: center; flex-shrink: 0; }
+
+.badge-count {
+  position: absolute;
+  right: .75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--danger);
+  color: white;
+  font-size: .6875rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.sidebar-footer {
+  padding: 1rem .75rem;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .625rem .875rem;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar-user-info { flex: 1; min-width: 0; }
+.sidebar-user-name {
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-user-role {
+  font-size: .75rem;
+  color: var(--text3);
+}
+
+/* ---------- Sidebar overlay (mobile) ---------- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 199;
+}
+
+/* ---------- Bottom tab bar (mobile) ---------- */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--border);
+  padding: .375rem .375rem calc(.375rem + env(safe-area-inset-bottom));
+  gap: .125rem;
+}
+
+.bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .2rem;
+  min-height: 50px;
+  padding: .375rem .25rem;
+  border: none;
+  background: none;
+  color: var(--text3);
+  font-size: .625rem;
+  font-weight: 600;
+  letter-spacing: .1px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition), background var(--transition);
+}
+
+.bottom-nav-btn .bn-icon { font-size: 1.25rem; line-height: 1; }
+
+.bottom-nav-btn.active {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.bottom-nav-btn .bn-badge {
+  position: absolute;
+  top: .1rem;
+  right: 18%;
+  background: var(--danger);
+  color: #fff;
+  font-size: .5625rem;
+  font-weight: 700;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+}
+
+/* ---------- Header ---------- */
+.header {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-w);
+  right: 0;
+  height: var(--header-h);
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+  z-index: 100;
+}
+
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border: none;
+  background: none;
+  color: var(--text2);
+  font-size: 1.3rem;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+.hamburger-btn:hover { background: var(--bg); color: var(--text); }
+
+.header-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions { display: flex; align-items: center; gap: .5rem; }
+
+/* ---------- Notification bell ---------- */
+.notif-wrap { position: relative; }
+.notif-bell { position: relative; }
+.notif-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: var(--danger);
+  color: #fff;
+  font-size: .625rem;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + .5rem);
+  right: 0;
+  width: 340px;
+  max-width: 88vw;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 250;
+  animation: slideUp .15s ease;
+}
+
+.notif-dropdown-header {
+  padding: .875rem 1.125rem;
+  font-weight: 700;
+  font-size: .875rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: .625rem;
+  width: 100%;
+  padding: .75rem 1.125rem;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition);
+  font-family: inherit;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg); }
+.notif-item.unread { background: var(--primary-light); }
+.notif-item-icon { font-size: 1rem; flex-shrink: 0; margin-top: .1rem; }
+.notif-item-body { flex: 1; min-width: 0; }
+.notif-item-title { font-size: .8125rem; font-weight: 600; color: var(--text); line-height: 1.4; }
+.notif-item-sub { font-size: .75rem; color: var(--text3); margin-top: .15rem; }
+
+.notif-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text3);
+  font-size: .875rem;
+}
+
+/* ---------- Main Content ---------- */
+.main {
+  margin-left: var(--sidebar-w);
+  margin-top: var(--header-h);
+  padding: 1.75rem;
+  min-height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  max-height: calc(100vh - var(--header-h));
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5625rem 1.125rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: .1px;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 2px 8px rgba(6,182,212,.35);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(6,182,212,.45);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { background: var(--bg); color: var(--text); }
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+.btn-danger:hover { background: #dc2626; }
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+.btn-success:hover { background: #16a34a; }
+
+.btn-sm {
+  padding: .375rem .75rem;
+  font-size: .8125rem;
+}
+
+/* Ripple */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  transform: scale(0);
+  animation: rippleAnim .5s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: .5rem;
+  gap: 1rem;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.card-body { padding: 1.5rem; }
+
+/* ---------- Stat Cards ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 99px 99px 0 0;
+}
+
+.stat-card.blue::before { background: linear-gradient(90deg, var(--primary), #60a5fa); }
+.stat-card.green::before { background: linear-gradient(90deg, var(--success), #4ade80); }
+.stat-card.yellow::before { background: linear-gradient(90deg, var(--warning), #fbbf24); }
+.stat-card.purple::before { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+.stat-card.red::before { background: linear-gradient(90deg, var(--danger), #f87171); }
+
+.stat-card.blue { background: linear-gradient(135deg, var(--surface) 60%, rgba(6,182,212,.06)); }
+.stat-card.green { background: linear-gradient(135deg, var(--surface) 60%, rgba(34,197,94,.06)); }
+.stat-card.yellow { background: linear-gradient(135deg, var(--surface) 60%, rgba(245,158,11,.06)); }
+.stat-card.purple { background: linear-gradient(135deg, var(--surface) 60%, rgba(139,92,246,.06)); }
+.stat-card.red { background: linear-gradient(135deg, var(--surface) 60%, rgba(239,68,68,.06)); }
+
+.stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: .875rem;
+}
+
+.stat-card.blue .stat-icon { background: rgba(6,182,212,.12); }
+.stat-card.green .stat-icon { background: rgba(34,197,94,.12); }
+.stat-card.yellow .stat-icon { background: rgba(245,158,11,.12); }
+.stat-card.purple .stat-icon { background: rgba(139,92,246,.12); }
+.stat-card.red .stat-icon { background: rgba(239,68,68,.12); }
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -1px;
+  margin-bottom: .25rem;
+}
+
+.stat-label {
+  font-size: .8125rem;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+/* ---------- Avatar ---------- */
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8125rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: .3px;
+}
+
+.avatar-lg { width: 52px; height: 52px; font-size: 1.125rem; }
+.avatar-xl { width: 72px; height: 72px; font-size: 1.5rem; }
+
+/* ---------- Tables ---------- */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+}
+
+thead th {
+  text-align: left;
+  padding: .75rem 1rem;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: all var(--transition);
+  position: relative;
+}
+
+tbody tr:hover {
+  background: var(--bg);
+}
+
+tbody tr:hover td:first-child {
+  border-left: 3px solid var(--primary);
+}
+
+tbody td {
+  padding: .875rem 1rem;
+  color: var(--text);
+  border-left: 3px solid transparent;
+  transition: border-color var(--transition);
+}
+
+tbody td:not(:first-child) { border-left: none; }
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .25rem .625rem;
+  border-radius: 99px;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.badge-pending { background: var(--warning-light); color: var(--warning); }
+.badge-approved { background: var(--success-light); color: var(--success); }
+.badge-rejected { background: var(--danger-light); color: var(--danger); }
+.badge-info { background: var(--primary-light); color: var(--primary); }
+
+/* ---------- Forms ---------- */
+.form-group { margin-bottom: 1.25rem; }
+
+label {
+  display: block;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: .375rem;
+  letter-spacing: .3px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  padding: .625rem .875rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: .9375rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(6,182,212,.12);
+}
+
+/* Custom dropdown arrow so <select> always matches the theme instead of
+   falling back to the OS-native (light) widget background. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.25rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text3) 50%),
+    linear-gradient(135deg, var(--text3) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 13px) calc(50% - 3px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+
+textarea { resize: vertical; min-height: 80px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* ---------- Modals ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn .15s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp .2s ease;
+  will-change: transform;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.2px; }
+
+.modal-close {
+  width: 32px; height: 32px;
+  border: none;
+  background: var(--bg);
+  color: var(--text2);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all var(--transition);
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+
+.modal-body { padding: 1.5rem; }
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+}
+
+/* ---------- Calendar ---------- */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.calendar-month-label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  padding: .375rem .75rem;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+}
+.calendar-month-label:hover { background: var(--bg); }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Drag-to-select works via touch on the employee's own calendar, so the
+   browser shouldn't try to pan/scroll or select text while dragging there */
+#my-cal-grid {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#my-cal-grid .cal-day { -webkit-touch-callout: none; }
+
+.cal-header {
+  text-align: center;
+  font-size: .6875rem;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  padding: .5rem 0;
+  min-width: 0;
+}
+
+.cal-header.weekend { color: var(--danger); }
+.cal-header {
+  border-right: 1px solid var(--border);
+  border-bottom: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.cal-header:last-child { border-right: none; }
+
+.cal-day {
+  min-height: 80px;
+  min-width: 0;
+  padding: .375rem .5rem;
+  border-radius: 0;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+  transition: background var(--transition);
+  position: relative;
+  background: var(--surface);
+  overflow: hidden;
+}
+/* remove right border on last column, bottom on last row */
+.cal-day:nth-child(7n) { border-right: none; }
+
+.cal-day.weekend {
+  background: rgba(239,68,68,.04);
+}
+
+[data-theme="dark"] .cal-day.weekend {
+  background: rgba(239,68,68,.07);
+}
+
+.cal-day.other-month {
+  opacity: .4;
+  background: var(--bg);
+}
+
+.cal-day.today {
+  background: var(--primary-light);
+}
+
+.cal-day-num {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: .25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.cal-day.today .cal-day-num {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* drag-select highlight */
+.cal-day.drag-selecting {
+  background: rgba(99,102,241,.18) !important;
+}
+.cal-day.drag-start, .cal-day.drag-end {
+  background: rgba(99,102,241,.35) !important;
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+
+.cal-event {
+  font-size: .65rem;
+  font-weight: 600;
+  padding: .15rem .4rem;
+  border-radius: 4px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* Year picker */
+.year-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.4);
+  animation: fadeIn .15s ease;
+}
+
+.year-picker {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-lg);
+  width: 280px;
+  animation: slideUp .2s ease;
+}
+
+.year-picker h3 {
+  text-align: center;
+  font-size: .875rem;
+  color: var(--text2);
+  margin-bottom: 1rem;
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+}
+
+.year-btn {
+  padding: .625rem;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: .875rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--surface2);
+  color: var(--text);
+  transition: all var(--transition);
+}
+.year-btn:hover { border-color: var(--primary); color: var(--primary); }
+.year-btn.current-year { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* ---------- Chart ---------- */
+.chart-container {
+  padding: 1rem 1.5rem 1.5rem;
+}
+
+.chart-bar {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+
+.bar-label {
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text2);
+  width: 120px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-track {
+  flex: 1;
+  height: 28px;
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width .6s cubic-bezier(.4,0,.2,1);
+  background: linear-gradient(90deg, var(--primary), #60a5fa);
+  will-change: width;
+}
+
+.bar-value {
+  font-size: .8125rem;
+  font-weight: 700;
+  color: var(--text);
+  width: 40px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ---------- Progress Ring ---------- */
+.progress-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .375rem;
+}
+
+.progress-ring svg { transform: rotate(-90deg); }
+.progress-ring-label { font-size: .75rem; color: var(--text2); text-align: center; }
+.progress-ring-value { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+/* ---------- Timeline ---------- */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: .5625rem;
+  top: .5rem;
+  bottom: .5rem;
+  width: 2px;
+  background: var(--border);
+  border-radius: 99px;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0 0 1.25rem 1rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: .375rem;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.timeline-item.approved::before { background: var(--success); box-shadow: 0 0 0 2px var(--success); }
+.timeline-item.rejected::before { background: var(--danger); box-shadow: 0 0 0 2px var(--danger); }
+
+.timeline-date { font-size: .75rem; color: var(--text3); margin-bottom: .2rem; }
+.timeline-title { font-size: .875rem; font-weight: 600; color: var(--text); }
+.timeline-sub { font-size: .8125rem; color: var(--text2); }
+
+/* ---------- Empty States ---------- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text2);
+}
+
+.empty-state-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  opacity: .6;
+}
+
+.empty-state-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: .375rem;
+}
+
+.empty-state-sub {
+  font-size: .875rem;
+  color: var(--text2);
+  max-width: 280px;
+}
+
+/* ---------- Toast Notifications ---------- */
+#toast-stack {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: .5rem;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: .875rem 1.25rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-width: 280px;
+  max-width: 360px;
+  pointer-events: auto;
+  animation: toastIn .3s ease forwards;
+  will-change: transform;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.toast.removing {
+  animation: toastOut .25s ease forwards;
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(24px); }
+}
+
+.toast-icon { font-size: 1.125rem; flex-shrink: 0; }
+.toast-msg { font-size: .875rem; font-weight: 500; color: var(--text); flex: 1; }
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.info { border-left: 3px solid var(--primary); }
+.toast.warning { border-left: 3px solid var(--warning); }
+
+/* ---------- Command Palette ---------- */
+#cmd-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+  animation: fadeIn .15s ease;
+}
+
+.cmd-palette {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideUp .15s ease;
+}
+
+.cmd-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.cmd-icon { color: var(--text3); font-size: 1rem; }
+
+#cmd-input {
+  flex: 1;
+  border: none;
+  background: none;
+  outline: none;
+  font-size: 1rem;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.cmd-results {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.cmd-result-item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  font-size: .9375rem;
+}
+
+.cmd-result-item:hover,
+.cmd-result-item.selected {
+  background: var(--bg);
+}
+
+.cmd-result-item .cmd-item-icon { font-size: 1rem; width: 24px; text-align: center; color: var(--text2); }
+.cmd-result-item .cmd-item-label { font-weight: 500; color: var(--text); flex: 1; }
+.cmd-result-item .cmd-item-sub { font-size: .8125rem; color: var(--text3); }
+
+.cmd-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text3);
+  font-size: .875rem;
+}
+
+/* ---------- Leave balance warning ---------- */
+.leave-warning {
+  background: var(--danger-light);
+  border: 1px solid rgba(239,68,68,.25);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1rem;
+  font-size: .875rem;
+  color: var(--danger);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Section/Page Layout ---------- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: .875rem;
+  color: var(--text2);
+  margin-top: .125rem;
+}
+
+/* ---------- Filters ---------- */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.filter-row select,
+.filter-row input {
+  width: auto;
+  padding: .5rem .875rem;
+  font-size: .875rem;
+}
+
+/* ---------- Employee detail rows ---------- */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {}
+.detail-item .detail-label {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  color: var(--text3);
+  margin-bottom: .25rem;
+}
+.detail-item .detail-value {
+  font-size: .9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---------- Print styles ---------- */
+@media print {
+  .sidebar, .header, .toast-stack,
+  #cmd-palette-overlay, .modal-overlay,
+  .btn, .page-header .btn,
+  .filter-row { display: none !important; }
+  .main { margin: 0 !important; padding: 1rem !important; max-height: none !important; }
+  #app { height: auto !important; overflow: visible !important; }
+  body { background: white !important; }
+  .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.show { display: block; }
+  .hamburger-btn { display: flex; }
+  .header { left: 0; }
+  .main {
+    margin-left: 0;
+    padding: 1rem;
+    padding-bottom: calc(1.25rem + 66px + env(safe-area-inset-bottom));
+  }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .card-body { padding: 1rem; }
+
+  /* ---- Calendar: tighter cells, compact events, no more overflow ---- */
+  .calendar-grid { font-size: .7rem; }
+  .cal-day { min-height: 64px; padding: .25rem .2rem; }
+  .cal-day-num { width: 18px; height: 18px; font-size: .6875rem; margin-bottom: .15rem; }
+  .cal-header { font-size: .5625rem; padding: .4rem 0; letter-spacing: .3px; }
+  .cal-event {
+    font-size: .55rem;
+    padding: .1rem .2rem;
+    border-radius: 3px;
+    margin-bottom: 1px;
+  }
+
+  /* Bottom tab bar replaces the sidebar as the primary way to navigate */
+  .bottom-nav { display: flex; }
+
+  /* Bigger touch targets */
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 38px; }
+  .nav-btn { min-height: 46px; }
+  .modal-close, .hamburger-btn, .year-btn { min-height: 40px; }
+
+  /* Prevent iOS Safari from auto-zooming when a field is focused
+     (it zooms whenever a focused input's font-size is under 16px) */
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="date"],
+  input[type="password"],
+  select,
+  textarea,
+  .login-form input {
+    font-size: 16px;
+  }
+
+  .header-actions .btn-label { display: none; }
+  #cmd-palette-btn { padding-left: .625rem; padding-right: .625rem; }
+
+  /* ---- Tables become stacked cards instead of horizontal-scroll grids ---- */
+  .table-wrap table.responsive-stack thead { display: none; }
+  table.responsive-stack,
+  table.responsive-stack tbody,
+  table.responsive-stack tr,
+  table.responsive-stack td {
+    display: block;
+    width: 100%;
+  }
+  table.responsive-stack tr {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin: .75rem;
+    padding: .75rem;
+    background: var(--surface2);
+  }
+  table.responsive-stack tbody tr:hover td:first-child { border-left: none; }
+  table.responsive-stack td {
+    border: none !important;
+    padding: .3rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .75rem;
+    text-align: right;
+  }
+  table.responsive-stack td::before {
+    content: attr(data-label);
+    font-size: .6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--text3);
+    flex-shrink: 0;
+    text-align: left;
+  }
+  table.responsive-stack td.td-primary {
+    padding-bottom: .6rem;
+    margin-bottom: .35rem;
+    border-bottom: 1px solid var(--border) !important;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  table.responsive-stack td.td-actions {
+    justify-content: flex-end;
+    padding-top: .6rem;
+    margin-top: .35rem;
+    border-top: 1px solid var(--border) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .modal { border-radius: 12px 12px 0 0; }
+  .modal-overlay { align-items: flex-end; padding: 0; }
+}
+
+/* ---------- Misc helpers ---------- */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-2 { gap: .5rem; }
+.gap-3 { gap: .75rem; }
+.mt-1 { margin-top: .25rem; }
+.mt-2 { margin-top: .5rem; }
+.mt-3 { margin-top: .75rem; }
+.mb-3 { margin-bottom: .75rem; }
+.text-sm { font-size: .875rem; }
+.text-xs { font-size: .75rem; }
+.text-muted { color: var(--text2); }
+.font-bold { font-weight: 700; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN SCREEN
+     ============================================================ -->
+<div id="login-screen">
+  <div class="aurora-blob b1"></div>
+  <div class="aurora-blob b2"></div>
+  <div class="aurora-blob b3"></div>
+  <div class="aurora-grid"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <h1>☀️ OdmorPro</h1>
+      <p>Sistem za upravljanje odsustvima</p>
+    </div>
+    <div class="login-error" id="login-error"></div>
+    <form class="login-form" id="login-form">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="text" id="login-email" placeholder="npr. marko@firma.rs" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="login-pass">Lozinka</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+        Prijava
+      </button>
+    </form>
+    <p class="auth-switch-link hidden" id="register-link-wrap">
+      Nemate nalog? <a id="show-register-link">Registrujte se</a>
+    </p>
+    <p class="hidden" id="demo-hint" style="text-align:center;margin-top:1rem;font-size:.8125rem;color:#5b6b85">
+      Demo: <strong style="color:#94a3b8">admin</strong> / <strong style="color:#94a3b8">admin123</strong>
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     REGISTER SCREEN (self-service registration)
+     ============================================================ -->
+<div id="register-screen">
+  <div class="aurora-blob b1"></div>
+  <div class="aurora-blob b2"></div>
+  <div class="aurora-blob b3"></div>
+  <div class="aurora-grid"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <h1>☀️ OdmorPro</h1>
+      <p>Kreirajte svoj nalog</p>
+    </div>
+    <div class="login-error" id="register-error"></div>
+    <form class="login-form" id="register-form">
+      <div class="form-group">
+        <label for="reg-name">Ime i prezime</label>
+        <input type="text" id="reg-name" placeholder="Marko Nikolić" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email</label>
+        <input type="email" id="reg-email" placeholder="marko@firma.rs" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="reg-pass">Lozinka</label>
+        <input type="password" id="reg-pass" placeholder="Najmanje 6 karaktera" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="reg-pass2">Potvrdi lozinku</label>
+        <input type="password" id="reg-pass2" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center">
+        Registruj se
+      </button>
+    </form>
+    <p class="auth-switch-link">
+      Već imate nalog? <a id="show-login-link">Prijavite se</a>
+    </p>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
+<div id="app">
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-icon">☀️</div>
+      <div class="sidebar-brand-text">OdmorPro</div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- Injected by JS -->
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="avatar" id="sidebar-avatar" style="background:#3b82f6">--</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-user-name">Korisnik</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Admin</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="header">
+    <button class="hamburger-btn" id="hamburger-btn" aria-label="Meni">☰</button>
+    <div class="header-title" id="header-title">Dashboard</div>
+    <div class="header-actions">
+      <button class="btn btn-secondary btn-sm" id="cmd-palette-btn" title="Pretraga (Ctrl+K)">
+        🔍 <span class="btn-label">Pretraga</span>
+      </button>
+      <div class="notif-wrap">
+        <button class="btn btn-secondary btn-sm notif-bell" id="notif-bell-btn" title="Obaveštenja">
+          🔔
+          <span class="notif-badge hidden" id="notif-badge">0</span>
+        </button>
+        <div class="notif-dropdown hidden" id="notif-dropdown">
+          <div class="notif-dropdown-header" id="notif-dropdown-title">Obaveštenja</div>
+          <div class="notif-list" id="notif-list"></div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="theme-toggle">🌙</button>
+      <button class="btn btn-secondary btn-sm" id="logout-btn">Odjava</button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="main" id="main-content">
+    <!-- Injected by JS -->
+  </main>
+
+  <!-- Bottom tab bar (mobile) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <!-- Injected by JS -->
+  </nav>
+
+</div>
+
+<!-- ============================================================
+     TOAST STACK
+     ============================================================ -->
+<div id="toast-stack"></div>
+
+<!-- ============================================================
+     COMMAND PALETTE
+     ============================================================ -->
+<div id="cmd-palette-overlay" class="hidden">
+  <div class="cmd-palette">
+    <div class="cmd-input-wrap">
+      <span class="cmd-icon">🔍</span>
+      <input type="text" id="cmd-input" placeholder="Pretražite radnike ili navigirajte...">
+      <span style="font-size:.75rem;color:var(--text3)">ESC</span>
+    </div>
+    <div class="cmd-results" id="cmd-results"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     REJECT MODAL
+     ============================================================ -->
+<div id="reject-modal-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">Odbijanje zahteva</span>
+      <button class="modal-close" id="reject-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Razlog odbijanja</label>
+        <textarea id="reject-reason-input" placeholder="Unesite razlog odbijanja zahteva..." rows="4"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="reject-cancel-btn">Otkaži</button>
+      <button class="btn btn-danger" id="reject-confirm-btn">Odbij zahtev</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     CLOSE SICK LEAVE MODAL (mark last day of ongoing "Bolovanje")
+     ============================================================ -->
+<div id="close-sick-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-title">🩹 Zatvori bolovanje</span>
+      <button class="modal-close" id="close-sick-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Poslednji dan bolovanja</label>
+        <input type="date" id="close-sick-date">
+      </div>
+      <div id="close-sick-info" class="text-sm text-muted"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="close-sick-cancel-btn">Otkaži</button>
+      <button class="btn btn-primary" id="close-sick-confirm-btn">Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     YEAR PICKER
+     ============================================================ -->
+<!-- Quick-add leave modal (employee calendar) -->
+<div id="quick-leave-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <div class="modal-title">📅 Dodaj zahtev za odsustvo</div>
+      <button class="modal-close" id="quick-leave-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tip odsustva *</label>
+        <select id="ql-type">
+          <option>Godišnji odmor</option>
+          <option>Bolovanje</option>
+          <option>Bolovanje (do 2 dana)</option>
+          <option>Slobodan dan</option>
+          <option>Plaćeno odsustvo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Datum od *</label>
+          <input type="date" id="ql-start">
+        </div>
+        <div class="form-group">
+          <label id="ql-end-label">Datum do *</label>
+          <input type="date" id="ql-end">
+        </div>
+      </div>
+      <div id="ql-sick-hint" class="hidden" style="font-size:.8125rem;color:var(--text2);margin:-.75rem 0 .75rem;padding:.5rem .75rem;background:var(--warning-light);border-radius:var(--radius-sm)">
+        ℹ️ Ostavite "Datum do" prazno ako bolovanje još traje. Poslednji dan ćete moći da označite kasnije.
+      </div>
+      <div id="ql-days-info" style="font-size:.875rem;color:var(--text2);margin-bottom:.75rem"></div>
+      <div class="form-group">
+        <label>Napomena</label>
+        <textarea id="ql-note" placeholder="Opciono..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="ql-cancel">Otkaži</button>
+      <button class="btn btn-primary" id="ql-submit">📤 Podnesi zahtev</button>
+    </div>
+  </div>
+</div>
+
+<div id="year-picker-overlay" class="year-picker-overlay hidden">
+  <div class="year-picker">
+    <h3>Izaberite godinu</h3>
+    <div class="year-grid" id="year-grid"></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FIREBASE SDK (compat build – matches the ref()/.on('value') style
+     used by cloudPush/cloudListen below). Safe to load even before
+     FIREBASE_CONFIG is filled in — everything stays inert until then.
+     ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ================================================================
+   FIREBASE CONFIG — zameni ovim placeholder vrednostima svoj pravi
+   config iz Firebase Console (Project settings → Your apps → Web).
+   Dok su ovo placeholder vrednosti, app radi u čisto lokalnom
+   (localStorage-only) režimu — pogledaj README.md za podešavanje.
+   ================================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBJeQmJIs3M2rIiBV3_Llm1S1nld-JM2DQ",
+  authDomain: "odmorpro.firebaseapp.com",
+  databaseURL: "https://odmorpro-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "odmorpro",
+  storageBucket: "odmorpro.firebasestorage.app",
+  messagingSenderId: "962274205149",
+  appId: "1:962274205149:web:6ae91809721b0484deaa34"
+};
+
+const FIREBASE_ENABLED = FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
+let firebaseDB = null;
+let firebaseAuth = null;
+if (FIREBASE_ENABLED) {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  firebaseDB = firebase.database();
+  firebaseAuth = firebase.auth();
+}
+
+// Creates a Firebase Auth account for someone else (e.g. admin adding an
+// employee) without disturbing the currently signed-in session. Firebase's
+// client SDK auto-signs-in whatever account you just created on the auth
+// instance you called it from, so this runs on a throwaway secondary app
+// instance instead of the main `firebaseAuth`.
+async function createAuthAccountFor(email, password) {
+  const secondaryApp = firebase.initializeApp(FIREBASE_CONFIG, 'Secondary-' + Date.now());
+  try {
+    const cred = await secondaryApp.auth().createUserWithEmailAndPassword(email, password);
+    return cred.user.uid;
+  } finally {
+    await secondaryApp.delete();
+  }
+}
+
+/* ================================================================
+   STATE
+   ================================================================ */
+let currentUser = null;
+let currentPage = 'dashboard';
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let rejectCallback = null;
+let cmdSelectedIndex = -1;
+let cmdResults = [];
+
+/* ================================================================
+   DATA HELPERS
+   ================================================================ */
+function getEmployees() {
+  return JSON.parse(localStorage.getItem('employees') || '[]').filter(e => e && e.name);
+}
+
+function saveEmployees(arr) {
+  localStorage.setItem('employees', JSON.stringify(arr));
+  if (firebaseDB) cloudPush('employees', arr);
+}
+
+function getUsers() {
+  const stored = localStorage.getItem('users');
+  let users = (stored ? JSON.parse(stored) : []).filter(u => u && u.email);
+  // Local-only fallback mode (no Firebase configured): self-heal a demo
+  // admin/admin123 account so the app is still usable without setup.
+  // In Firebase mode, admin status comes from real Auth + the first
+  // person to register — never injected here.
+  if (!FIREBASE_ENABLED && !users.some(u => u.role === 'admin')) {
+    users.push({ id: 'u1', email: 'admin', password: 'admin123', role: 'admin', name: 'Administrator', employeeId: null });
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+  return users;
+}
+
+function saveUsers(arr) {
+  localStorage.setItem('users', JSON.stringify(arr));
+  if (firebaseDB) cloudPush('users', arr);
+}
+
+function cloudPush(key, data) {
+  if (!firebaseDB) return;
+  firebaseDB.ref(key).set(data).catch(console.error);
+}
+
+function cloudListen(key, cb) {
+  if (!firebaseDB) return;
+  firebaseDB.ref(key).on('value', snap => cb(snap.val() || []));
+}
+
+/* ================================================================
+   SEED DATA
+   ================================================================ */
+function seedData() {
+  // Demo/seed data only makes sense in local-only fallback mode — in
+  // Firebase mode this would push fake employees into the real shared
+  // company database, so real usage starts empty until people register.
+  if (FIREBASE_ENABLED) return;
+  if (getEmployees().length) return;
+  const types = ['Godišnji odmor', 'Bolovanje', 'Slobodan dan', 'Plaćeno odsustvo'];
+  const depts = ['Razvoj', 'Marketing', 'Prodaja', 'HR', 'Finansije'];
+  const names = [
+    'Marko Nikolić', 'Ana Petrović', 'Stefan Jovanović',
+    'Jelena Đorđević', 'Miloš Stojanović', 'Ivana Lazović'
+  ];
+  const employees = names.map((name, i) => ({
+    id: 'e' + (i + 1),
+    name,
+    email: name.toLowerCase().replace(' ', '.') + '@firma.rs',
+    position: ['Senior Dev', 'Marketing Manager', 'Sales Lead', 'HR Specialist', 'CFO', 'Dev Lead'][i],
+    department: depts[i % depts.length],
+    startDate: `202${i % 4 + 1}-0${i + 1}-15`,
+    annualLeave: 20,
+    usedLeave: Math.floor(Math.random() * 15),
+    freeDaysAllowance: 3,
+    usedFreeDays: 0,
+    lastRolloverYear: new Date().getFullYear(),
+    notifications: [],
+    leave_requests: [],
+    leave_history: []
+  }));
+  saveEmployees(employees);
+
+  // Add user accounts for employees
+  const users = getUsers();
+  employees.forEach(e => {
+    if (!users.find(u => u.email === e.email)) {
+      users.push({ id: 'u' + e.id, email: e.email, password: 'emp123', role: 'employee', name: e.name, employeeId: e.id });
+    }
+  });
+  saveUsers(users);
+}
+
+/* ================================================================
+   AUTH
+   ================================================================ */
+// Local-only fallback mode (no Firebase configured): plaintext password
+// match against the users array, same as before.
+function login(identifier, password) {
+  const users = getUsers();
+  const id = identifier.trim().toLowerCase();
+  return users.find(u =>
+    ((u.email && u.email.toLowerCase() === id) || (u.name && u.name.toLowerCase() === id)) &&
+    u.password === password
+  ) || null;
+}
+
+function logout() {
+  if (firebaseAuth) firebaseAuth.signOut();
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('register-screen').style.display = 'none';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// Firebase Auth error codes -> Serbian messages for the login/register forms.
+function authErrorSr(err) {
+  const map = {
+    'auth/invalid-email': 'Neispravna email adresa.',
+    'auth/user-disabled': 'Nalog je onemogućen.',
+    'auth/user-not-found': 'Pogrešan email ili lozinka.',
+    'auth/wrong-password': 'Pogrešan email ili lozinka.',
+    'auth/invalid-credential': 'Pogrešan email ili lozinka.',
+    'auth/email-already-in-use': 'Nalog sa ovim email-om već postoji.',
+    'auth/weak-password': 'Lozinka mora imati najmanje 6 karaktera.',
+    'auth/network-request-failed': 'Greška u mreži. Proverite internet konekciju.',
+    'auth/too-many-requests': 'Previše pokušaja. Pokušajte kasnije.'
+  };
+  return map[err && err.code] || 'Došlo je do greške. Pokušajte ponovo.';
+}
+
+/* ================================================================
+   AVATAR COLORS
+   ================================================================ */
+const AVATAR_COLORS = [
+  '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b',
+  '#10b981', '#ef4444', '#06b6d4', '#84cc16'
+];
+
+function nameHash(name) {
+  return name.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 0);
+}
+
+function avatarColor(name) {
+  return AVATAR_COLORS[Math.abs(nameHash(name)) % AVATAR_COLORS.length];
+}
+
+function avatarInitials(name) {
+  const parts = name.trim().split(' ');
+  return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+function makeAvatar(name, size = '') {
+  const color = avatarColor(name);
+  const initials = avatarInitials(name);
+  return `<div class="avatar ${size}" style="background:${color}">${initials}</div>`;
+}
+
+/* ================================================================
+   ANIMATED COUNTER
+   ================================================================ */
+function animateCounter(el, target, duration = 600) {
+  const start = performance.now();
+  const startVal = 0;
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(startVal + (target - startVal) * ease);
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+/* ================================================================
+   RIPPLE EFFECT
+   ================================================================ */
+function addRipple(e) {
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const r = document.createElement('span');
+  const size = Math.max(rect.width, rect.height);
+  r.className = 'ripple';
+  r.style.width = r.style.height = size + 'px';
+  r.style.left = (e.clientX - rect.left - size / 2) + 'px';
+  r.style.top = (e.clientY - rect.top - size / 2) + 'px';
+  btn.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+}
+
+function applyRipple() {
+  document.querySelectorAll('.btn-primary').forEach(btn => {
+    btn.removeEventListener('click', addRipple);
+    btn.addEventListener('click', addRipple);
+  });
+}
+
+/* ================================================================
+   TOAST NOTIFICATIONS
+   ================================================================ */
+function toast(msg, type = 'info', duration = 3500) {
+  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-icon">${icons[type]}</span><span class="toast-msg">${msg}</span>`;
+  stack.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('removing');
+    t.addEventListener('animationend', () => t.remove());
+  }, duration);
+}
+
+/* ================================================================
+   REJECT MODAL
+   ================================================================ */
+function openRejectModal(cb) {
+  rejectCallback = cb;
+  document.getElementById('reject-reason-input').value = '';
+  document.getElementById('reject-modal-overlay').classList.remove('hidden');
+  document.getElementById('reject-reason-input').focus();
+}
+
+function closeRejectModal() {
+  document.getElementById('reject-modal-overlay').classList.add('hidden');
+  rejectCallback = null;
+}
+
+document.getElementById('reject-modal-close').onclick = closeRejectModal;
+document.getElementById('reject-cancel-btn').onclick = closeRejectModal;
+document.getElementById('reject-confirm-btn').onclick = () => {
+  const reason = document.getElementById('reject-reason-input').value.trim();
+  if (!reason) { toast('Unesite razlog odbijanja', 'warning'); return; }
+  if (rejectCallback) rejectCallback(reason);
+  closeRejectModal();
+};
+
+/* ================================================================
+   CLOSE SICK LEAVE MODAL
+   ================================================================ */
+let closeSickTarget = null;
+
+function openCloseSickModal(empId, reqId) {
+  const emp = getEmployees().find(e => e.id === empId);
+  if (!emp) return;
+  const req = [...(emp.leave_requests||[]), ...(emp.leave_history||[])].find(r => r.id === reqId);
+  if (!req) return;
+  closeSickTarget = { empId, reqId };
+  const dateInput = document.getElementById('close-sick-date');
+  dateInput.value = new Date().toISOString().split('T')[0];
+  dateInput.min = req.startDate;
+  document.getElementById('close-sick-info').textContent = `Bolovanje počelo: ${req.startDate}`;
+  document.getElementById('close-sick-overlay').classList.remove('hidden');
+}
+
+function closeCloseSickModal() {
+  document.getElementById('close-sick-overlay').classList.add('hidden');
+  closeSickTarget = null;
+}
+
+document.getElementById('close-sick-modal-close').onclick = closeCloseSickModal;
+document.getElementById('close-sick-cancel-btn').onclick = closeCloseSickModal;
+document.getElementById('close-sick-overlay').addEventListener('click', e => {
+  if (e.target.id === 'close-sick-overlay') closeCloseSickModal();
+});
+
+document.getElementById('close-sick-confirm-btn').onclick = () => {
+  if (!closeSickTarget) return;
+  const end = document.getElementById('close-sick-date').value;
+  if (!end) { toast('Izaberite datum', 'warning'); return; }
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === closeSickTarget.empId);
+  if (!emp) return;
+  const req = [...(emp.leave_requests||[]), ...(emp.leave_history||[])].find(r => r.id === closeSickTarget.reqId);
+  if (!req) return;
+  if (new Date(end) < new Date(req.startDate)) {
+    toast('Datum ne može biti pre početka bolovanja', 'error'); return;
+  }
+  req.endDate = end;
+  req.days = Math.round((new Date(end) - new Date(req.startDate)) / 86400000) + 1;
+  req.ongoing = false;
+  saveEmployees(emps);
+  toast('Bolovanje je zatvoreno', 'success');
+  closeCloseSickModal();
+  renderSidebar();
+  renderPage();
+};
+
+/* ================================================================
+   PROGRESS RING
+   ================================================================ */
+function progressRing(used, total, color = '#3b82f6', size = 56) {
+  const r = (size - 8) / 2;
+  const circ = 2 * Math.PI * r;
+  const pct = total > 0 ? Math.min(used / total, 1) : 0;
+  const offset = circ * (1 - pct);
+  return `
+    <div class="progress-ring-wrap">
+      <svg width="${size}" height="${size}" class="progress-ring">
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none"
+          stroke="var(--border)" stroke-width="6"/>
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none"
+          stroke="${color}" stroke-width="6"
+          stroke-dasharray="${circ.toFixed(2)}"
+          stroke-dashoffset="${offset.toFixed(2)}"
+          stroke-linecap="round"/>
+      </svg>
+      <div class="progress-ring-value">${used}/${total}</div>
+      <div class="progress-ring-label">dana</div>
+    </div>`;
+}
+
+/* ================================================================
+   SIDEBAR & NAVIGATION
+   ================================================================ */
+const ADMIN_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊', section: null },
+  { id: 'employees', label: 'Radnici', icon: '👥', section: 'Upravljanje' },
+  { id: 'add-employee', label: 'Dodaj radnika', icon: '➕', section: null },
+  { id: 'requests', label: 'Zahtevi', icon: '📋', section: null, badge: true },
+  { id: 'history', label: 'Istorija', icon: '📁', section: null },
+  { id: 'reports', label: 'Izveštaji', icon: '📈', section: 'Analitika' },
+  { id: 'settings', label: 'Podešavanja', icon: '⚙️', section: null }
+];
+
+const EMPLOYEE_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊', section: null },
+  { id: 'my-calendar', label: 'Kalendar', icon: '📅', section: 'Odsustvo' },
+  { id: 'my-request', label: 'Podnesi zahtev', icon: '📝', section: null },
+  { id: 'my-profile', label: 'Moj profil', icon: '👤', section: null }
+];
+
+// An admin who is also an employee of the company (has their own employee
+// profile) gets the admin menu PLUS their personal pages, so they can
+// manage the company and track/request their own leave from one account.
+function navItemsFor(user) {
+  if (user.role !== 'admin') return EMPLOYEE_NAV;
+  if (!user.employeeId) return ADMIN_NAV;
+  return ADMIN_NAV.concat([
+    { id: 'my-calendar', label: 'Moj kalendar', icon: '📅', section: 'Moje odsustvo' },
+    { id: 'my-request', label: 'Podnesi zahtev', icon: '📝', section: null },
+    { id: 'my-profile', label: 'Moj profil', icon: '👤', section: null }
+  ]);
+}
+
+function pendingCount() {
+  return getEmployees().reduce((sum, e) => sum + (e.leave_requests || []).filter(r => r.status === 'pending').length, 0);
+}
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  const items = navItemsFor(currentUser);
+  const pending = pendingCount();
+  let lastSection = null;
+  let html = '';
+  items.forEach(item => {
+    if (item.section && item.section !== lastSection) {
+      html += `<div class="nav-section-label">${item.section}</div>`;
+      lastSection = item.section;
+    }
+    const isActive = currentPage === item.id;
+    const badge = item.badge && pending > 0
+      ? `<span class="badge-count">${pending}</span>` : '';
+    html += `<button class="nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}">
+      <span class="nav-icon">${item.icon}</span>
+      ${item.label}
+      ${badge}
+    </button>`;
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigateTo(btn.dataset.page);
+      closeMobileMenu();
+    });
+  });
+
+  // Sidebar user info
+  const name = currentUser.name || 'Korisnik';
+  const avEl = document.getElementById('sidebar-avatar');
+  const color = avatarColor(name);
+  avEl.style.background = color;
+  avEl.textContent = avatarInitials(name);
+  document.getElementById('sidebar-user-name').textContent = name;
+  document.getElementById('sidebar-user-role').textContent = currentUser.role === 'admin' ? 'Administrator' : 'Radnik';
+
+  renderBottomNav();
+  renderNotifBell();
+}
+
+/* ================================================================
+   BOTTOM TAB BAR (mobile)
+   ================================================================ */
+function renderBottomNav() {
+  const bn = document.getElementById('bottom-nav');
+  if (!bn) return;
+  const items = navItemsFor(currentUser);
+  const primary = items.slice(0, 4);
+  const pending = pendingCount();
+
+  let html = primary.map(item => {
+    const isActive = currentPage === item.id;
+    const badge = item.badge && pending > 0 ? `<span class="bn-badge">${pending}</span>` : '';
+    return `<button class="bottom-nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}">
+      <span class="bn-icon">${item.icon}</span>
+      ${item.label}
+      ${badge}
+    </button>`;
+  }).join('');
+
+  html += `<button class="bottom-nav-btn" id="bottom-nav-more">
+    <span class="bn-icon">☰</span>
+    Meni
+  </button>`;
+
+  bn.innerHTML = html;
+  bn.querySelectorAll('.bottom-nav-btn[data-page]').forEach(btn => {
+    btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+  });
+  document.getElementById('bottom-nav-more').addEventListener('click', toggleMobileMenu);
+}
+
+function navigateTo(page) {
+  currentPage = page;
+  renderSidebar();
+  renderPage();
+}
+
+/* ================================================================
+   NOTIFICATION BELL
+   ================================================================ */
+function renderNotifBell() {
+  const badge = document.getElementById('notif-badge');
+  const list = document.getElementById('notif-list');
+  const title = document.getElementById('notif-dropdown-title');
+  if (!badge || !list || !currentUser) return;
+
+  if (currentUser.role === 'admin') {
+    title.textContent = 'Zahtevi na čekanju';
+    const emps = getEmployees();
+    const items = [];
+    emps.forEach(e => (e.leave_requests||[]).filter(r => r.status === 'pending').forEach(r => items.push({ emp: e, req: r })));
+    items.sort((a, b) => new Date(b.req.submittedAt) - new Date(a.req.submittedAt));
+
+    if (items.length) {
+      badge.textContent = items.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+
+    list.innerHTML = items.length ? items.map(({ emp, req }) => `
+      <button class="notif-item unread" onclick="closeNotifDropdown(); navigateTo('requests');">
+        <div class="notif-item-icon">⏳</div>
+        <div class="notif-item-body">
+          <div class="notif-item-title">${emp.name} — ${req.leaveType}</div>
+          <div class="notif-item-sub">${req.startDate}${req.ongoing ? ' (u toku)' : ' → ' + req.endDate} · ${timeAgo(req.submittedAt)}</div>
+        </div>
+      </button>`).join('') : `<div class="notif-empty">🎉 Nema zahteva na čekanju</div>`;
+  } else {
+    title.textContent = 'Obaveštenja';
+    const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+    const notifs = (emp && emp.notifications) || [];
+    const unread = notifs.filter(n => !n.read).length;
+
+    if (unread) {
+      badge.textContent = unread;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+
+    list.innerHTML = notifs.length ? notifs.map(n => `
+      <div class="notif-item ${n.read ? '' : 'unread'}">
+        <div class="notif-item-icon">🔔</div>
+        <div class="notif-item-body">
+          <div class="notif-item-title">${n.message}</div>
+          <div class="notif-item-sub">${timeAgo(n.createdAt)}</div>
+        </div>
+      </div>`).join('') : `<div class="notif-empty">Nema obaveštenja</div>`;
+  }
+}
+
+function toggleNotifDropdown(e) {
+  if (e) e.stopPropagation();
+  const dd = document.getElementById('notif-dropdown');
+  const willOpen = dd.classList.contains('hidden');
+  dd.classList.toggle('hidden');
+  if (willOpen && currentUser && currentUser.role !== 'admin') {
+    const emps = getEmployees();
+    const emp = emps.find(x => x.id === currentUser.employeeId);
+    if (emp && emp.notifications && emp.notifications.some(n => !n.read)) {
+      emp.notifications.forEach(n => { n.read = true; });
+      saveEmployees(emps);
+    }
+    renderNotifBell();
+  }
+}
+
+function closeNotifDropdown() {
+  const dd = document.getElementById('notif-dropdown');
+  if (dd) dd.classList.add('hidden');
+}
+
+document.getElementById('notif-bell-btn').addEventListener('click', toggleNotifDropdown);
+document.addEventListener('click', (e) => {
+  const wrap = document.querySelector('.notif-wrap');
+  if (wrap && !wrap.contains(e.target)) closeNotifDropdown();
+});
+
+/* ================================================================
+   MOBILE MENU
+   ================================================================ */
+document.getElementById('hamburger-btn').addEventListener('click', toggleMobileMenu);
+document.getElementById('sidebar-overlay').addEventListener('click', closeMobileMenu);
+
+function toggleMobileMenu() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('show');
+}
+
+function closeMobileMenu() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+/* ================================================================
+   THEME
+   ================================================================ */
+function initTheme() {
+  const saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+}
+
+document.getElementById('theme-toggle').addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  document.getElementById('theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+/* ================================================================
+   RENDER PAGE (router)
+   ================================================================ */
+const PAGE_TITLES = {
+  'dashboard': 'Dashboard',
+  'employees': 'Radnici',
+  'add-employee': 'Dodaj radnika',
+  'requests': 'Zahtevi za odsustvo',
+  'history': 'Istorija odsustva',
+  'reports': 'Izveštaji',
+  'settings': 'Podešavanja',
+  'my-calendar': 'Moj kalendar',
+  'my-request': 'Podnesi zahtev',
+  'my-profile': 'Moj profil',
+  'employee-detail': 'Detalji radnika'
+};
+
+function renderPage() {
+  const main = document.getElementById('main-content');
+  document.getElementById('header-title').textContent = PAGE_TITLES[currentPage] || 'OdmorPro';
+  main.innerHTML = '';
+  switch (currentPage) {
+    case 'dashboard': renderDashboard(); break;
+    case 'employees': renderEmployees(); break;
+    case 'add-employee': renderAddEmployee(); break;
+    case 'requests': renderRequests(); break;
+    case 'history': renderHistory(); break;
+    case 'reports': renderReports(); break;
+    case 'settings': renderSettings(); break;
+    case 'my-calendar': renderMyCalendar(); break;
+    case 'my-request': renderMyRequest(); break;
+    case 'my-profile': renderMyProfile(); break;
+    case 'employee-detail': renderEmployeeDetail(main._empId); break;
+    default: renderDashboard();
+  }
+  applyRipple();
+}
+
+/* ================================================================
+   DASHBOARD
+   ================================================================ */
+function renderDashboard() {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const pending = emps.reduce((s, e) => s + (e.leave_requests||[]).filter(r=>r.status==='pending').length, 0);
+  const approved = emps.reduce((s, e) => s + (e.leave_history||[]).filter(r=>r.status==='approved').length, 0);
+  const onLeave = emps.filter(e => isOnLeaveToday(e)).length;
+  const totalUsed = emps.reduce((s, e) => s + (e.usedLeave||0), 0);
+
+  if (currentUser.role === 'admin') {
+    const sickDaysTotal = emps.reduce((s, e) => s + computeSickDaysTotal(e), 0);
+    const sickShortTotal = emps.reduce((s, e) => s + computeSickShortCount(e), 0);
+
+    main.innerHTML = `
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dobrodošli, ${currentUser.name.split(' ')[0]}! 👋</div>
+          <div class="page-subtitle">${formatDate(new Date())} · Pregled sistema</div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" data-counter="${emps.length}">0</div>
+          <div class="stat-label">Ukupno radnika</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" data-counter="${pending}">0</div>
+          <div class="stat-label">Na čekanju</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" data-counter="${approved}">0</div>
+          <div class="stat-label">Odobreno ukupno</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">🏖️</div>
+          <div class="stat-value" data-counter="${onLeave}">0</div>
+          <div class="stat-label">Danas na odmoru</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🩹</div>
+          <div class="stat-value" data-counter="${sickDaysTotal}">0</div>
+          <div class="stat-label">Bolovanje (dana ukupno)</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🤒</div>
+          <div class="stat-value" data-counter="${sickShortTotal}">0</div>
+          <div class="stat-label">Bolovanje do 2 dana (broj)</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem">
+        <div class="card-header">
+          <div class="card-title">📅 Kalendar odsustva</div>
+          <div style="margin-left:auto;display:flex;gap:.5rem">
+            <button class="btn btn-secondary btn-sm" id="cal-today">Danas</button>
+            <button class="btn btn-secondary btn-sm" id="cal-prev">◀</button>
+            <button class="btn btn-secondary btn-sm" id="cal-next">▶</button>
+          </div>
+        </div>
+        <div class="card-body" style="padding-top:.5rem">
+          <div class="calendar-nav">
+            <span class="calendar-month-label" id="cal-month-label"></span>
+          </div>
+          <div class="calendar-grid" id="cal-grid"></div>
+        </div>
+      </div>`;
+
+    // Animate counters
+    document.querySelectorAll('[data-counter]').forEach(el => {
+      animateCounter(el, parseInt(el.dataset.counter));
+    });
+
+    renderCalendar();
+
+    document.getElementById('cal-prev').onclick = () => {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      renderCalendar();
+    };
+    document.getElementById('cal-next').onclick = () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      renderCalendar();
+    };
+    document.getElementById('cal-today').onclick = () => {
+      currentMonth = new Date().getMonth();
+      currentYear = new Date().getFullYear();
+      renderCalendar();
+    };
+    document.getElementById('cal-month-label').onclick = openYearPicker;
+
+  } else {
+    // Employee dashboard
+    const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+    if (!emp) { main.innerHTML = '<p>Greška: radnik nije pronađen.</p>'; return; }
+    const remaining = (emp.annualLeave || 20) - (emp.usedLeave || 0);
+    const myPending = (emp.leave_requests||[]).filter(r=>r.status==='pending').length;
+    const freeRemaining = freeDaysRemaining(emp);
+    const sickDaysTotal = computeSickDaysTotal(emp);
+    const sickShortCount = computeSickShortCount(emp);
+
+    main.innerHTML = `
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dobrodošli, ${emp.name.split(' ')[0]}! 👋</div>
+          <div class="page-subtitle">${formatDate(new Date())} · Vaš odmor</div>
+        </div>
+      </div>
+      ${remaining < 5 ? `<div class="leave-warning">⚠️ Upozorenje: Imate samo <strong>${remaining} dana</strong> godišnjeg odmora!</div>` : ''}
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value" data-counter="${remaining}">0</div>
+          <div class="stat-label">Preostalo godišnjeg odmora</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">🗓️</div>
+          <div class="stat-value" data-counter="${freeRemaining}">0</div>
+          <div class="stat-label">Preostalo slobodnih dana</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" data-counter="${myPending}">0</div>
+          <div class="stat-label">Na čekanju</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🩹</div>
+          <div class="stat-value" data-counter="${sickDaysTotal}">0</div>
+          <div class="stat-label">Bolovanje (dana ukupno)</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🤒</div>
+          <div class="stat-value" data-counter="${sickShortCount}">0</div>
+          <div class="stat-label">Bolovanje do 2 dana (broj)</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Skorašnji zahtevi</div></div>
+        <div class="card-body" style="padding:0">
+          ${renderRequestsTable([...(emp.leave_requests||[]), ...(emp.leave_history||[])].slice(-5), emp.id)}
+        </div>
+      </div>`;
+
+    document.querySelectorAll('[data-counter]').forEach(el => {
+      animateCounter(el, parseInt(el.dataset.counter));
+    });
+  }
+}
+
+function isOnLeaveToday(emp) {
+  const today = new Date().toISOString().split('T')[0];
+  const covers = r => r.status === 'approved' && r.startDate <= today && (r.ongoing || r.endDate >= today);
+  return (emp.leave_history||[]).some(covers) || (emp.leave_requests||[]).some(covers);
+}
+
+/* ================================================================
+   SICK LEAVE / FREE DAYS / NOTIFICATIONS
+   ================================================================ */
+function todayDateOnly() {
+  return new Date(new Date().toISOString().split('T')[0]);
+}
+
+function computeSickDaysTotal(emp) {
+  const all = [...(emp.leave_history||[]), ...(emp.leave_requests||[])];
+  let total = 0;
+  all.forEach(r => {
+    if (r.leaveType !== 'Bolovanje' || r.status === 'rejected') return;
+    if (r.ongoing) {
+      total += Math.max(1, Math.round((todayDateOnly() - new Date(r.startDate)) / 86400000) + 1);
+    } else {
+      total += r.days || 0;
+    }
+  });
+  return total;
+}
+
+function computeSickShortCount(emp) {
+  const all = [...(emp.leave_history||[]), ...(emp.leave_requests||[])];
+  return all.filter(r => r.leaveType === 'Bolovanje (do 2 dana)' && r.status !== 'rejected').length;
+}
+
+function freeDaysAllowance(emp) { return emp.freeDaysAllowance ?? 3; }
+function freeDaysRemaining(emp) { return freeDaysAllowance(emp) - (emp.usedFreeDays || 0); }
+
+// Runs on every app start. For each employee, catches up any New Year's
+// (Jan 1st) rollovers they missed since the app was last opened:
+//   - Godišnji odmor: neiskorišćeni dani iz prethodne godine se PRENOSE
+//     (annualLeave postaje ostatak + 20 novih dana, usedLeave se resetuje).
+//   - Slobodni dani: NE prenose se — svake godine se vraća na podrazumevani
+//     broj (3), bez obzira koliko je ostalo.
+// The `while` loop handles employees who haven't opened the app in more
+// than one calendar year (catches up multiple years at once, one at a time).
+function applyYearRollover() {
+  const year = new Date().getFullYear();
+  const emps = getEmployees();
+  let changed = false;
+  emps.forEach(emp => {
+    if (emp.lastRolloverYear === undefined) {
+      // Existing employee predating this feature — start tracking from
+      // this year without retroactively rolling over past years.
+      emp.lastRolloverYear = year;
+      changed = true;
+      return;
+    }
+    while (emp.lastRolloverYear < year) {
+      const remainingAnnual = Math.max(0, (emp.annualLeave || 0) - (emp.usedLeave || 0));
+      emp.annualLeave = remainingAnnual + 20;
+      emp.usedLeave = 0;
+      emp.freeDaysAllowance = 3;
+      emp.usedFreeDays = 0;
+      emp.lastRolloverYear++;
+      changed = true;
+    }
+  });
+  if (changed) saveEmployees(emps);
+}
+
+function addNotification(emp, message) {
+  emp.notifications = emp.notifications || [];
+  emp.notifications.unshift({
+    id: 'n' + Date.now() + Math.random().toString(36).slice(2, 6),
+    message,
+    read: false,
+    createdAt: new Date().toISOString()
+  });
+}
+
+function timeAgo(iso) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return 'upravo sada';
+  if (min < 60) return `pre ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `pre ${h} h`;
+  const d = Math.floor(h / 24);
+  return `pre ${d} d`;
+}
+
+/* ================================================================
+   CALENDAR
+   ================================================================ */
+const MONTHS_SR = ['Januar','Februar','Mart','April','Maj','Jun','Jul','Avgust','Septembar','Oktobar','Novembar','Decembar'];
+const DAYS_SR = ['Pon','Uto','Sre','Čet','Pet','Sub','Ned'];
+
+const LEAVE_COLORS = {
+  'Godišnji odmor': { bg: '#dbeafe', text: '#1d4ed8' },
+  'Bolovanje': { bg: '#fee2e2', text: '#b91c1c' },
+  'Bolovanje (do 2 dana)': { bg: '#fed7aa', text: '#9a3412' },
+  'Slobodan dan': { bg: '#fef3c7', text: '#92400e' },
+  'Plaćeno odsustvo': { bg: '#d1fae5', text: '#065f46' }
+};
+
+function renderCalendar() {
+  const label = document.getElementById('cal-month-label');
+  const grid = document.getElementById('cal-grid');
+  if (!label || !grid) return;
+  label.textContent = `${MONTHS_SR[currentMonth]} ${currentYear}`;
+
+  // Headers (Mon–Sun)
+  let html = DAYS_SR.map((d, i) =>
+    `<div class="cal-header ${i >= 5 ? 'weekend' : ''}">${d}</div>`
+  ).join('');
+
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  // Convert Sunday=0 to Mon-first: Mon=0 ... Sun=6
+  let startDow = (firstDay.getDay() + 6) % 7;
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const prevDays = new Date(currentYear, currentMonth, 0).getDate();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const emps = getEmployees();
+
+  // Collect all leave events
+  const events = {};
+  emps.forEach(emp => {
+    const all = [...(emp.leave_requests||[]), ...(emp.leave_history||[])];
+    all.filter(r => r.status === 'approved').forEach(r => {
+      let d = new Date(r.startDate);
+      const end = r.ongoing ? todayDateOnly() : new Date(r.endDate);
+      while (d <= end) {
+        const key = d.toISOString().split('T')[0];
+        if (!events[key]) events[key] = [];
+        events[key].push({ name: emp.name, type: r.leaveType });
+        d.setDate(d.getDate() + 1);
+      }
+    });
+  });
+
+  // Prev month filler
+  for (let i = 0; i < startDow; i++) {
+    const dayNum = prevDays - startDow + 1 + i;
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${dayNum}</div></div>`;
+  }
+
+  // Current month days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const dow = (new Date(currentYear, currentMonth, day).getDay() + 6) % 7;
+    const isWeekend = dow >= 5;
+    const isToday = dateStr === todayStr;
+    const dayEvents = events[dateStr] || [];
+
+    let evHtml = dayEvents.slice(0, 2).map(ev => {
+      const c = LEAVE_COLORS[ev.type] || { bg: '#e0e7ff', text: '#3730a3' };
+      return `<div class="cal-event" style="background:${c.bg};color:${c.text}" title="${ev.name}">${ev.name.split(' ')[0]}</div>`;
+    }).join('');
+    if (dayEvents.length > 2) evHtml += `<div class="cal-event" style="background:var(--border);color:var(--text2)">+${dayEvents.length-2}</div>`;
+
+    html += `<div class="cal-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}">
+      <div class="cal-day-num">${day}</div>
+      ${evHtml}
+    </div>`;
+  }
+
+  // Fill remaining cells
+  const totalCells = startDow + daysInMonth;
+  const remaining = (7 - (totalCells % 7)) % 7;
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+/* ================================================================
+   YEAR PICKER
+   ================================================================ */
+function openYearPicker() {
+  const overlay = document.getElementById('year-picker-overlay');
+  const grid = document.getElementById('year-grid');
+  const yr = currentYear;
+  let html = '';
+  for (let y = yr - 4; y <= yr + 4; y++) {
+    html += `<button class="year-btn ${y === yr ? 'current-year' : ''}" data-year="${y}">${y}</button>`;
+  }
+  grid.innerHTML = html;
+  overlay.classList.remove('hidden');
+  grid.querySelectorAll('.year-btn').forEach(btn => {
+    btn.onclick = () => {
+      currentYear = parseInt(btn.dataset.year);
+      overlay.classList.add('hidden');
+      renderCalendar();
+    };
+  });
+}
+
+document.getElementById('year-picker-overlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.add('hidden');
+});
+
+/* ================================================================
+   EMPLOYEES LIST
+   ================================================================ */
+function renderEmployees() {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const depts = [...new Set(emps.map(e => e.department).filter(Boolean))].sort();
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Radnici</div>
+        <div class="page-subtitle">${emps.length} radnika ukupno</div>
+      </div>
+      <button class="btn btn-primary" onclick="navigateTo('add-employee')">➕ Dodaj radnika</button>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="emp-search" placeholder="🔍 Pretraži po imenu..." style="max-width:220px">
+      <select id="dept-filter">
+        <option value="">Svi sektori</option>
+        ${depts.map(d => `<option value="${d}">${d}</option>`).join('')}
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table id="emp-table" class="responsive-stack">
+          <thead>
+            <tr>
+              <th>Radnik</th>
+              <th>Sektor</th>
+              <th>Pozicija</th>
+              <th>Odmor</th>
+              <th>Status</th>
+              <th>Akcija</th>
+            </tr>
+          </thead>
+          <tbody id="emp-tbody"></tbody>
+        </table>
+      </div>
+    </div>`;
+
+  renderEmployeeTable(emps);
+
+  document.getElementById('emp-search').addEventListener('input', filterEmployees);
+  document.getElementById('dept-filter').addEventListener('change', filterEmployees);
+}
+
+function filterEmployees() {
+  const search = document.getElementById('emp-search').value.toLowerCase();
+  const dept = document.getElementById('dept-filter').value;
+  let emps = getEmployees();
+  if (search) emps = emps.filter(e => e.name.toLowerCase().includes(search) || e.email.toLowerCase().includes(search));
+  if (dept) emps = emps.filter(e => e.department === dept);
+  renderEmployeeTable(emps);
+}
+
+function renderEmployeeTable(emps) {
+  const tbody = document.getElementById('emp-tbody');
+  if (!tbody) return;
+  if (!emps.length) {
+    tbody.innerHTML = `<tr><td colspan="6">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-title">Nema rezultata</div>
+        <div class="empty-state-sub">Pokušajte drugi filter ili pretragu</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = emps.map(emp => {
+    const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+    const warnClass = remaining < 5 ? 'color:var(--danger);font-weight:700' : '';
+    const onLeave = isOnLeaveToday(emp);
+    return `<tr>
+      <td class="td-primary">
+        <div class="flex items-center gap-2">
+          ${makeAvatar(emp.name)}
+          <div>
+            <div style="font-weight:600">${emp.name}</div>
+            <div class="text-xs text-muted">${emp.email}</div>
+          </div>
+        </div>
+      </td>
+      <td data-label="Sektor">${emp.department || '—'}</td>
+      <td data-label="Pozicija">${emp.position || '—'}</td>
+      <td data-label="Odmor">
+        <span style="${warnClass}">${remaining}</span>
+        <span class="text-muted text-xs"> / ${emp.annualLeave||20}</span>
+      </td>
+      <td data-label="Status">${onLeave ? '<span class="badge badge-approved">🏖️ Na odmoru</span>' : '<span class="badge badge-info">🏢 Na poslu</span>'}</td>
+      <td class="td-actions">
+        <button class="btn btn-secondary btn-sm" onclick="showEmployeeDetail('${emp.id}')">Detalji</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')" style="margin-left:.25rem">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function deleteEmployee(id) {
+  if (!confirm('Obrisati radnika?')) return;
+  let emps = getEmployees().filter(e => e.id !== id);
+  saveEmployees(emps);
+  renderEmployees();
+  toast('Radnik obrisan', 'success');
+}
+
+function showEmployeeDetail(id) {
+  document.getElementById('main-content')._empId = id;
+  currentPage = 'employee-detail';
+  document.getElementById('header-title').textContent = 'Detalji radnika';
+  renderSidebar();
+  renderEmployeeDetail(id);
+}
+
+/* ================================================================
+   EMPLOYEE DETAIL
+   ================================================================ */
+function renderEmployeeDetail(id) {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === id);
+  if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
+  const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+  const allHistory = [...(emp.leave_history||[]), ...(emp.leave_requests||[])].sort((a,b) => new Date(b.startDate)-new Date(a.startDate));
+
+  const ringBlue = progressRing(emp.usedLeave||0, emp.annualLeave||20, '#3b82f6', 64);
+  const ringGreen = progressRing(remaining, emp.annualLeave||20, '#22c55e', 64);
+  const sickTotal = computeSickDaysTotal(emp);
+  const sickShort = computeSickShortCount(emp);
+  const freeRemaining = freeDaysRemaining(emp);
+
+  // Timeline
+  const timelineHtml = allHistory.length ? allHistory.map(r => `
+    <div class="timeline-item ${r.status}">
+      <div class="timeline-date">${r.startDate} → ${r.ongoing ? 'u toku' : r.endDate}</div>
+      <div class="timeline-title">${r.leaveType}</div>
+      <div class="timeline-sub">
+        ${r.ongoing ? 'bolovanje u toku' : `${r.days} dan(a)`} · <span class="badge badge-${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${statusSr(r.status)}</span>
+        ${r.reason ? ' · ' + r.reason : ''}
+        ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
+      </div>
+    </div>`).join('') :
+    `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema istorije</div></div>`;
+
+  main.innerHTML = `
+    <div class="page-header">
+      <button class="btn btn-secondary" onclick="navigateTo('employees')">← Nazad</button>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-body">
+        <div class="flex items-center gap-3" style="margin-bottom:1.5rem">
+          ${makeAvatar(emp.name, 'avatar-xl')}
+          <div>
+            <div style="font-size:1.5rem;font-weight:800;letter-spacing:-.3px">${emp.name}</div>
+            <div class="text-muted">${emp.position || ''} · ${emp.department || ''}</div>
+            <div class="text-xs text-muted">${emp.email}</div>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Datum zaposlenja</div>
+            <div class="detail-value">${emp.startDate || '—'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Godišnji odmor</div>
+            <div class="detail-value">${emp.annualLeave||20} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Iskorišćeno</div>
+            <div class="detail-value">${emp.usedLeave||0} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Preostalo</div>
+            <div class="detail-value" style="${remaining<5?'color:var(--danger)':'color:var(--success)'}">${remaining} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Preostalo slobodnih dana</div>
+            <div class="detail-value" style="${freeRemaining<=0?'color:var(--danger)':''}">${freeRemaining} / ${freeDaysAllowance(emp)}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Bolovanje (ukupno)</div>
+            <div class="detail-value">${sickTotal} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Bolovanje do 2 dana</div>
+            <div class="detail-value">${sickShort}×</div>
+          </div>
+        </div>
+        <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap">
+          ${ringBlue}${ringGreen}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📅 Istorija odsustva</div></div>
+      <div class="card-body">
+        <div class="timeline">${timelineHtml}</div>
+      </div>
+    </div>`;
+}
+
+/* ================================================================
+   ADD EMPLOYEE
+   ================================================================ */
+function renderAddEmployee() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Dodaj radnika</div>
+    </div>
+    <div class="card" style="max-width:600px">
+      <div class="card-body">
+        <form id="add-emp-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ime i prezime *</label>
+              <input type="text" id="emp-name" required placeholder="Marko Nikolić">
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="emp-email" required placeholder="marko@firma.rs">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pozicija</label>
+              <input type="text" id="emp-position" placeholder="Senior Developer">
+            </div>
+            <div class="form-group">
+              <label>Sektor</label>
+              <input type="text" id="emp-dept" placeholder="Razvoj">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum zaposlenja</label>
+              <input type="date" id="emp-start">
+            </div>
+            <div class="form-group">
+              <label>Godišnji odmor (dana)</label>
+              <input type="number" id="emp-annual" value="20" min="0" max="60">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Slobodni dani (dana)</label>
+              <input type="number" id="emp-free-days" value="3" min="0" max="30">
+            </div>
+            <div class="form-group">
+              <label>Lozinka za pristup</label>
+              <input type="text" id="emp-password" placeholder="emp123">
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;justify-content:flex-end">
+            <button type="button" class="btn btn-secondary" onclick="navigateTo('employees')">Otkaži</button>
+            <button type="submit" class="btn btn-primary">➕ Dodaj radnika</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  document.getElementById('add-emp-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('emp-name').value.trim();
+    const email = document.getElementById('emp-email').value.trim();
+    const emps = getEmployees();
+    if (emps.find(e => e.email === email)) { toast('Email već postoji', 'error'); return; }
+    const newEmp = {
+      id: 'e' + Date.now(),
+      name, email,
+      position: document.getElementById('emp-position').value.trim(),
+      department: document.getElementById('emp-dept').value.trim(),
+      startDate: document.getElementById('emp-start').value,
+      annualLeave: parseInt(document.getElementById('emp-annual').value) || 20,
+      usedLeave: 0,
+      freeDaysAllowance: parseInt(document.getElementById('emp-free-days').value) || 0,
+      usedFreeDays: 0,
+      lastRolloverYear: new Date().getFullYear(),
+      notifications: [],
+      leave_requests: [],
+      leave_history: []
+    };
+    const pwd = document.getElementById('emp-password').value.trim() || 'emp123';
+
+    if (FIREBASE_ENABLED) {
+      let uid;
+      try {
+        uid = await createAuthAccountFor(email, pwd);
+      } catch (ex) {
+        toast(authErrorSr(ex), 'error');
+        return;
+      }
+      emps.push(newEmp);
+      saveEmployees(emps);
+      const users = getUsers();
+      users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
+      saveUsers(users);
+      toast('Radnik uspešno dodat!', 'success');
+      navigateTo('employees');
+      return;
+    }
+
+    emps.push(newEmp);
+    saveEmployees(emps);
+
+    const users = getUsers();
+    users.push({ id: 'u' + newEmp.id, email: newEmp.email, password: pwd, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
+    saveUsers(users);
+
+    toast('Radnik uspešno dodat!', 'success');
+    navigateTo('employees');
+  };
+}
+
+/* ================================================================
+   LEAVE REQUESTS
+   ================================================================ */
+function renderRequests() {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const allRequests = [];
+  emps.forEach(e => {
+    (e.leave_requests||[]).filter(r=>r.status==='pending').forEach(r => {
+      allRequests.push({ emp: e, req: r });
+    });
+  });
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Zahtevi za odsustvo</div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        ${allRequests.length ? `<table class="responsive-stack">
+          <thead>
+            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Akcije</th></tr>
+          </thead>
+          <tbody>
+            ${allRequests.map(({emp, req}) => `
+              <tr>
+                <td class="td-primary">
+                  <div class="flex items-center gap-2">
+                    ${makeAvatar(emp.name)}
+                    <span style="font-weight:600">${emp.name}</span>
+                  </div>
+                </td>
+                <td data-label="Tip">${req.leaveType}</td>
+                <td data-label="Od">${req.startDate}</td>
+                <td data-label="Do">${req.ongoing ? 'u toku' : req.endDate}</td>
+                <td data-label="Dana">${req.ongoing ? '—' : req.days}</td>
+                <td data-label="Status"><span class="badge badge-pending">⏳ Na čekanju</span></td>
+                <td class="td-actions">
+                  <button class="btn btn-success btn-sm" onclick="approveRequest('${emp.id}','${req.id}')">✅ Odobri</button>
+                  <button class="btn btn-danger btn-sm" onclick="showRejectModal('${emp.id}','${req.id}')" style="margin-left:.25rem">❌ Odbij</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>` : `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎉</div>
+            <div class="empty-state-title">Nema zahteva na čekanju</div>
+            <div class="empty-state-sub">Svi zahtevi su obrađeni</div>
+          </div>`}
+      </div>
+    </div>`;
+}
+
+function approveRequest(empId, reqId) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return;
+  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
+  if (idx === -1) return;
+  const req = emp.leave_requests.splice(idx, 1)[0];
+  req.status = 'approved';
+  req.approvedAt = new Date().toISOString();
+  emp.leave_history = emp.leave_history || [];
+  emp.leave_history.push(req);
+
+  if (req.leaveType === 'Godišnji odmor') {
+    emp.usedLeave = (emp.usedLeave||0) + req.days;
+  } else if (req.leaveType === 'Slobodan dan') {
+    const allowance = freeDaysAllowance(emp);
+    const remainingFree = Math.max(allowance - (emp.usedFreeDays||0), 0);
+    if (req.days <= remainingFree) {
+      emp.usedFreeDays = (emp.usedFreeDays||0) + req.days;
+    } else {
+      const overflow = req.days - remainingFree;
+      emp.usedFreeDays = allowance;
+      emp.usedLeave = (emp.usedLeave||0) + overflow;
+      addNotification(emp, `Iskorišćeni su svi slobodni dani (${allowance}). ${overflow} dan(a) od zahteva ${req.startDate} → ${req.endDate} je preneto i oduzeto od godišnjeg odmora.`);
+    }
+  }
+  addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
+
+  saveEmployees(emps);
+  toast(`Zahtev odobren za ${emp.name}`, 'success');
+  renderRequests();
+  renderSidebar();
+}
+
+function showRejectModal(empId, reqId) {
+  openRejectModal((reason) => {
+    const emps = getEmployees();
+    const emp = emps.find(e => e.id === empId);
+    if (!emp) return;
+    const idx = emp.leave_requests.findIndex(r => r.id === reqId);
+    if (idx === -1) return;
+    const req = emp.leave_requests.splice(idx, 1)[0];
+    req.status = 'rejected';
+    req.rejectedAt = new Date().toISOString();
+    req.rejectionReason = reason;
+    emp.leave_history = emp.leave_history || [];
+    emp.leave_history.push(req);
+    addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}) je odbijen. Razlog: ${reason}`);
+    saveEmployees(emps);
+    toast(`Zahtev odbijen za ${emp.name}`, 'error');
+    renderRequests();
+    renderSidebar();
+  });
+}
+
+/* ================================================================
+   HISTORY
+   ================================================================ */
+function renderHistory() {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const allHistory = [];
+  emps.forEach(e => {
+    (e.leave_history||[]).forEach(r => allHistory.push({ emp: e, req: r }));
+  });
+  allHistory.sort((a,b) => new Date(b.req.startDate) - new Date(a.req.startDate));
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Istorija odsustva</div>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        ${allHistory.length ? `<table class="responsive-stack">
+          <thead>
+            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Razlog odbijanja</th></tr>
+          </thead>
+          <tbody>
+            ${allHistory.map(({emp, req}) => `
+              <tr>
+                <td class="td-primary">
+                  <div class="flex items-center gap-2">
+                    ${makeAvatar(emp.name)}
+                    <span style="font-weight:600">${emp.name}</span>
+                  </div>
+                </td>
+                <td data-label="Tip">${req.leaveType}</td>
+                <td data-label="Od">${req.startDate}</td>
+                <td data-label="Do">${req.ongoing ? 'u toku' : req.endDate}</td>
+                <td data-label="Dana">${req.ongoing ? '—' : req.days}</td>
+                <td data-label="Status"><span class="badge badge-${req.status==='approved'?'approved':'rejected'}">${statusSr(req.status)}</span></td>
+                <td class="text-sm text-muted" data-label="Razlog">${req.rejectionReason || (req.ongoing ? '🩹 bolovanje u toku' : '—')}</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>` : `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-title">Nema istorije</div>
+            <div class="empty-state-sub">Obrađeni zahtevi će se pojaviti ovde</div>
+          </div>`}
+      </div>
+    </div>`;
+}
+
+/* ================================================================
+   REPORTS
+   ================================================================ */
+function renderReports() {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Izveštaji</div>
+      <button class="btn btn-secondary" onclick="window.print()">🖨️ Štampaj</button>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">📊 Iskorišćenost odmora po radniku</div></div>
+      <div class="chart-container" id="chart-container"></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">📋 Tabela radnika</div></div>
+      <div class="table-wrap">
+        <table class="responsive-stack">
+          <thead>
+            <tr><th>Radnik</th><th>Sektor</th><th>Ukupno dana</th><th>Iskorišćeno</th><th>Preostalo</th><th>%</th></tr>
+          </thead>
+          <tbody>
+            ${emps.map(e => {
+              const rem = (e.annualLeave||20) - (e.usedLeave||0);
+              const pct = Math.round(((e.usedLeave||0) / (e.annualLeave||20)) * 100);
+              return `<tr>
+                <td class="td-primary">
+                  <div class="flex items-center gap-2">
+                    ${makeAvatar(e.name)}
+                    <span style="font-weight:600">${e.name}</span>
+                  </div>
+                </td>
+                <td data-label="Sektor">${e.department||'—'}</td>
+                <td data-label="Ukupno dana">${e.annualLeave||20}</td>
+                <td data-label="Iskorišćeno">${e.usedLeave||0}</td>
+                <td data-label="Preostalo" style="${rem<5?'color:var(--danger);font-weight:700':''}">${rem}</td>
+                <td data-label="%">${pct}%</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  // Render chart
+  const container = document.getElementById('chart-container');
+  const maxVal = Math.max(...emps.map(e => e.annualLeave||20), 1);
+  container.innerHTML = emps.map(e => {
+    const pct = ((e.usedLeave||0) / maxVal) * 100;
+    const color = avatarColor(e.name);
+    return `<div class="chart-bar">
+      <div class="bar-label">${e.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:0%;background:linear-gradient(90deg,${color},${color}99)" data-target="${pct.toFixed(1)}"></div>
+      </div>
+      <div class="bar-value">${e.usedLeave||0}d</div>
+    </div>`;
+  }).join('');
+
+  // Animate bars
+  requestAnimationFrame(() => {
+    container.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.target + '%';
+    });
+  });
+}
+
+/* ================================================================
+   SETTINGS
+   ================================================================ */
+function renderSettings() {
+  const main = document.getElementById('main-content');
+  const users = getUsers();
+  const emps = getEmployees();
+
+  main.innerHTML = `
+    <div class="page-header"><div class="page-title">Podešavanja</div></div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">👥 Korisnici sistema</div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ime</th><th>Email</th><th>Uloga</th><th>Akcija</th></tr></thead>
+          <tbody>
+            ${users.map(u => `<tr>
+              <td>${u.name}</td>
+              <td>${u.email}</td>
+              <td><span class="badge badge-info">${u.role === 'admin' ? '👑 Admin' : '👤 Radnik'}</span></td>
+              <td>
+                ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Obriši</button>` : '—'}
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">📤 Export / Import</div></div>
+      <div class="card-body" style="display:flex;gap:.75rem;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="exportData()">📥 Export JSON</button>
+        <label class="btn btn-secondary" style="cursor:pointer">
+          📤 Import JSON
+          <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+        </label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">☁️ Firebase sync</div></div>
+      <div class="card-body">
+        <p class="text-sm text-muted">Firebase konfiguracija je placeholder. Popunite FIREBASE_CONFIG u kodu za sinhronizaciju u oblaku.</p>
+        <button class="btn btn-secondary" style="margin-top:.75rem" onclick="toast('Firebase nije konfigurisan', 'warning')">Testiraj konekciju</button>
+      </div>
+    </div>`;
+}
+
+function deleteUser(userId) {
+  if (!confirm('Obrisati korisnika?')) return;
+  let users = getUsers().filter(u => u.id !== userId);
+  saveUsers(users);
+  renderSettings();
+  // Note: in Firebase mode this only revokes the person's profile/role —
+  // their Firebase Auth login itself can't be deleted from the client SDK
+  // (that needs the Admin SDK / a server). They'll be auto-signed-out with
+  // an error on their next login attempt since no profile will match.
+  toast('Korisnik obrisan', 'success');
+}
+
+function exportData() {
+  const data = { employees: getEmployees(), users: getUsers(), exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'odmorpro-export.json';
+  a.click();
+  toast('Podaci exportovani', 'success');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.employees) saveEmployees(data.employees);
+      if (data.users) saveUsers(data.users);
+      toast('Podaci importovani', 'success');
+      renderPage();
+    } catch {
+      toast('Greška pri importu', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ================================================================
+   MY REQUEST (employee)
+   ================================================================ */
+/* ================================================================
+   MY CALENDAR (employee)
+   ================================================================ */
+function renderMyCalendar() {
+  const main = document.getElementById('main-content');
+  const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+  if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">📅 Moj kalendar</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title" id="my-cal-month-label" style="cursor:pointer;user-select:none"></div>
+        <div style="margin-left:auto;display:flex;gap:.5rem;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" id="my-cal-today">Danas</button>
+          <button class="btn btn-secondary btn-sm" id="my-cal-prev">◀</button>
+          <button class="btn btn-secondary btn-sm" id="my-cal-next">▶</button>
+          <button class="btn btn-primary btn-sm" id="my-cal-add">➕ Novi zahtev</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:.5rem">
+        <p style="font-size:.8rem;color:var(--text2);margin-bottom:.5rem">Klikni na dan da dodaš zahtev za odsustvo</p>
+        <div class="calendar-grid" id="my-cal-grid"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-header"><div class="card-title">Moji zahtevi</div></div>
+      <div style="padding:0">${renderRequestsTable([...(emp.leave_requests||[]), ...(emp.leave_history||[])], emp.id)}</div>
+    </div>`;
+
+  function drawMyCal() {
+    const label = document.getElementById('my-cal-month-label');
+    const grid = document.getElementById('my-cal-grid');
+    label.textContent = `${MONTHS_SR[currentMonth]} ${currentYear}`;
+
+    let html = DAYS_SR.map((d, i) =>
+      `<div class="cal-header ${i >= 5 ? 'weekend' : ''}">${d}</div>`
+    ).join('');
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    let startDow = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const prevDays = new Date(currentYear, currentMonth, 0).getDate();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Build events map: approved from ALL employees + own pending/rejected
+    const allEmps = getEmployees();
+    const eventsMap = {};
+    allEmps.forEach(e => {
+      const isMe = e.id === emp.id;
+      const records = [...(e.leave_requests||[]), ...(e.leave_history||[])];
+      records.forEach(r => {
+        // Show approved leave for everyone; show own pending/rejected too
+        if (r.status !== 'approved' && !isMe) return;
+        let d = new Date(r.startDate);
+        const end = r.ongoing ? todayDateOnly() : new Date(r.endDate);
+        while (d <= end) {
+          const key = d.toISOString().split('T')[0];
+          if (!eventsMap[key]) eventsMap[key] = [];
+          eventsMap[key].push({ name: e.name, isMe, leaveType: r.leaveType, status: r.status });
+          d.setDate(d.getDate() + 1);
+        }
+      });
+    });
+
+    for (let i = 0; i < startDow; i++) {
+      html += `<div class="cal-day other-month"><div class="cal-day-num">${prevDays - startDow + 1 + i}</div></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const dow = (new Date(currentYear, currentMonth, day).getDay() + 6) % 7;
+      const isWeekend = dow >= 5;
+      const isToday = dateStr === todayStr;
+      const dayEvs = eventsMap[dateStr] || [];
+
+      let evHtml = dayEvs.slice(0,2).map(ev => {
+        const c = LEAVE_COLORS[ev.leaveType] || { bg: '#e0e7ff', text: '#3730a3' };
+        const statusDot = ev.status === 'approved' ? '' : ev.status === 'rejected' ? '❌ ' : '⏳ ';
+        const label = ev.name.split(' ')[0];
+        const bold = ev.isMe ? 'font-weight:700;' : '';
+        const meTitle = ev.isMe ? ' (ja)' : '';
+        return `<div class="cal-event" style="background:${c.bg};color:${c.text};${bold}" title="${ev.name}${meTitle} – ${ev.leaveType}">${statusDot}${label}</div>`;
+      }).join('');
+      if (dayEvs.length > 2) evHtml += `<div class="cal-event" style="background:var(--border);color:var(--text2)">+${dayEvs.length-2}</div>`;
+
+      html += `<div class="cal-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}"
+        style="cursor:pointer"
+        data-date="${dateStr}"
+        title="Klikni ili prevuci za odsustvo">
+        <div class="cal-day-num">${day}</div>
+        ${evHtml}
+      </div>`;
+    }
+
+    const totalCells = startDow + daysInMonth;
+    const rem = (7 - (totalCells % 7)) % 7;
+    for (let i = 1; i <= rem; i++) {
+      html += `<div class="cal-day other-month"><div class="cal-day-num">${i}</div></div>`;
+    }
+    grid.innerHTML = html;
+  }
+
+  drawMyCal();
+  document.getElementById('my-cal-month-label').onclick = openYearPicker;
+  document.getElementById('my-cal-prev').onclick = () => { currentMonth--; if (currentMonth<0){currentMonth=11;currentYear--;} drawMyCal(); setupDrag(); };
+  document.getElementById('my-cal-next').onclick = () => { currentMonth++; if (currentMonth>11){currentMonth=0;currentYear++;} drawMyCal(); setupDrag(); };
+  document.getElementById('my-cal-today').onclick = () => { currentMonth=new Date().getMonth(); currentYear=new Date().getFullYear(); drawMyCal(); setupDrag(); };
+  document.getElementById('my-cal-add').onclick = () => openQuickLeave(new Date().toISOString().split('T')[0]);
+  setupDrag();
+
+  function setupDrag() {
+    const grid = document.getElementById('my-cal-grid');
+    if (!grid) return;
+    let dragStart = null;
+    let isDragging = false;
+
+    function dateOfCell(el) { return el.dataset.date || null; }
+
+    function clearHighlight() {
+      grid.querySelectorAll('.drag-selecting,.drag-start,.drag-end').forEach(el => {
+        el.classList.remove('drag-selecting','drag-start','drag-end');
+      });
+    }
+
+    function highlightRange(a, b) {
+      clearHighlight();
+      const d1 = a < b ? a : b;
+      const d2 = a < b ? b : a;
+      grid.querySelectorAll('[data-date]').forEach(el => {
+        const d = el.dataset.date;
+        if (d >= d1 && d <= d2) {
+          el.classList.add('drag-selecting');
+          if (d === d1) el.classList.add('drag-start');
+          if (d === d2) el.classList.add('drag-end');
+        }
+      });
+    }
+
+    grid.addEventListener('mousedown', e => {
+      const cell = e.target.closest('[data-date]');
+      if (!cell) return;
+      e.preventDefault();
+      dragStart = dateOfCell(cell);
+      isDragging = false;
+      clearHighlight();
+      cell.classList.add('drag-start','drag-end');
+    });
+
+    grid.addEventListener('mousemove', e => {
+      if (!dragStart) return;
+      const cell = e.target.closest('[data-date]');
+      if (!cell) return;
+      isDragging = true;
+      highlightRange(dragStart, dateOfCell(cell));
+    });
+
+    function endDragAt(targetEl) {
+      if (!dragStart) return;
+      const cell = targetEl ? targetEl.closest('[data-date]') : null;
+      const dragEnd = cell ? dateOfCell(cell) : dragStart;
+      clearHighlight();
+      const start = dragStart < dragEnd ? dragStart : dragEnd;
+      const end   = dragStart < dragEnd ? dragEnd   : dragStart;
+      dragStart = null;
+      if (!isDragging) {
+        openQuickLeave(start);
+      } else {
+        openQuickLeave(start, end);
+      }
+      isDragging = false;
+    }
+
+    grid.addEventListener('mouseup', e => endDragAt(e.target));
+    document.addEventListener('mouseup', () => { if (dragStart) { clearHighlight(); dragStart = null; isDragging = false; } }, { once: false });
+
+    /* ---- Touch support: same drag-to-select gesture, for phones/tablets ---- */
+    grid.addEventListener('touchstart', e => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const cell = el ? el.closest('[data-date]') : null;
+      if (!cell) return;
+      dragStart = dateOfCell(cell);
+      isDragging = false;
+      clearHighlight();
+      cell.classList.add('drag-start', 'drag-end');
+    }, { passive: true });
+
+    grid.addEventListener('touchmove', e => {
+      if (!dragStart) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      const cell = el ? el.closest('[data-date]') : null;
+      if (!cell) return;
+      e.preventDefault();
+      isDragging = true;
+      highlightRange(dragStart, dateOfCell(cell));
+    }, { passive: false });
+
+    grid.addEventListener('touchend', e => {
+      const touch = e.changedTouches[0];
+      const el = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+      endDragAt(el);
+    });
+
+    grid.addEventListener('touchcancel', () => {
+      if (dragStart) { clearHighlight(); dragStart = null; isDragging = false; }
+    });
+  }
+}
+
+function openQuickLeave(startStr, endStr) {
+  if (!currentUser || !currentUser.employeeId) return;
+  const overlay = document.getElementById('quick-leave-overlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('ql-start').value = startStr;
+  document.getElementById('ql-end').value = endStr || startStr;
+  document.getElementById('ql-note').value = '';
+  const initDays = endStr ? Math.round((new Date(endStr)-new Date(startStr))/86400000)+1 : 1;
+  document.getElementById('ql-days-info').textContent = `📅 ${initDays} dan(a) odsustva`;
+
+  const calcDays = () => {
+    const s = document.getElementById('ql-start').value;
+    const en = document.getElementById('ql-end').value;
+    const type = document.getElementById('ql-type').value;
+    const isSick = type === 'Bolovanje';
+    document.getElementById('ql-sick-hint').classList.toggle('hidden', !isSick);
+    document.getElementById('ql-end-label').textContent = isSick ? 'Datum do (opciono)' : 'Datum do *';
+    const info = document.getElementById('ql-days-info');
+    if (s && !en && isSick) {
+      info.textContent = '📅 Bolovanje u toku (bez određenog kraja)';
+      info.style.color = 'var(--text2)';
+      return;
+    }
+    if (s && en) {
+      const days = Math.round((new Date(en) - new Date(s)) / 86400000) + 1;
+      const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+      const remaining = emp ? (emp.annualLeave||20) - (emp.usedLeave||0) : 0;
+      if (days > 0) {
+        info.textContent = `📅 ${days} dan(a) odsustva`;
+        info.style.color = (type === 'Godišnji odmor' && days > remaining) ? 'var(--danger)' : 'var(--text2)';
+      }
+    }
+  };
+  document.getElementById('ql-start').onchange = calcDays;
+  document.getElementById('ql-end').onchange = calcDays;
+  document.getElementById('ql-type').onchange = calcDays;
+  calcDays();
+
+  document.getElementById('quick-leave-close').onclick = closeQuickLeave;
+  document.getElementById('ql-cancel').onclick = closeQuickLeave;
+  overlay.onclick = (e) => { if (e.target === overlay) closeQuickLeave(); };
+
+  document.getElementById('ql-submit').onclick = () => {
+    const start = document.getElementById('ql-start').value;
+    const end = document.getElementById('ql-end').value;
+    const type = document.getElementById('ql-type').value;
+    const isSick = type === 'Bolovanje';
+    if (!start || (!end && !isSick)) { toast('Izaberi datume', 'error'); return; }
+
+    const ongoing = isSick && !end;
+    const days = ongoing ? null : Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+    if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
+
+    const emps = getEmployees();
+    const emp = emps.find(x => x.id === currentUser.employeeId);
+    if (!emp) return;
+    const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+    if (type === 'Godišnji odmor' && days > remaining) {
+      toast(`Nemate dovoljno dana (preostalo: ${remaining})`, 'error'); return;
+    }
+    if (type === 'Bolovanje (do 2 dana)' && days > 2) {
+      toast('Ovaj tip bolovanja je ograničen na 2 dana. Za duže odsustvo koristite "Bolovanje".', 'error'); return;
+    }
+    emp.leave_requests = emp.leave_requests || [];
+    emp.leave_requests.push({
+      id: 'r' + Date.now(),
+      leaveType: type,
+      startDate: start,
+      endDate: ongoing ? null : end,
+      days,
+      ongoing,
+      note: document.getElementById('ql-note').value,
+      status: 'pending',
+      submittedAt: new Date().toISOString()
+    });
+    saveEmployees(emps);
+    closeQuickLeave();
+    toast('Zahtev podnet!', 'success');
+    renderSidebar();
+    if (currentPage === 'my-calendar') renderMyCalendar();
+  };
+}
+
+function closeQuickLeave() {
+  document.getElementById('quick-leave-overlay').classList.add('hidden');
+}
+
+function renderMyRequest() {
+  const main = document.getElementById('main-content');
+  const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+  if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
+  const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+
+  main.innerHTML = `
+    <div class="page-header"><div class="page-title">Podnesi zahtev</div></div>
+    ${remaining < 5 ? `<div class="leave-warning">⚠️ Preostalo vam je samo <strong>${remaining} dana</strong> godišnjeg odmora!</div>` : ''}
+    <div class="card" style="max-width:560px">
+      <div class="card-body">
+        <form id="req-form">
+          <div class="form-group">
+            <label>Tip odsustva *</label>
+            <select id="req-type">
+              <option>Godišnji odmor</option>
+              <option>Bolovanje</option>
+              <option>Bolovanje (do 2 dana)</option>
+              <option>Slobodan dan</option>
+              <option>Plaćeno odsustvo</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum od *</label>
+              <input type="date" id="req-start" required>
+            </div>
+            <div class="form-group">
+              <label id="req-end-label">Datum do *</label>
+              <input type="date" id="req-end" required>
+            </div>
+          </div>
+          <div id="req-sick-hint" class="hidden" style="font-size:.8125rem;color:var(--text2);margin:-.5rem 0 1rem;padding:.5rem .75rem;background:var(--warning-light);border-radius:var(--radius-sm)">
+            ℹ️ Ostavite "Datum do" prazno ako bolovanje još traje. Poslednji dan ćete moći da označite kasnije.
+          </div>
+          <div class="form-group">
+            <label>Napomena</label>
+            <textarea id="req-note" placeholder="Dodatni komentar..."></textarea>
+          </div>
+          <div id="req-days-info" style="margin-bottom:1rem;font-size:.875rem;color:var(--text2)"></div>
+          <div style="display:flex;gap:.75rem;justify-content:flex-end">
+            <button type="submit" class="btn btn-primary">📤 Podnesi zahtev</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="card" style="max-width:560px;margin-top:1.5rem">
+      <div class="card-header"><div class="card-title">Moji zahtevi</div></div>
+      <div style="padding:0">
+        ${renderRequestsTable([...(emp.leave_requests||[]), ...(emp.leave_history||[])], emp.id)}
+      </div>
+    </div>`;
+
+  const calcDays = () => {
+    const s = document.getElementById('req-start').value;
+    const e2 = document.getElementById('req-end').value;
+    const type = document.getElementById('req-type').value;
+    const isSick = type === 'Bolovanje';
+    const endInput = document.getElementById('req-end');
+    document.getElementById('req-sick-hint').classList.toggle('hidden', !isSick);
+    document.getElementById('req-end-label').textContent = isSick ? 'Datum do (opciono)' : 'Datum do *';
+    endInput.required = !isSick;
+    const info = document.getElementById('req-days-info');
+    if (s && !e2 && isSick) {
+      info.textContent = '📅 Bolovanje u toku (bez određenog kraja)';
+      info.style.color = 'var(--text2)';
+      return;
+    }
+    if (s && e2) {
+      const days = Math.round((new Date(e2) - new Date(s)) / 86400000) + 1;
+      if (days > 0) {
+        info.textContent = `📅 ${days} dan(a) odsustva`;
+        info.style.color = (type === 'Godišnji odmor' && days > remaining) ? 'var(--danger)' : 'var(--text2)';
+      }
+    } else {
+      info.textContent = '';
+    }
+  };
+  document.getElementById('req-start').addEventListener('change', calcDays);
+  document.getElementById('req-end').addEventListener('change', calcDays);
+  document.getElementById('req-type').addEventListener('change', calcDays);
+
+  document.getElementById('req-form').onsubmit = (e) => {
+    e.preventDefault();
+    const start = document.getElementById('req-start').value;
+    const end = document.getElementById('req-end').value;
+    const type = document.getElementById('req-type').value;
+    const isSick = type === 'Bolovanje';
+    if (!start || (!end && !isSick)) { toast('Izaberi datume', 'error'); return; }
+
+    const ongoing = isSick && !end;
+    const days = ongoing ? null : Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+    if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
+
+    if (type === 'Godišnji odmor' && days > remaining) {
+      toast(`Nemate dovoljno dana odmora (preostalo: ${remaining})`, 'error'); return;
+    }
+    if (type === 'Bolovanje (do 2 dana)' && days > 2) {
+      toast('Ovaj tip bolovanja je ograničen na 2 dana. Za duže odsustvo koristite "Bolovanje".', 'error'); return;
+    }
+    const emps2 = getEmployees();
+    const e2 = emps2.find(x => x.id === currentUser.employeeId);
+    e2.leave_requests = e2.leave_requests || [];
+    e2.leave_requests.push({
+      id: 'r' + Date.now(),
+      leaveType: type,
+      startDate: start,
+      endDate: ongoing ? null : end,
+      days,
+      ongoing,
+      note: document.getElementById('req-note').value,
+      status: 'pending',
+      submittedAt: new Date().toISOString()
+    });
+    saveEmployees(emps2);
+    toast('Zahtev podnet!', 'success');
+    renderSidebar();
+    renderMyRequest();
+  };
+}
+
+function renderRequestsTable(requests, empId) {
+  if (!requests || !requests.length) {
+    return `<div class="empty-state">
+      <div class="empty-state-icon">📭</div>
+      <div class="empty-state-title">Nema zahteva</div>
+      <div class="empty-state-sub">Vaši zahtevi će se pojaviti ovde</div>
+    </div>`;
+  }
+  return `<div class="table-wrap"><table class="responsive-stack">
+    <thead><tr><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th></tr></thead>
+    <tbody>
+      ${[...requests].sort((a,b)=>new Date(b.startDate)-new Date(a.startDate)).map(r => `
+        <tr>
+          <td class="td-primary" style="font-weight:600">${r.leaveType}</td>
+          <td data-label="Od">${r.startDate}</td>
+          <td data-label="Do">${r.ongoing ? '<span class="badge badge-pending">u toku</span>' : r.endDate}</td>
+          <td data-label="Dana">${r.ongoing ? '—' : r.days}</td>
+          <td data-label="Status">
+            <span class="badge badge-${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${statusSr(r.status)}</span>
+            ${r.ongoing && empId ? `<button class="btn btn-secondary btn-sm" style="margin-left:.35rem" onclick="openCloseSickModal('${empId}','${r.id}')">🩹 Zatvori</button>` : ''}
+          </td>
+        </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+/* ================================================================
+   MY PROFILE (employee)
+   ================================================================ */
+function renderMyProfile() {
+  const main = document.getElementById('main-content');
+  const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+  if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
+  const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+  const freeRemaining = freeDaysRemaining(emp);
+  const sickDaysTotal = computeSickDaysTotal(emp);
+  const sickShortCount = computeSickShortCount(emp);
+
+  main.innerHTML = `
+    <div class="page-header"><div class="page-title">Moj profil</div></div>
+    <div class="card">
+      <div class="card-body">
+        <div class="flex items-center gap-3" style="margin-bottom:1.5rem">
+          ${makeAvatar(emp.name, 'avatar-xl')}
+          <div>
+            <div style="font-size:1.5rem;font-weight:800">${emp.name}</div>
+            <div class="text-muted">${emp.position || ''} · ${emp.department || ''}</div>
+          </div>
+        </div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Email</div>
+            <div class="detail-value">${emp.email}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Sektor</div>
+            <div class="detail-value">${emp.department || '—'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Datum zaposlenja</div>
+            <div class="detail-value">${emp.startDate || '—'}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Preostalo odmora</div>
+            <div class="detail-value" style="${remaining<5?'color:var(--danger)':''}">${remaining} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Preostalo slobodnih dana</div>
+            <div class="detail-value" style="${freeRemaining<=0?'color:var(--danger)':''}">${freeRemaining} / ${freeDaysAllowance(emp)}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Bolovanje (ukupno)</div>
+            <div class="detail-value">${sickDaysTotal} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Bolovanje do 2 dana</div>
+            <div class="detail-value">${sickShortCount}×</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;flex-wrap:wrap">
+          ${progressRing(emp.usedLeave||0, emp.annualLeave||20, '#3b82f6', 72)}
+          ${progressRing(remaining, emp.annualLeave||20, '#22c55e', 72)}
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-header"><div class="card-title">📅 Istorija</div></div>
+      <div class="card-body">
+        <div class="timeline">
+          ${[...(emp.leave_history||[])].sort((a,b)=>new Date(b.startDate)-new Date(a.startDate))
+            .map(r => `
+              <div class="timeline-item ${r.status}">
+                <div class="timeline-date">${r.startDate} → ${r.ongoing ? 'u toku' : r.endDate}</div>
+                <div class="timeline-title">${r.leaveType}</div>
+                <div class="timeline-sub">
+                  ${r.ongoing ? 'bolovanje u toku' : `${r.days} dan(a)`} · <span class="badge badge-${r.status==='approved'?'approved':'rejected'}">${statusSr(r.status)}</span>
+                  ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.4rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
+                </div>
+              </div>`).join('') || '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema istorije</div></div>'}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ================================================================
+   COMMAND PALETTE
+   ================================================================ */
+function openCmdPalette() {
+  document.getElementById('cmd-palette-overlay').classList.remove('hidden');
+  document.getElementById('cmd-input').value = '';
+  document.getElementById('cmd-input').focus();
+  cmdSelectedIndex = -1;
+  renderCmdResults('');
+}
+
+function closeCmdPalette() {
+  document.getElementById('cmd-palette-overlay').classList.add('hidden');
+}
+
+function renderCmdResults(query) {
+  const q = query.toLowerCase();
+  const results = [];
+  const navItems = navItemsFor(currentUser);
+  navItems.forEach(item => {
+    if (!q || item.label.toLowerCase().includes(q)) {
+      results.push({ type: 'page', icon: item.icon, label: item.label, sub: 'Navigacija', action: () => { closeCmdPalette(); navigateTo(item.id); } });
+    }
+  });
+  if (currentUser.role === 'admin') {
+    getEmployees().forEach(e => {
+      if (!q || e.name.toLowerCase().includes(q) || e.email.toLowerCase().includes(q)) {
+        results.push({ type: 'emp', icon: '👤', label: e.name, sub: e.email, action: () => { closeCmdPalette(); showEmployeeDetail(e.id); } });
+      }
+    });
+  }
+  cmdResults = results;
+  cmdSelectedIndex = -1;
+  const container = document.getElementById('cmd-results');
+  if (!results.length) {
+    container.innerHTML = `<div class="cmd-empty">Nema rezultata za "${query}"</div>`;
+    return;
+  }
+  container.innerHTML = results.map((r, i) => `
+    <div class="cmd-result-item" data-idx="${i}">
+      <span class="cmd-item-icon">${r.icon}</span>
+      <span class="cmd-item-label">${r.label}</span>
+      <span class="cmd-item-sub">${r.sub}</span>
+    </div>`).join('');
+  container.querySelectorAll('.cmd-result-item').forEach(item => {
+    item.addEventListener('click', () => {
+      cmdResults[parseInt(item.dataset.idx)].action();
+    });
+  });
+}
+
+document.getElementById('cmd-input').addEventListener('input', e => renderCmdResults(e.target.value));
+document.getElementById('cmd-input').addEventListener('keydown', e => {
+  const items = document.querySelectorAll('.cmd-result-item');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    cmdSelectedIndex = Math.min(cmdSelectedIndex + 1, items.length - 1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    cmdSelectedIndex = Math.max(cmdSelectedIndex - 1, 0);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (cmdSelectedIndex >= 0 && cmdResults[cmdSelectedIndex]) {
+      cmdResults[cmdSelectedIndex].action();
+    } else if (cmdResults.length > 0) {
+      cmdResults[0].action();
+    }
+    return;
+  }
+  items.forEach((item, i) => item.classList.toggle('selected', i === cmdSelectedIndex));
+  if (items[cmdSelectedIndex]) items[cmdSelectedIndex].scrollIntoView({ block: 'nearest' });
+});
+
+document.getElementById('cmd-palette-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('cmd-palette-overlay')) closeCmdPalette();
+});
+
+document.getElementById('cmd-palette-btn').addEventListener('click', openCmdPalette);
+
+/* ================================================================
+   KEYBOARD SHORTCUTS
+   ================================================================ */
+document.addEventListener('keydown', e => {
+  // Ctrl+K: command palette
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    if (currentUser) openCmdPalette();
+    return;
+  }
+  // Esc: close modals/palette
+  if (e.key === 'Escape') {
+    closeCmdPalette();
+    closeRejectModal();
+    closeQuickLeave();
+    document.getElementById('year-picker-overlay').classList.add('hidden');
+    return;
+  }
+  // Enter in reject modal
+  if (e.key === 'Enter' && !document.getElementById('reject-modal-overlay').classList.contains('hidden')) {
+    const activeEl = document.activeElement;
+    if (activeEl && activeEl.id !== 'reject-reason-input') {
+      document.getElementById('reject-confirm-btn').click();
+    }
+  }
+});
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+function formatDate(d) {
+  return d.toLocaleDateString('sr-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function statusSr(s) {
+  return s === 'approved' ? '✅ Odobreno' : s === 'rejected' ? '❌ Odbijeno' : '⏳ Na čekanju';
+}
+
+/* ================================================================
+   LOGIN FORM
+   ================================================================ */
+document.getElementById('login-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const identifier = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+
+  if (FIREBASE_ENABLED) {
+    try {
+      const cred = await firebaseAuth.signInWithEmailAndPassword(identifier, password);
+      const profile = getUsers().find(u => u.uid === cred.user.uid);
+      if (!profile) {
+        await firebaseAuth.signOut();
+        err.textContent = 'Nalog nije aktivan, kontaktirajte administratora.';
+        err.style.display = 'block';
+        return;
+      }
+      err.style.display = 'none';
+      currentUser = profile;
+      startApp();
+    } catch (ex) {
+      err.textContent = authErrorSr(ex);
+      err.style.display = 'block';
+    }
+    return;
+  }
+
+  const user = login(identifier, password);
+  if (!user) {
+    err.textContent = 'Pogrešan email ili lozinka.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  currentUser = user;
+  startApp();
+});
+
+document.getElementById('logout-btn').addEventListener('click', logout);
+
+/* ================================================================
+   REGISTER FORM (self-service registration)
+   ================================================================ */
+function showRegisterScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('register-screen').style.display = 'flex';
+  document.getElementById('register-error').style.display = 'none';
+  document.getElementById('register-form').reset();
+}
+
+function showLoginScreen() {
+  document.getElementById('register-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+document.getElementById('show-register-link').addEventListener('click', e => {
+  e.preventDefault();
+  showRegisterScreen();
+});
+
+document.getElementById('show-login-link').addEventListener('click', e => {
+  e.preventDefault();
+  showLoginScreen();
+});
+
+document.getElementById('register-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('register-error');
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const pass2 = document.getElementById('reg-pass2').value;
+
+  if (!name || !email || !pass || !pass2) {
+    err.textContent = 'Popunite sva polja.';
+    err.style.display = 'block';
+    return;
+  }
+  if (pass.length < 6) {
+    err.textContent = 'Lozinka mora imati najmanje 6 karaktera.';
+    err.style.display = 'block';
+    return;
+  }
+  if (pass !== pass2) {
+    err.textContent = 'Lozinke se ne poklapaju.';
+    err.style.display = 'block';
+    return;
+  }
+
+  const users = getUsers();
+  if (!FIREBASE_ENABLED && users.find(u => (u.email || '').toLowerCase() === email.toLowerCase())) {
+    err.textContent = 'Nalog sa ovim email-om već postoji.';
+    err.style.display = 'block';
+    return;
+  }
+
+  err.style.display = 'none';
+
+  const employees = getEmployees();
+  const newEmp = {
+    id: 'e' + Date.now(),
+    name, email,
+    position: '',
+    department: '',
+    startDate: new Date().toISOString().split('T')[0],
+    annualLeave: 20,
+    usedLeave: 0,
+    freeDaysAllowance: 3,
+    usedFreeDays: 0,
+    lastRolloverYear: new Date().getFullYear(),
+    notifications: [],
+    leave_requests: [],
+    leave_history: []
+  };
+
+  if (FIREBASE_ENABLED) {
+    let cred;
+    try {
+      cred = await firebaseAuth.createUserWithEmailAndPassword(email, pass);
+    } catch (ex) {
+      err.textContent = authErrorSr(ex);
+      err.style.display = 'block';
+      return;
+    }
+    // First person to ever register becomes admin — everyone after is a
+    // regular employee. Checked against the real cloud data (not the local
+    // cache, which can hold stale/unrelated data from local fallback mode
+    // or other local prototypes sharing this browser's file:// storage).
+    let cloudUsers = [];
+    try {
+      const snap = await firebaseDB.ref('users').once('value');
+      cloudUsers = snap.val() || [];
+    } catch (ex) { /* if the read fails, fall back to treating as non-first */ cloudUsers = users; }
+
+    employees.push(newEmp);
+    saveEmployees(employees);
+    const newUser = { id: 'u' + newEmp.id, uid: cred.user.uid, email, role: cloudUsers.length === 0 ? 'admin' : 'employee', name, employeeId: newEmp.id };
+    const mergedUsers = cloudUsers.length ? cloudUsers.concat([newUser]) : users.concat([newUser]);
+    saveUsers(mergedUsers);
+    toast('Nalog uspešno kreiran! Dobrodošli.', 'success');
+    document.getElementById('register-screen').style.display = 'none';
+    currentUser = newUser;
+    startApp();
+    return;
+  }
+
+  employees.push(newEmp);
+  saveEmployees(employees);
+
+  const newUser = { id: 'u' + newEmp.id, email, password: pass, role: 'employee', name, employeeId: newEmp.id };
+  users.push(newUser);
+  saveUsers(users);
+
+  toast('Nalog uspešno kreiran! Dobrodošli.', 'success');
+  document.getElementById('register-screen').style.display = 'none';
+  currentUser = newUser;
+  startApp();
+});
+
+/* ================================================================
+   APP START
+   ================================================================ */
+let cloudListenersActive = false;
+function startCloudListeners() {
+  // Guarded so a page-load session restore (onAuthStateChanged) and an
+  // interactive login/register in the same page load never double-subscribe.
+  if (cloudListenersActive || !firebaseDB) return;
+  cloudListenersActive = true;
+  cloudListen('employees', data => {
+    if (data && Array.isArray(data)) {
+      localStorage.setItem('employees', JSON.stringify(data));
+      renderSidebar();
+      renderPage();
+    }
+  });
+  cloudListen('users', data => {
+    if (data && Array.isArray(data)) {
+      localStorage.setItem('users', JSON.stringify(data));
+      renderSidebar();
+      renderPage();
+    }
+  });
+}
+
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('register-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  currentPage = 'dashboard';
+  initTheme();
+  applyYearRollover();
+  renderSidebar();
+  renderPage();
+  startCloudListeners();
+}
+
+/* ================================================================
+   INIT
+   ================================================================ */
+seedData();
+initTheme();
+
+// Self-service registration is only meant for the one-time admin bootstrap
+// in Firebase mode (first registrant becomes admin) — every employee after
+// that should be added by the admin via "Dodaj radnika", not self-register.
+// So the link is hidden by default in Firebase mode; open index.html?register
+// once to reach it (e.g. for that first admin signup). Local demo mode
+// always shows it since self-service registration there is harmless.
+if (!FIREBASE_ENABLED || location.search.includes('register')) {
+  document.getElementById('register-link-wrap').classList.remove('hidden');
+}
+if (!FIREBASE_ENABLED) {
+  document.getElementById('demo-hint').classList.remove('hidden');
+}
+
+// Restore a persisted Firebase session on page load/reload, so returning
+// employees don't have to log in every time. Only handles the very first
+// callback (page load) — interactive login/register already set
+// currentUser + call startApp() themselves, so later auth-state changes
+// are ignored here to avoid racing with those flows.
+if (FIREBASE_ENABLED) {
+  let authInitialCheckDone = false;
+  firebaseAuth.onAuthStateChanged(async (user) => {
+    if (authInitialCheckDone) return;
+    authInitialCheckDone = true;
+    if (!user) return;
+
+    let profile = getUsers().find(u => u.uid === user.uid);
+    if (!profile) {
+      try {
+        const snap = await firebaseDB.ref('users').once('value');
+        const cloudUsers = snap.val() || [];
+        localStorage.setItem('users', JSON.stringify(cloudUsers));
+        profile = cloudUsers.find(u => u.uid === user.uid);
+      } catch (ex) { /* fall through to sign-out below */ }
+    }
+    if (!profile) {
+      await firebaseAuth.signOut();
+      return;
+    }
+    currentUser = profile;
+    startApp();
+  });
+}
+</script>
+</body>
+</html>
