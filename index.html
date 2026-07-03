@@ -4179,7 +4179,19 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   if (FIREBASE_ENABLED) {
     try {
       const cred = await firebaseAuth.signInWithEmailAndPassword(identifier, password);
-      const profile = getUsers().find(u => u.uid === cred.user.uid);
+      let profile = getUsers().find(u => u.uid === cred.user.uid);
+      if (!profile) {
+        // Local 'users' cache can be empty/stale on a fresh device (before
+        // cloudListen has ever populated it) — fall back to a fresh cloud
+        // read before concluding the account has no profile, same as the
+        // page-reload session restore below.
+        try {
+          const snap = await firebaseDB.ref('users').once('value');
+          const cloudUsers = snap.val() || [];
+          localStorage.setItem('users', JSON.stringify(cloudUsers));
+          profile = cloudUsers.find(u => u.uid === cred.user.uid);
+        } catch (ex) { /* fall through to sign-out below */ }
+      }
       if (!profile) {
         await firebaseAuth.signOut();
         err.textContent = 'Nalog nije aktivan, kontaktirajte administratora.';
