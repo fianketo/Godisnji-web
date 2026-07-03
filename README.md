@@ -7,7 +7,7 @@ Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez bui
 
 ## Šta aplikacija radi
 
-- **Nalozi** – samostalna registracija je namenjena samo za **jednokratni admin bootstrap** (prva osoba koja se ikad registruje automatski postaje Admin) i skrivena je sa login ekrana (otvara se preko `index.html?register`, pogledaj korak 8 ispod). Ubuduće, admin dodaje sve zaposlene kroz *Dodaj radnika* (puni profil + lozinka koju admin zada).
+- **Nalozi** – samostalna registracija je namenjena samo za **jednokratni admin bootstrap** (prva osoba koja se ikad registruje automatski postaje Admin) i skrivena je sa login ekrana (otvara se preko `index.html?register`, pogledaj korak 8 ispod). Ubuduće, admin dodaje sve zaposlene kroz *Dodaj radnika* (puni profil + lozinka koju admin zada). Email pri dodavanju radnika je opcion — ako ga radnik nema, aplikacija napravi korisničko ime od imena (npr. `marko.nikolic`) koje se koristi umesto email-a i za prijavu i za sve ostalo.
 - **Korisnički profil** – svaki zaposleni ima *Moj profil* sa ličnim podacima i istorijom odsustava, i *Moj zahtev* gde sam prijavljuje odsustvo (tip, datumi, automatski obračun radnih dana, razlog) — ide Adminu na odobrenje.
 - **Zajednički kalendar** – na *Kontrolnoj tabli* svi vide ko je odsutan (mesečni/nedeljni/dnevni prikaz), boje po tipu odsustva, status (odobreno/na čekanju).
 - **Statistika** – kartice (broj zaposlenih, ko je danas odsutan, zahtevi na čekanju, prosek preostalih dana) + Admin stranica *Izveštaji* sa grafikonom i izvozom u CSV/PDF.

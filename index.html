@@ -48,6 +48,7 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
   --transition: .2s ease;
   --glass-blur: none;
+  --dropdown-surface: #ffffff;
   color-scheme: light;
 }
 
@@ -67,6 +68,11 @@
   --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.3);
   --shadow-lg: 0 20px 60px rgba(0,0,0,.55);
   --glass-blur: blur(20px);
+  /* .notif-dropdown floats over page content with no dimming backdrop
+     behind it (unlike .modal, which sits on a dark .modal-overlay) — so
+     unlike --surface, this needs to be solid, or headings behind it
+     ghost through the glass effect. */
+  --dropdown-surface: #131c30;
   color-scheme: dark;
 }
 
@@ -523,20 +529,22 @@ body {
 .notif-bell { position: relative; }
 .notif-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -6px;
+  right: -6px;
   background: var(--danger);
   color: #fff;
-  font-size: .625rem;
+  font-size: .6875rem;
   font-weight: 700;
-  min-width: 16px;
-  height: 16px;
+  min-width: 18px;
+  height: 18px;
   border-radius: 99px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3px;
-  box-shadow: 0 0 0 2px var(--surface);
+  padding: 0 4px;
+  box-shadow: 0 0 0 2px var(--bg);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .notif-dropdown {
@@ -547,9 +555,7 @@ body {
   max-width: 88vw;
   max-height: 420px;
   overflow-y: auto;
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--dropdown-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
@@ -564,7 +570,7 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: var(--surface);
+  background: var(--dropdown-surface);
 }
 
 .notif-item {
@@ -1567,6 +1573,20 @@ textarea { resize: vertical; min-height: 80px; }
   .header-actions .btn-label { display: none; }
   #cmd-palette-btn { padding-left: .625rem; padding-right: .625rem; }
 
+  /* The dropdown is normally anchored (right:0) to the bell button itself,
+     which works on desktop where it sits near the header's right edge. On
+     mobile the bell sits mid-header (theme toggle + logout button follow
+     it), so a fixed-width dropdown anchored to it overflows off the left
+     edge of the screen. Anchor to the viewport instead. */
+  .notif-dropdown {
+    position: fixed;
+    top: calc(var(--header-h) + .5rem);
+    left: .75rem;
+    right: .75rem;
+    width: auto;
+    max-width: none;
+  }
+
   /* ---- Tables become stacked cards instead of horizontal-scroll grids ---- */
   .table-wrap table.responsive-stack thead { display: none; }
   table.responsive-stack,
@@ -1658,8 +1678,8 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="login-error" id="login-error"></div>
     <form class="login-form" id="login-form">
       <div class="form-group">
-        <label for="login-email">Email</label>
-        <input type="text" id="login-email" placeholder="npr. marko@firma.rs" autocomplete="username">
+        <label for="login-email">Email ili korisničko ime</label>
+        <input type="text" id="login-email" placeholder="npr. marko@firma.rs ili marko.nikolic" autocomplete="username">
       </div>
       <div class="form-group">
         <label for="login-pass">Lozinka</label>
@@ -1760,8 +1780,8 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="notif-wrap">
         <button class="btn btn-secondary btn-sm notif-bell" id="notif-bell-btn" title="Obaveštenja">
           🔔
-          <span class="notif-badge hidden" id="notif-badge">0</span>
         </button>
+        <span class="notif-badge hidden" id="notif-badge">0</span>
         <div class="notif-dropdown hidden" id="notif-dropdown">
           <div class="notif-dropdown-header" id="notif-dropdown-title">Obaveštenja</div>
           <div class="notif-list" id="notif-list"></div>
@@ -1844,6 +1864,44 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="modal-footer">
       <button class="btn btn-secondary" id="close-sick-cancel-btn">Otkaži</button>
       <button class="btn btn-primary" id="close-sick-confirm-btn">Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT HISTORY ENTRY MODAL (admin correction to an approved/rejected
+     leave request — e.g. employee needs different dates after approval)
+     ============================================================ -->
+<div id="edit-history-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">✏️ Izmena zahteva</span>
+      <button class="modal-close" id="edit-history-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tip odsustva</label>
+        <select id="edit-history-type">
+          <option>Godišnji odmor</option>
+          <option>Bolovanje</option>
+          <option>Slobodan dan</option>
+          <option>Plaćeno odsustvo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Od</label>
+          <input type="date" id="edit-history-start">
+        </div>
+        <div class="form-group">
+          <label>Do</label>
+          <input type="date" id="edit-history-end">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="edit-history-cancel-btn">Otkaži</button>
+      <button class="btn btn-primary" id="edit-history-confirm-btn">💾 Sačuvaj</button>
     </div>
   </div>
 </div>
@@ -1938,6 +1996,33 @@ if (FIREBASE_ENABLED) {
   firebase.initializeApp(FIREBASE_CONFIG);
   firebaseDB = firebase.database();
   firebaseAuth = firebase.auth();
+}
+
+// Firebase Auth accounts always need an email-shaped identifier, but not
+// every employee has (or wants to use) a real email address. For those,
+// "Dodaj radnika" generates a username from their name and pairs it with
+// this fake domain to get a valid Firebase Auth email — the employee then
+// logs in with just the username, never seeing the @ part.
+const LOCAL_LOGIN_DOMAIN = 'odmorpro.local';
+
+function slugifyName(name) {
+  const diacritics = { š:'s', đ:'dj', č:'c', ć:'c', ž:'z' };
+  return name.toLowerCase()
+    .replace(/[šđčćž]/g, ch => diacritics[ch])
+    .normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/^\.+|\.+$/g, '');
+}
+
+// Turns whatever the login form's identifier field holds into something
+// Firebase Auth will accept: real emails pass through untouched, bare
+// usernames get the fake local domain appended.
+function toLoginEmail(identifier) {
+  // Usernames are generated from the employee's name via slugifyName, but
+  // people naturally type their name back as shown ("Mihajlo Mitrovic"),
+  // not in its slugified form ("mihajlo.mitrovic") — normalize the same
+  // way here so either form logs in.
+  return identifier.includes('@') ? identifier : slugifyName(identifier) + '@' + LOCAL_LOGIN_DOMAIN;
 }
 
 // Creates a Firebase Auth account for someone else (e.g. admin adding an
@@ -2516,7 +2601,8 @@ const PAGE_TITLES = {
   'my-calendar': 'Moj kalendar',
   'my-request': 'Podnesi zahtev',
   'my-profile': 'Moj profil',
-  'employee-detail': 'Detalji radnika'
+  'employee-detail': 'Detalji radnika',
+  'edit-employee': 'Izmeni radnika'
 };
 
 function renderPage() {
@@ -2535,6 +2621,7 @@ function renderPage() {
     case 'my-request': renderMyRequest(); break;
     case 'my-profile': renderMyProfile(); break;
     case 'employee-detail': renderEmployeeDetail(main._empId); break;
+    case 'edit-employee': renderEditEmployee(main._empId); break;
     default: renderDashboard();
   }
   applyRipple();
@@ -3033,6 +3120,9 @@ function renderEmployeeDetail(id) {
         ${r.ongoing ? 'bolovanje u toku' : `${r.days} dan(a)`} · <span class="badge badge-${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${statusSr(r.status)}</span>
         ${r.reason ? ' · ' + r.reason : ''}
         ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
+        ${!r.ongoing && r.status !== 'pending' ? `
+          <button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openEditHistoryModal('${emp.id}','${r.id}')">✏️ Izmeni</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${r.id}')">🗑️</button>` : ''}
       </div>
     </div>`).join('') :
     `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema istorije</div></div>`;
@@ -3040,6 +3130,7 @@ function renderEmployeeDetail(id) {
   main.innerHTML = `
     <div class="page-header">
       <button class="btn btn-secondary" onclick="navigateTo('employees')">← Nazad</button>
+      <button class="btn btn-primary" onclick="showEditEmployee('${emp.id}')">✏️ Izmeni</button>
     </div>
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-body">
@@ -3112,8 +3203,9 @@ function renderAddEmployee() {
               <input type="text" id="emp-name" required placeholder="Marko Nikolić">
             </div>
             <div class="form-group">
-              <label>Email *</label>
-              <input type="email" id="emp-email" required placeholder="marko@firma.rs">
+              <label>Email (opciono)</label>
+              <input type="email" id="emp-email" placeholder="marko@firma.rs">
+              <div class="text-xs text-muted" style="margin-top:.25rem">Ako radnik nema email, ostavite prazno — dobiće korisničko ime za prijavu na osnovu imena.</div>
             </div>
           </div>
           <div class="form-row">
@@ -3157,9 +3249,20 @@ function renderAddEmployee() {
   document.getElementById('add-emp-form').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('emp-name').value.trim();
-    const email = document.getElementById('emp-email').value.trim();
+    let email = document.getElementById('emp-email').value.trim();
     const emps = getEmployees();
-    if (emps.find(e => e.email === email)) { toast('Email već postoji', 'error'); return; }
+    if (email && emps.find(e => e.email === email)) { toast('Email već postoji', 'error'); return; }
+
+    let generatedUsername = null;
+    if (!email) {
+      const base = slugifyName(name) || 'radnik';
+      const taken = new Set(emps.map(e => e.email).concat(getUsers().map(u => u.email)).filter(Boolean));
+      let candidate = base, n = 1;
+      while (taken.has(candidate + '@' + LOCAL_LOGIN_DOMAIN)) { n++; candidate = base + n; }
+      generatedUsername = candidate;
+      email = candidate + '@' + LOCAL_LOGIN_DOMAIN;
+    }
+
     const newEmp = {
       id: 'e' + Date.now(),
       name, email,
@@ -3190,7 +3293,11 @@ function renderAddEmployee() {
       const users = getUsers();
       users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
       saveUsers(users);
-      toast('Radnik uspešno dodat!', 'success');
+      if (generatedUsername) {
+        alert(`Radnik dodat!\n\nZa prijavu recite radniku da unese:\nKorisničko ime: ${generatedUsername}\nLozinka: ${pwd}`);
+      } else {
+        toast('Radnik uspešno dodat!', 'success');
+      }
       navigateTo('employees');
       return;
     }
@@ -3202,8 +3309,120 @@ function renderAddEmployee() {
     users.push({ id: 'u' + newEmp.id, email: newEmp.email, password: pwd, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
     saveUsers(users);
 
-    toast('Radnik uspešno dodat!', 'success');
+    if (generatedUsername) {
+      alert(`Radnik dodat!\n\nZa prijavu recite radniku da unese:\nKorisničko ime: ${generatedUsername}\nLozinka: ${pwd}`);
+    } else {
+      toast('Radnik uspešno dodat!', 'success');
+    }
     navigateTo('employees');
+  };
+}
+
+/* ================================================================
+   EDIT EMPLOYEE
+   ================================================================ */
+function showEditEmployee(id) {
+  document.getElementById('main-content')._empId = id;
+  currentPage = 'edit-employee';
+  document.getElementById('header-title').textContent = 'Izmeni radnika';
+  renderSidebar();
+  renderEditEmployee(id);
+}
+
+function renderEditEmployee(id) {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === id);
+  if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Izmeni radnika</div>
+    </div>
+    <div class="card" style="max-width:600px">
+      <div class="card-body">
+        <form id="edit-emp-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ime i prezime *</label>
+              <input type="text" id="edit-emp-name" required value="${emp.name}">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="${emp.email}" disabled title="Email se ne može menjati ovde">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pozicija</label>
+              <input type="text" id="edit-emp-position" value="${emp.position || ''}">
+            </div>
+            <div class="form-group">
+              <label>Sektor</label>
+              <input type="text" id="edit-emp-dept" value="${emp.department || ''}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum zaposlenja</label>
+              <input type="date" id="edit-emp-start" value="${emp.startDate || ''}">
+            </div>
+            <div class="form-group">
+              <label>Godišnji odmor (dana)</label>
+              <input type="number" id="edit-emp-annual" value="${emp.annualLeave||20}" min="0" max="60">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Iskorišćeno godišnjeg (dana)</label>
+              <input type="number" id="edit-emp-used" value="${emp.usedLeave||0}" min="0" max="60">
+            </div>
+            <div class="form-group">
+              <label>Slobodni dani (ukupno)</label>
+              <input type="number" id="edit-emp-free" value="${emp.freeDaysAllowance!=null?emp.freeDaysAllowance:3}" min="0" max="30">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Iskorišćeni slobodni dani</label>
+              <input type="number" id="edit-emp-used-free" value="${emp.usedFreeDays||0}" min="0" max="30">
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;justify-content:flex-end">
+            <button type="button" class="btn btn-secondary" onclick="showEmployeeDetail('${emp.id}')">Otkaži</button>
+            <button type="submit" class="btn btn-primary">💾 Sačuvaj izmene</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  document.getElementById('edit-emp-form').onsubmit = e => {
+    e.preventDefault();
+    const name = document.getElementById('edit-emp-name').value.trim();
+    if (!name) { toast('Ime je obavezno', 'error'); return; }
+    const idx = emps.findIndex(x => x.id === id);
+    emps[idx] = {
+      ...emp,
+      name,
+      position: document.getElementById('edit-emp-position').value.trim(),
+      department: document.getElementById('edit-emp-dept').value.trim(),
+      startDate: document.getElementById('edit-emp-start').value,
+      annualLeave: parseInt(document.getElementById('edit-emp-annual').value) || 0,
+      usedLeave: parseInt(document.getElementById('edit-emp-used').value) || 0,
+      freeDaysAllowance: parseInt(document.getElementById('edit-emp-free').value) || 0,
+      usedFreeDays: parseInt(document.getElementById('edit-emp-used-free').value) || 0
+    };
+    saveEmployees(emps);
+
+    const users = getUsers();
+    const uIdx = users.findIndex(u => u.employeeId === id);
+    if (uIdx !== -1 && users[uIdx].name !== name) {
+      users[uIdx] = { ...users[uIdx], name };
+      saveUsers(users);
+    }
+
+    toast('Podaci radnika sačuvani', 'success');
+    showEmployeeDetail(id);
   };
 }
 
@@ -3260,18 +3479,11 @@ function renderRequests() {
     </div>`;
 }
 
-function approveRequest(empId, reqId) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === empId);
-  if (!emp) return;
-  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
-  if (idx === -1) return;
-  const req = emp.leave_requests.splice(idx, 1)[0];
-  req.status = 'approved';
-  req.approvedAt = new Date().toISOString();
-  emp.leave_history = emp.leave_history || [];
-  emp.leave_history.push(req);
-
+// Applies the day-count side effects of an approved request to the
+// employee's counters. Shared between approving a pending request and
+// saving an edit to an already-approved history entry (which re-applies
+// after reversing the old counts).
+function applyApprovedDays(emp, req) {
   if (req.leaveType === 'Godišnji odmor') {
     emp.usedLeave = (emp.usedLeave||0) + req.days;
   } else if (req.leaveType === 'Slobodan dan') {
@@ -3286,6 +3498,39 @@ function approveRequest(empId, reqId) {
       addNotification(emp, `Iskorišćeni su svi slobodni dani (${allowance}). ${overflow} dan(a) od zahteva ${req.startDate} → ${req.endDate} je preneto i oduzeto od godišnjeg odmora.`);
     }
   }
+}
+
+// Reverses applyApprovedDays — used when deleting or editing an approved
+// history entry, before either dropping it or re-applying it with new
+// values. Free-day usage isn't tagged with how much of a given request
+// came from the free-day pool vs. overflow, so this reverses from the
+// free-day counter first (up to what's available) and treats any
+// remainder as having come from annual leave, mirroring how it would
+// have been split going forward.
+function reverseApprovedDays(emp, req) {
+  if (req.leaveType === 'Godišnji odmor') {
+    emp.usedLeave = Math.max((emp.usedLeave||0) - req.days, 0);
+  } else if (req.leaveType === 'Slobodan dan') {
+    const fromFree = Math.min(emp.usedFreeDays||0, req.days);
+    emp.usedFreeDays = (emp.usedFreeDays||0) - fromFree;
+    const remainder = req.days - fromFree;
+    if (remainder > 0) emp.usedLeave = Math.max((emp.usedLeave||0) - remainder, 0);
+  }
+}
+
+function approveRequest(empId, reqId) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return;
+  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
+  if (idx === -1) return;
+  const req = emp.leave_requests.splice(idx, 1)[0];
+  req.status = 'approved';
+  req.approvedAt = new Date().toISOString();
+  emp.leave_history = emp.leave_history || [];
+  emp.leave_history.push(req);
+
+  applyApprovedDays(emp, req);
   addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
 
   saveEmployees(emps);
@@ -3293,6 +3538,82 @@ function approveRequest(empId, reqId) {
   renderRequests();
   renderSidebar();
 }
+
+/* ================================================================
+   EDIT / DELETE HISTORY ENTRY (admin correction to an already
+   approved/rejected request)
+   ================================================================ */
+function deleteHistoryEntry(empId, reqId) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return;
+  const idx = (emp.leave_history||[]).findIndex(r => r.id === reqId);
+  if (idx === -1) return;
+  const req = emp.leave_history[idx];
+  if (!confirm(`Obrisati ovaj zapis (${req.leaveType}, ${req.startDate} → ${req.ongoing ? 'u toku' : req.endDate})?${req.status === 'approved' ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
+
+  if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(emp, req);
+  emp.leave_history.splice(idx, 1);
+  saveEmployees(emps);
+  toast('Zapis obrisan', 'success');
+  if (currentPage === 'employee-detail') renderEmployeeDetail(empId);
+  else if (currentPage === 'history') renderHistory();
+  renderSidebar();
+}
+
+let editHistoryTarget = null;
+
+function openEditHistoryModal(empId, reqId) {
+  const emp = getEmployees().find(e => e.id === empId);
+  const req = emp && (emp.leave_history||[]).find(r => r.id === reqId);
+  if (!req || req.ongoing) return;
+  editHistoryTarget = { empId, reqId };
+  document.getElementById('edit-history-type').value = req.leaveType;
+  document.getElementById('edit-history-start').value = req.startDate;
+  document.getElementById('edit-history-end').value = req.endDate;
+  document.getElementById('edit-history-overlay').classList.remove('hidden');
+}
+
+function closeEditHistoryModal() {
+  document.getElementById('edit-history-overlay').classList.add('hidden');
+  editHistoryTarget = null;
+}
+
+document.getElementById('edit-history-modal-close').onclick = closeEditHistoryModal;
+document.getElementById('edit-history-cancel-btn').onclick = closeEditHistoryModal;
+document.getElementById('edit-history-overlay').addEventListener('click', e => {
+  if (e.target.id === 'edit-history-overlay') closeEditHistoryModal();
+});
+
+document.getElementById('edit-history-confirm-btn').onclick = () => {
+  if (!editHistoryTarget) return;
+  const leaveType = document.getElementById('edit-history-type').value;
+  const startDate = document.getElementById('edit-history-start').value;
+  const endDate = document.getElementById('edit-history-end').value;
+  if (!startDate || !endDate) { toast('Unesite oba datuma', 'warning'); return; }
+  const days = Math.round((new Date(endDate) - new Date(startDate)) / 86400000) + 1;
+  if (days <= 0) { toast('Nevalidni datumi', 'error'); return; }
+
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === editHistoryTarget.empId);
+  const req = emp && (emp.leave_history||[]).find(r => r.id === editHistoryTarget.reqId);
+  if (!req) { closeEditHistoryModal(); return; }
+
+  if (req.status === 'approved') reverseApprovedDays(emp, req);
+  req.leaveType = leaveType;
+  req.startDate = startDate;
+  req.endDate = endDate;
+  req.days = days;
+  if (req.status === 'approved') applyApprovedDays(emp, req);
+
+  saveEmployees(emps);
+  addNotification(emp, `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
+  toast('Zapis izmenjen', 'success');
+  closeEditHistoryModal();
+  if (currentPage === 'employee-detail') renderEmployeeDetail(editHistoryTarget.empId);
+  else if (currentPage === 'history') renderHistory();
+  renderSidebar();
+};
 
 function showRejectModal(empId, reqId) {
   openRejectModal((reason) => {
@@ -3335,7 +3656,7 @@ function renderHistory() {
       <div class="table-wrap">
         ${allHistory.length ? `<table class="responsive-stack">
           <thead>
-            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Razlog odbijanja</th></tr>
+            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Razlog odbijanja</th><th>Akcije</th></tr>
           </thead>
           <tbody>
             ${allHistory.map(({emp, req}) => `
@@ -3352,6 +3673,11 @@ function renderHistory() {
                 <td data-label="Dana">${req.ongoing ? '—' : req.days}</td>
                 <td data-label="Status"><span class="badge badge-${req.status==='approved'?'approved':'rejected'}">${statusSr(req.status)}</span></td>
                 <td class="text-sm text-muted" data-label="Razlog">${req.rejectionReason || (req.ongoing ? '🩹 bolovanje u toku' : '—')}</td>
+                <td data-label="Akcije" class="td-actions">
+                  ${!req.ongoing ? `
+                    <button class="btn btn-secondary btn-sm" onclick="openEditHistoryModal('${emp.id}','${req.id}')">✏️</button>
+                    <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${req.id}')">🗑️</button>` : '—'}
+                </td>
               </tr>`).join('')}
           </tbody>
         </table>` : `
@@ -4144,6 +4470,7 @@ document.addEventListener('keydown', e => {
     closeCmdPalette();
     closeRejectModal();
     closeQuickLeave();
+    closeEditHistoryModal();
     document.getElementById('year-picker-overlay').classList.add('hidden');
     return;
   }
@@ -4178,7 +4505,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 
   if (FIREBASE_ENABLED) {
     try {
-      const cred = await firebaseAuth.signInWithEmailAndPassword(identifier, password);
+      const cred = await firebaseAuth.signInWithEmailAndPassword(toLoginEmail(identifier), password);
       let profile = getUsers().find(u => u.uid === cred.user.uid);
       if (!profile) {
         // Local 'users' cache can be empty/stale on a fresh device (before
