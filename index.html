@@ -2516,7 +2516,8 @@ const PAGE_TITLES = {
   'my-calendar': 'Moj kalendar',
   'my-request': 'Podnesi zahtev',
   'my-profile': 'Moj profil',
-  'employee-detail': 'Detalji radnika'
+  'employee-detail': 'Detalji radnika',
+  'edit-employee': 'Izmeni radnika'
 };
 
 function renderPage() {
@@ -2535,6 +2536,7 @@ function renderPage() {
     case 'my-request': renderMyRequest(); break;
     case 'my-profile': renderMyProfile(); break;
     case 'employee-detail': renderEmployeeDetail(main._empId); break;
+    case 'edit-employee': renderEditEmployee(main._empId); break;
     default: renderDashboard();
   }
   applyRipple();
@@ -3040,6 +3042,7 @@ function renderEmployeeDetail(id) {
   main.innerHTML = `
     <div class="page-header">
       <button class="btn btn-secondary" onclick="navigateTo('employees')">← Nazad</button>
+      <button class="btn btn-primary" onclick="showEditEmployee('${emp.id}')">✏️ Izmeni</button>
     </div>
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-body">
@@ -3204,6 +3207,114 @@ function renderAddEmployee() {
 
     toast('Radnik uspešno dodat!', 'success');
     navigateTo('employees');
+  };
+}
+
+/* ================================================================
+   EDIT EMPLOYEE
+   ================================================================ */
+function showEditEmployee(id) {
+  document.getElementById('main-content')._empId = id;
+  currentPage = 'edit-employee';
+  document.getElementById('header-title').textContent = 'Izmeni radnika';
+  renderSidebar();
+  renderEditEmployee(id);
+}
+
+function renderEditEmployee(id) {
+  const main = document.getElementById('main-content');
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === id);
+  if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div class="page-title">Izmeni radnika</div>
+    </div>
+    <div class="card" style="max-width:600px">
+      <div class="card-body">
+        <form id="edit-emp-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ime i prezime *</label>
+              <input type="text" id="edit-emp-name" required value="${emp.name}">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="${emp.email}" disabled title="Email se ne može menjati ovde">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Pozicija</label>
+              <input type="text" id="edit-emp-position" value="${emp.position || ''}">
+            </div>
+            <div class="form-group">
+              <label>Sektor</label>
+              <input type="text" id="edit-emp-dept" value="${emp.department || ''}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum zaposlenja</label>
+              <input type="date" id="edit-emp-start" value="${emp.startDate || ''}">
+            </div>
+            <div class="form-group">
+              <label>Godišnji odmor (dana)</label>
+              <input type="number" id="edit-emp-annual" value="${emp.annualLeave||20}" min="0" max="60">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Iskorišćeno godišnjeg (dana)</label>
+              <input type="number" id="edit-emp-used" value="${emp.usedLeave||0}" min="0" max="60">
+            </div>
+            <div class="form-group">
+              <label>Slobodni dani (ukupno)</label>
+              <input type="number" id="edit-emp-free" value="${emp.freeDaysAllowance!=null?emp.freeDaysAllowance:3}" min="0" max="30">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Iskorišćeni slobodni dani</label>
+              <input type="number" id="edit-emp-used-free" value="${emp.usedFreeDays||0}" min="0" max="30">
+            </div>
+          </div>
+          <div style="display:flex;gap:.75rem;justify-content:flex-end">
+            <button type="button" class="btn btn-secondary" onclick="showEmployeeDetail('${emp.id}')">Otkaži</button>
+            <button type="submit" class="btn btn-primary">💾 Sačuvaj izmene</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  document.getElementById('edit-emp-form').onsubmit = e => {
+    e.preventDefault();
+    const name = document.getElementById('edit-emp-name').value.trim();
+    if (!name) { toast('Ime je obavezno', 'error'); return; }
+    const idx = emps.findIndex(x => x.id === id);
+    emps[idx] = {
+      ...emp,
+      name,
+      position: document.getElementById('edit-emp-position').value.trim(),
+      department: document.getElementById('edit-emp-dept').value.trim(),
+      startDate: document.getElementById('edit-emp-start').value,
+      annualLeave: parseInt(document.getElementById('edit-emp-annual').value) || 0,
+      usedLeave: parseInt(document.getElementById('edit-emp-used').value) || 0,
+      freeDaysAllowance: parseInt(document.getElementById('edit-emp-free').value) || 0,
+      usedFreeDays: parseInt(document.getElementById('edit-emp-used-free').value) || 0
+    };
+    saveEmployees(emps);
+
+    const users = getUsers();
+    const uIdx = users.findIndex(u => u.employeeId === id);
+    if (uIdx !== -1 && users[uIdx].name !== name) {
+      users[uIdx] = { ...users[uIdx], name };
+      saveUsers(users);
+    }
+
+    toast('Podaci radnika sačuvani', 'success');
+    showEmployeeDetail(id);
   };
 }
 
