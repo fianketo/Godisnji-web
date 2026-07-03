@@ -2018,7 +2018,11 @@ function slugifyName(name) {
 // Firebase Auth will accept: real emails pass through untouched, bare
 // usernames get the fake local domain appended.
 function toLoginEmail(identifier) {
-  return identifier.includes('@') ? identifier : identifier + '@' + LOCAL_LOGIN_DOMAIN;
+  // Usernames are generated from the employee's name via slugifyName, but
+  // people naturally type their name back as shown ("Mihajlo Mitrovic"),
+  // not in its slugified form ("mihajlo.mitrovic") — normalize the same
+  // way here so either form logs in.
+  return identifier.includes('@') ? identifier : slugifyName(identifier) + '@' + LOCAL_LOGIN_DOMAIN;
 }
 
 // Creates a Firebase Auth account for someone else (e.g. admin adding an
