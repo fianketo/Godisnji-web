@@ -1567,6 +1567,20 @@ textarea { resize: vertical; min-height: 80px; }
   .header-actions .btn-label { display: none; }
   #cmd-palette-btn { padding-left: .625rem; padding-right: .625rem; }
 
+  /* The dropdown is normally anchored (right:0) to the bell button itself,
+     which works on desktop where it sits near the header's right edge. On
+     mobile the bell sits mid-header (theme toggle + logout button follow
+     it), so a fixed-width dropdown anchored to it overflows off the left
+     edge of the screen. Anchor to the viewport instead. */
+  .notif-dropdown {
+    position: fixed;
+    top: calc(var(--header-h) + .5rem);
+    left: .75rem;
+    right: .75rem;
+    width: auto;
+    max-width: none;
+  }
+
   /* ---- Tables become stacked cards instead of horizontal-scroll grids ---- */
   .table-wrap table.responsive-stack thead { display: none; }
   table.responsive-stack,
@@ -1844,6 +1858,44 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="modal-footer">
       <button class="btn btn-secondary" id="close-sick-cancel-btn">Otkaži</button>
       <button class="btn btn-primary" id="close-sick-confirm-btn">Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     EDIT HISTORY ENTRY MODAL (admin correction to an approved/rejected
+     leave request — e.g. employee needs different dates after approval)
+     ============================================================ -->
+<div id="edit-history-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <span class="modal-title">✏️ Izmena zahteva</span>
+      <button class="modal-close" id="edit-history-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tip odsustva</label>
+        <select id="edit-history-type">
+          <option>Godišnji odmor</option>
+          <option>Bolovanje</option>
+          <option>Slobodan dan</option>
+          <option>Plaćeno odsustvo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Od</label>
+          <input type="date" id="edit-history-start">
+        </div>
+        <div class="form-group">
+          <label>Do</label>
+          <input type="date" id="edit-history-end">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="edit-history-cancel-btn">Otkaži</button>
+      <button class="btn btn-primary" id="edit-history-confirm-btn">💾 Sačuvaj</button>
     </div>
   </div>
 </div>
@@ -3035,6 +3087,9 @@ function renderEmployeeDetail(id) {
         ${r.ongoing ? 'bolovanje u toku' : `${r.days} dan(a)`} · <span class="badge badge-${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${statusSr(r.status)}</span>
         ${r.reason ? ' · ' + r.reason : ''}
         ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
+        ${!r.ongoing && r.status !== 'pending' ? `
+          <button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openEditHistoryModal('${emp.id}','${r.id}')">✏️ Izmeni</button>
+          <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${r.id}')">🗑️</button>` : ''}
       </div>
     </div>`).join('') :
     `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema istorije</div></div>`;
@@ -3371,18 +3426,11 @@ function renderRequests() {
     </div>`;
 }
 
-function approveRequest(empId, reqId) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === empId);
-  if (!emp) return;
-  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
-  if (idx === -1) return;
-  const req = emp.leave_requests.splice(idx, 1)[0];
-  req.status = 'approved';
-  req.approvedAt = new Date().toISOString();
-  emp.leave_history = emp.leave_history || [];
-  emp.leave_history.push(req);
-
+// Applies the day-count side effects of an approved request to the
+// employee's counters. Shared between approving a pending request and
+// saving an edit to an already-approved history entry (which re-applies
+// after reversing the old counts).
+function applyApprovedDays(emp, req) {
   if (req.leaveType === 'Godišnji odmor') {
     emp.usedLeave = (emp.usedLeave||0) + req.days;
   } else if (req.leaveType === 'Slobodan dan') {
@@ -3397,6 +3445,39 @@ function approveRequest(empId, reqId) {
       addNotification(emp, `Iskorišćeni su svi slobodni dani (${allowance}). ${overflow} dan(a) od zahteva ${req.startDate} → ${req.endDate} je preneto i oduzeto od godišnjeg odmora.`);
     }
   }
+}
+
+// Reverses applyApprovedDays — used when deleting or editing an approved
+// history entry, before either dropping it or re-applying it with new
+// values. Free-day usage isn't tagged with how much of a given request
+// came from the free-day pool vs. overflow, so this reverses from the
+// free-day counter first (up to what's available) and treats any
+// remainder as having come from annual leave, mirroring how it would
+// have been split going forward.
+function reverseApprovedDays(emp, req) {
+  if (req.leaveType === 'Godišnji odmor') {
+    emp.usedLeave = Math.max((emp.usedLeave||0) - req.days, 0);
+  } else if (req.leaveType === 'Slobodan dan') {
+    const fromFree = Math.min(emp.usedFreeDays||0, req.days);
+    emp.usedFreeDays = (emp.usedFreeDays||0) - fromFree;
+    const remainder = req.days - fromFree;
+    if (remainder > 0) emp.usedLeave = Math.max((emp.usedLeave||0) - remainder, 0);
+  }
+}
+
+function approveRequest(empId, reqId) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return;
+  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
+  if (idx === -1) return;
+  const req = emp.leave_requests.splice(idx, 1)[0];
+  req.status = 'approved';
+  req.approvedAt = new Date().toISOString();
+  emp.leave_history = emp.leave_history || [];
+  emp.leave_history.push(req);
+
+  applyApprovedDays(emp, req);
   addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
 
   saveEmployees(emps);
@@ -3404,6 +3485,82 @@ function approveRequest(empId, reqId) {
   renderRequests();
   renderSidebar();
 }
+
+/* ================================================================
+   EDIT / DELETE HISTORY ENTRY (admin correction to an already
+   approved/rejected request)
+   ================================================================ */
+function deleteHistoryEntry(empId, reqId) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return;
+  const idx = (emp.leave_history||[]).findIndex(r => r.id === reqId);
+  if (idx === -1) return;
+  const req = emp.leave_history[idx];
+  if (!confirm(`Obrisati ovaj zapis (${req.leaveType}, ${req.startDate} → ${req.ongoing ? 'u toku' : req.endDate})?${req.status === 'approved' ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
+
+  if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(emp, req);
+  emp.leave_history.splice(idx, 1);
+  saveEmployees(emps);
+  toast('Zapis obrisan', 'success');
+  if (currentPage === 'employee-detail') renderEmployeeDetail(empId);
+  else if (currentPage === 'history') renderHistory();
+  renderSidebar();
+}
+
+let editHistoryTarget = null;
+
+function openEditHistoryModal(empId, reqId) {
+  const emp = getEmployees().find(e => e.id === empId);
+  const req = emp && (emp.leave_history||[]).find(r => r.id === reqId);
+  if (!req || req.ongoing) return;
+  editHistoryTarget = { empId, reqId };
+  document.getElementById('edit-history-type').value = req.leaveType;
+  document.getElementById('edit-history-start').value = req.startDate;
+  document.getElementById('edit-history-end').value = req.endDate;
+  document.getElementById('edit-history-overlay').classList.remove('hidden');
+}
+
+function closeEditHistoryModal() {
+  document.getElementById('edit-history-overlay').classList.add('hidden');
+  editHistoryTarget = null;
+}
+
+document.getElementById('edit-history-modal-close').onclick = closeEditHistoryModal;
+document.getElementById('edit-history-cancel-btn').onclick = closeEditHistoryModal;
+document.getElementById('edit-history-overlay').addEventListener('click', e => {
+  if (e.target.id === 'edit-history-overlay') closeEditHistoryModal();
+});
+
+document.getElementById('edit-history-confirm-btn').onclick = () => {
+  if (!editHistoryTarget) return;
+  const leaveType = document.getElementById('edit-history-type').value;
+  const startDate = document.getElementById('edit-history-start').value;
+  const endDate = document.getElementById('edit-history-end').value;
+  if (!startDate || !endDate) { toast('Unesite oba datuma', 'warning'); return; }
+  const days = Math.round((new Date(endDate) - new Date(startDate)) / 86400000) + 1;
+  if (days <= 0) { toast('Nevalidni datumi', 'error'); return; }
+
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === editHistoryTarget.empId);
+  const req = emp && (emp.leave_history||[]).find(r => r.id === editHistoryTarget.reqId);
+  if (!req) { closeEditHistoryModal(); return; }
+
+  if (req.status === 'approved') reverseApprovedDays(emp, req);
+  req.leaveType = leaveType;
+  req.startDate = startDate;
+  req.endDate = endDate;
+  req.days = days;
+  if (req.status === 'approved') applyApprovedDays(emp, req);
+
+  saveEmployees(emps);
+  addNotification(emp, `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
+  toast('Zapis izmenjen', 'success');
+  closeEditHistoryModal();
+  if (currentPage === 'employee-detail') renderEmployeeDetail(editHistoryTarget.empId);
+  else if (currentPage === 'history') renderHistory();
+  renderSidebar();
+};
 
 function showRejectModal(empId, reqId) {
   openRejectModal((reason) => {
@@ -3446,7 +3603,7 @@ function renderHistory() {
       <div class="table-wrap">
         ${allHistory.length ? `<table class="responsive-stack">
           <thead>
-            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Razlog odbijanja</th></tr>
+            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Razlog odbijanja</th><th>Akcije</th></tr>
           </thead>
           <tbody>
             ${allHistory.map(({emp, req}) => `
@@ -3463,6 +3620,11 @@ function renderHistory() {
                 <td data-label="Dana">${req.ongoing ? '—' : req.days}</td>
                 <td data-label="Status"><span class="badge badge-${req.status==='approved'?'approved':'rejected'}">${statusSr(req.status)}</span></td>
                 <td class="text-sm text-muted" data-label="Razlog">${req.rejectionReason || (req.ongoing ? '🩹 bolovanje u toku' : '—')}</td>
+                <td data-label="Akcije" class="td-actions">
+                  ${!req.ongoing ? `
+                    <button class="btn btn-secondary btn-sm" onclick="openEditHistoryModal('${emp.id}','${req.id}')">✏️</button>
+                    <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${req.id}')">🗑️</button>` : '—'}
+                </td>
               </tr>`).join('')}
           </tbody>
         </table>` : `
@@ -4255,6 +4417,7 @@ document.addEventListener('keydown', e => {
     closeCmdPalette();
     closeRejectModal();
     closeQuickLeave();
+    closeEditHistoryModal();
     document.getElementById('year-picker-overlay').classList.add('hidden');
     return;
   }
