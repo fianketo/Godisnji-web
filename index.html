@@ -1970,6 +1970,13 @@ textarea { resize: vertical; min-height: 80px; }
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
 
 <!-- ============================================================
+     EMAILJS SDK — sends the approval/rejection/edit emails straight
+     from the browser, no server needed. Safe to load even before
+     EMAILJS_CONFIG is filled in, see README.md.
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<!-- ============================================================
      JAVASCRIPT
      ============================================================ -->
 <script>
@@ -1996,6 +2003,47 @@ if (FIREBASE_ENABLED) {
   firebase.initializeApp(FIREBASE_CONFIG);
   firebaseDB = firebase.database();
   firebaseAuth = firebase.auth();
+}
+
+/* ================================================================
+   EMAILJS CONFIG — zameni placeholder vrednosti svojim pravim
+   podacima sa emailjs.com (Email Services / Email Templates / Account
+   → General → Public Key). Dok su ovo placeholder vrednosti, email
+   se jednostavno ne šalje — sve ostalo u aplikaciji radi normalno.
+   ================================================================ */
+const EMAILJS_CONFIG = {
+  publicKey: "YOUR_PUBLIC_KEY",
+  serviceId: "YOUR_SERVICE_ID",
+  templateId: "YOUR_TEMPLATE_ID"
+};
+
+const EMAILJS_ENABLED = EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY";
+if (EMAILJS_ENABLED) emailjs.init(EMAILJS_CONFIG.publicKey);
+
+// Employees added without a real email get a fake @odmorpro.local address
+// purely so Firebase Auth has something to log in with — never send mail
+// to those.
+function hasRealEmail(emp) {
+  return !!emp.email && !emp.email.endsWith('@' + LOCAL_LOGIN_DOMAIN);
+}
+
+function sendLeaveEmail(emp, subject, message) {
+  if (!EMAILJS_ENABLED || !hasRealEmail(emp)) return;
+  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_email: emp.email,
+    to_name: emp.name,
+    subject,
+    message
+  }).catch(err => console.error('EmailJS slanje nije uspelo:', err));
+}
+
+// Records an in-app notification (bell icon) and — if EmailJS is
+// configured and the employee has a real email on file — also emails
+// them the same message. Used for every leave request status change
+// (approved/rejected/edited) so employees hear about it either way.
+function notifyEmployee(emp, subject, message) {
+  addNotification(emp, message);
+  sendLeaveEmail(emp, subject, message);
 }
 
 // Firebase Auth accounts always need an email-shaped identifier, but not
@@ -3531,7 +3579,7 @@ function approveRequest(empId, reqId) {
   emp.leave_history.push(req);
 
   applyApprovedDays(emp, req);
-  addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
+  notifyEmployee(emp, 'Zahtev odobren', `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
 
   saveEmployees(emps);
   toast(`Zahtev odobren za ${emp.name}`, 'success');
@@ -3555,6 +3603,7 @@ function deleteHistoryEntry(empId, reqId) {
   if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(emp, req);
   emp.leave_history.splice(idx, 1);
   saveEmployees(emps);
+  notifyEmployee(emp, 'Zapis obrisan', `Administrator je obrisao vaš zapis za "${req.leaveType}" (${req.startDate}${req.ongoing ? '' : ' → ' + req.endDate}).`);
   toast('Zapis obrisan', 'success');
   if (currentPage === 'employee-detail') renderEmployeeDetail(empId);
   else if (currentPage === 'history') renderHistory();
@@ -3607,7 +3656,7 @@ document.getElementById('edit-history-confirm-btn').onclick = () => {
   if (req.status === 'approved') applyApprovedDays(emp, req);
 
   saveEmployees(emps);
-  addNotification(emp, `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
+  notifyEmployee(emp, 'Zahtev izmenjen', `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
   toast('Zapis izmenjen', 'success');
   closeEditHistoryModal();
   if (currentPage === 'employee-detail') renderEmployeeDetail(editHistoryTarget.empId);
@@ -3628,7 +3677,7 @@ function showRejectModal(empId, reqId) {
     req.rejectionReason = reason;
     emp.leave_history = emp.leave_history || [];
     emp.leave_history.push(req);
-    addNotification(emp, `Vaš zahtev za "${req.leaveType}" (${req.startDate}) je odbijen. Razlog: ${reason}`);
+    notifyEmployee(emp, 'Zahtev odbijen', `Vaš zahtev za "${req.leaveType}" (${req.startDate}) je odbijen. Razlog: ${reason}`);
     saveEmployees(emps);
     toast(`Zahtev odbijen za ${emp.name}`, 'error');
     renderRequests();

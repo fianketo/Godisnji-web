@@ -43,6 +43,16 @@ Lozinke se **ne čuvaju** u našoj bazi — njima upravlja Firebase Authenticati
 
 Ako ne podesiš Firebase (ostaviš placeholder vrednosti u `FIREBASE_CONFIG`), aplikacija i dalje radi normalno u lokalnom demo režimu (admin/admin123, podaci samo na tom uređaju).
 
+## Podešavanje email obaveštenja (EmailJS, opciono, ~5 min, besplatno)
+
+Bez ovog koraka, obaveštenja o odobrenju/odbijanju/izmeni zahteva stižu samo unutar aplikacije (zvonce 🔔). Sa ovim korakom, radnik dobija i pravi email — ali samo ako ima **pravi email** upisan (radnici kojima je generisano korisničko ime bez email-a ne mogu da prime mail, logično).
+
+1. Idi na **https://www.emailjs.com**, napravi besplatan nalog (besplatan paket: ~200 email-ova mesečno).
+2. **Email Services → Add New Service** → poveži svoj Gmail/Outlook (ili drugi provajder) → zapamti prikazani **Service ID**.
+3. **Email Templates → Create New Template.** U telu šablona koristi promenljive `{{to_name}}`, `{{subject}}`, `{{message}}` (npr. naslov `{{subject}}`, telo "Zdravo {{to_name}}, {{message}}"). **Bitno:** u polju **"To Email"** (podešavanje primaoca, obično na vrhu editora) upiši `{{to_email}}` — bez ovoga mail ide na tvoju test adresu umesto radniku. Zapamti **Template ID**.
+4. **Account → General** → zapamti **Public Key**.
+5. Otvori `index.html`, pronađi `const EMAILJS_CONFIG = { ... }` (odmah ispod Firebase podešavanja), i zameni sve tri placeholder vrednosti (`YOUR_PUBLIC_KEY`, `YOUR_SERVICE_ID`, `YOUR_TEMPLATE_ID`) pravim vrednostima iz koraka 2-4. Sačuvaj.
+
 ## Postavljanje na besplatan GitHub Pages
 
 1. Napravi nalog na [github.com](https://github.com) ako ga nemaš.
