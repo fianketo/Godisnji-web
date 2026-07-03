@@ -48,6 +48,7 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
   --transition: .2s ease;
   --glass-blur: none;
+  --dropdown-surface: #ffffff;
   color-scheme: light;
 }
 
@@ -67,6 +68,11 @@
   --shadow: 0 1px 2px rgba(0,0,0,.35), 0 4px 16px rgba(0,0,0,.3);
   --shadow-lg: 0 20px 60px rgba(0,0,0,.55);
   --glass-blur: blur(20px);
+  /* .notif-dropdown floats over page content with no dimming backdrop
+     behind it (unlike .modal, which sits on a dark .modal-overlay) — so
+     unlike --surface, this needs to be solid, or headings behind it
+     ghost through the glass effect. */
+  --dropdown-surface: #131c30;
   color-scheme: dark;
 }
 
@@ -523,20 +529,22 @@ body {
 .notif-bell { position: relative; }
 .notif-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: -6px;
+  right: -6px;
   background: var(--danger);
   color: #fff;
-  font-size: .625rem;
+  font-size: .6875rem;
   font-weight: 700;
-  min-width: 16px;
-  height: 16px;
+  min-width: 18px;
+  height: 18px;
   border-radius: 99px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 3px;
-  box-shadow: 0 0 0 2px var(--surface);
+  padding: 0 4px;
+  box-shadow: 0 0 0 2px var(--bg);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .notif-dropdown {
@@ -547,9 +555,7 @@ body {
   max-width: 88vw;
   max-height: 420px;
   overflow-y: auto;
-  background: var(--surface);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--dropdown-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
@@ -564,7 +570,7 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: var(--surface);
+  background: var(--dropdown-surface);
 }
 
 .notif-item {
@@ -1774,8 +1780,8 @@ textarea { resize: vertical; min-height: 80px; }
       <div class="notif-wrap">
         <button class="btn btn-secondary btn-sm notif-bell" id="notif-bell-btn" title="Obaveštenja">
           🔔
-          <span class="notif-badge hidden" id="notif-badge">0</span>
         </button>
+        <span class="notif-badge hidden" id="notif-badge">0</span>
         <div class="notif-dropdown hidden" id="notif-dropdown">
           <div class="notif-dropdown-header" id="notif-dropdown-title">Obaveštenja</div>
           <div class="notif-list" id="notif-list"></div>
