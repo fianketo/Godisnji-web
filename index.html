@@ -1678,8 +1678,8 @@ textarea { resize: vertical; min-height: 80px; }
     <div class="login-error" id="login-error"></div>
     <form class="login-form" id="login-form">
       <div class="form-group">
-        <label for="login-email">Email</label>
-        <input type="text" id="login-email" placeholder="npr. marko@firma.rs" autocomplete="username">
+        <label for="login-email">Email ili korisničko ime</label>
+        <input type="text" id="login-email" placeholder="npr. marko@firma.rs ili marko.nikolic" autocomplete="username">
       </div>
       <div class="form-group">
         <label for="login-pass">Lozinka</label>
@@ -1996,6 +1996,29 @@ if (FIREBASE_ENABLED) {
   firebase.initializeApp(FIREBASE_CONFIG);
   firebaseDB = firebase.database();
   firebaseAuth = firebase.auth();
+}
+
+// Firebase Auth accounts always need an email-shaped identifier, but not
+// every employee has (or wants to use) a real email address. For those,
+// "Dodaj radnika" generates a username from their name and pairs it with
+// this fake domain to get a valid Firebase Auth email — the employee then
+// logs in with just the username, never seeing the @ part.
+const LOCAL_LOGIN_DOMAIN = 'odmorpro.local';
+
+function slugifyName(name) {
+  const diacritics = { š:'s', đ:'dj', č:'c', ć:'c', ž:'z' };
+  return name.toLowerCase()
+    .replace(/[šđčćž]/g, ch => diacritics[ch])
+    .normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]', 'g'), '')
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/^\.+|\.+$/g, '');
+}
+
+// Turns whatever the login form's identifier field holds into something
+// Firebase Auth will accept: real emails pass through untouched, bare
+// usernames get the fake local domain appended.
+function toLoginEmail(identifier) {
+  return identifier.includes('@') ? identifier : identifier + '@' + LOCAL_LOGIN_DOMAIN;
 }
 
 // Creates a Firebase Auth account for someone else (e.g. admin adding an
@@ -3176,8 +3199,9 @@ function renderAddEmployee() {
               <input type="text" id="emp-name" required placeholder="Marko Nikolić">
             </div>
             <div class="form-group">
-              <label>Email *</label>
-              <input type="email" id="emp-email" required placeholder="marko@firma.rs">
+              <label>Email (opciono)</label>
+              <input type="email" id="emp-email" placeholder="marko@firma.rs">
+              <div class="text-xs text-muted" style="margin-top:.25rem">Ako radnik nema email, ostavite prazno — dobiće korisničko ime za prijavu na osnovu imena.</div>
             </div>
           </div>
           <div class="form-row">
@@ -3221,9 +3245,20 @@ function renderAddEmployee() {
   document.getElementById('add-emp-form').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('emp-name').value.trim();
-    const email = document.getElementById('emp-email').value.trim();
+    let email = document.getElementById('emp-email').value.trim();
     const emps = getEmployees();
-    if (emps.find(e => e.email === email)) { toast('Email već postoji', 'error'); return; }
+    if (email && emps.find(e => e.email === email)) { toast('Email već postoji', 'error'); return; }
+
+    let generatedUsername = null;
+    if (!email) {
+      const base = slugifyName(name) || 'radnik';
+      const taken = new Set(emps.map(e => e.email).concat(getUsers().map(u => u.email)).filter(Boolean));
+      let candidate = base, n = 1;
+      while (taken.has(candidate + '@' + LOCAL_LOGIN_DOMAIN)) { n++; candidate = base + n; }
+      generatedUsername = candidate;
+      email = candidate + '@' + LOCAL_LOGIN_DOMAIN;
+    }
+
     const newEmp = {
       id: 'e' + Date.now(),
       name, email,
@@ -3254,7 +3289,11 @@ function renderAddEmployee() {
       const users = getUsers();
       users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
       saveUsers(users);
-      toast('Radnik uspešno dodat!', 'success');
+      if (generatedUsername) {
+        alert(`Radnik dodat!\n\nZa prijavu recite radniku da unese:\nKorisničko ime: ${generatedUsername}\nLozinka: ${pwd}`);
+      } else {
+        toast('Radnik uspešno dodat!', 'success');
+      }
       navigateTo('employees');
       return;
     }
@@ -3266,7 +3305,11 @@ function renderAddEmployee() {
     users.push({ id: 'u' + newEmp.id, email: newEmp.email, password: pwd, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
     saveUsers(users);
 
-    toast('Radnik uspešno dodat!', 'success');
+    if (generatedUsername) {
+      alert(`Radnik dodat!\n\nZa prijavu recite radniku da unese:\nKorisničko ime: ${generatedUsername}\nLozinka: ${pwd}`);
+    } else {
+      toast('Radnik uspešno dodat!', 'success');
+    }
     navigateTo('employees');
   };
 }
@@ -4458,7 +4501,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
 
   if (FIREBASE_ENABLED) {
     try {
-      const cred = await firebaseAuth.signInWithEmailAndPassword(identifier, password);
+      const cred = await firebaseAuth.signInWithEmailAndPassword(toLoginEmail(identifier), password);
       let profile = getUsers().find(u => u.uid === cred.user.uid);
       if (!profile) {
         // Local 'users' cache can be empty/stale on a fresh device (before
