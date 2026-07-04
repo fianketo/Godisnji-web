@@ -2806,6 +2806,30 @@ function isOnLeaveToday(emp) {
   return (emp.leave_history||[]).some(covers) || (emp.leave_requests||[]).some(covers);
 }
 
+function rangesOverlap(aStart, aEnd, bStart, bEnd) {
+  const aE = aEnd || '9999-12-31';
+  const bE = bEnd || '9999-12-31';
+  return aStart <= bE && bStart <= aE;
+}
+
+// Other employees whose already-approved leave overlaps the given
+// (pending) request's dates — shown on Zahtevi so the admin can see
+// team conflicts before approving, not just visually via the calendar.
+function overlappingCoworkers(emp, req) {
+  const emps = getEmployees();
+  const names = [];
+  emps.forEach(other => {
+    if (other.id === emp.id) return;
+    (other.leave_history||[]).forEach(r => {
+      if (r.status !== 'approved') return;
+      if (rangesOverlap(req.startDate, req.ongoing ? null : req.endDate, r.startDate, r.ongoing ? null : r.endDate)) {
+        names.push(other.name);
+      }
+    });
+  });
+  return [...new Set(names)];
+}
+
 /* ================================================================
    SICK LEAVE / FREE DAYS / NOTIFICATIONS
    ================================================================ */
@@ -3551,12 +3575,17 @@ function renderRequests() {
             <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Preostalo (uklj. rezervacije)</th><th>Status</th><th>Akcije</th></tr>
           </thead>
           <tbody>
-            ${allRequests.map(({emp, req}) => `
+            ${allRequests.map(({emp, req}) => {
+              const overlaps = overlappingCoworkers(emp, req);
+              return `
               <tr>
                 <td class="td-primary">
                   <div class="flex items-center gap-2">
                     ${makeAvatar(emp.name)}
-                    <span style="font-weight:600">${emp.name}</span>
+                    <div>
+                      <span style="font-weight:600">${emp.name}</span>
+                      ${overlaps.length ? `<div class="text-xs" style="color:var(--warning)">⚠️ Preklapa se: ${overlaps.join(', ')}</div>` : ''}
+                    </div>
                   </div>
                 </td>
                 <td data-label="Tip">${req.leaveType}</td>
@@ -3569,7 +3598,8 @@ function renderRequests() {
                   <button class="btn btn-success btn-sm" onclick="approveRequest('${emp.id}','${req.id}')">✅ Odobri</button>
                   <button class="btn btn-danger btn-sm" onclick="showRejectModal('${emp.id}','${req.id}')" style="margin-left:.25rem">❌ Odbij</button>
                 </td>
-              </tr>`).join('')}
+              </tr>`;
+            }).join('')}
           </tbody>
         </table>` : `
           <div class="empty-state">
@@ -3673,6 +3703,33 @@ function applyElapsedLeaveDeductions() {
       emp.usedLeave = (emp.usedLeave||0) + (req.annualDaysUsed||0);
       emp.usedFreeDays = (emp.usedFreeDays||0) + (req.freeDaysUsed||0);
       req.daysApplied = true;
+      changed = true;
+    });
+  });
+  if (changed) saveEmployees(emps);
+}
+
+// Runs at app start: notifies (in-app + email) an employee once their
+// approved leave is within 7 days of starting. reminderSent guards
+// against re-notifying every time the app is reopened during that week.
+// Backdated/already-started approvals are marked sent without notifying
+// — a "your leave starts in 7 days" reminder makes no sense in the past.
+function sendUpcomingLeaveReminders() {
+  const today = new Date().toISOString().split('T')[0];
+  const in7 = new Date();
+  in7.setDate(in7.getDate() + 7);
+  const in7Str = in7.toISOString().split('T')[0];
+  const remindableTypes = ['Godišnji odmor', 'Slobodan dan', 'Plaćeno odsustvo'];
+  const emps = getEmployees();
+  let changed = false;
+  emps.forEach(emp => {
+    (emp.leave_history||[]).forEach(req => {
+      if (req.status !== 'approved' || req.reminderSent || req.ongoing) return;
+      if (!remindableTypes.includes(req.leaveType)) return;
+      if (req.startDate < today) { req.reminderSent = true; changed = true; return; }
+      if (req.startDate > in7Str) return;
+      notifyEmployee(emp, 'Podsetnik: odmor uskoro', `Podsetnik: Vaš "${req.leaveType}" počinje ${req.startDate} → ${req.endDate}.`);
+      req.reminderSent = true;
       changed = true;
     });
   });
@@ -4869,6 +4926,7 @@ function startApp() {
   initTheme();
   applyElapsedLeaveDeductions();
   applyYearRollover();
+  sendUpcomingLeaveReminders();
   renderSidebar();
   renderPage();
   startCloudListeners();
