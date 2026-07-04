@@ -2729,46 +2729,14 @@ function renderDashboard() {
           <div class="stat-label">Bolovanje do 2 dana (broj)</div>
         </div>
       </div>
-      <div class="card" style="margin-bottom:1.5rem">
-        <div class="card-header">
-          <div class="card-title">📅 Kalendar odsustva</div>
-          <div style="margin-left:auto;display:flex;gap:.5rem">
-            <button class="btn btn-secondary btn-sm" id="cal-today">Danas</button>
-            <button class="btn btn-secondary btn-sm" id="cal-prev">◀</button>
-            <button class="btn btn-secondary btn-sm" id="cal-next">▶</button>
-          </div>
-        </div>
-        <div class="card-body" style="padding-top:.5rem">
-          <div class="calendar-nav">
-            <span class="calendar-month-label" id="cal-month-label"></span>
-          </div>
-          <div class="calendar-grid" id="cal-grid"></div>
-        </div>
-      </div>`;
+      ${calendarCardHtml()}`;
 
     // Animate counters
     document.querySelectorAll('[data-counter]').forEach(el => {
       animateCounter(el, parseInt(el.dataset.counter));
     });
 
-    renderCalendar();
-
-    document.getElementById('cal-prev').onclick = () => {
-      currentMonth--;
-      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-      renderCalendar();
-    };
-    document.getElementById('cal-next').onclick = () => {
-      currentMonth++;
-      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-      renderCalendar();
-    };
-    document.getElementById('cal-today').onclick = () => {
-      currentMonth = new Date().getMonth();
-      currentYear = new Date().getFullYear();
-      renderCalendar();
-    };
-    document.getElementById('cal-month-label').onclick = openYearPicker;
+    wireCalendarNav();
 
   } else {
     // Employee dashboard
@@ -2930,6 +2898,50 @@ const LEAVE_COLORS = {
   'Slobodan dan': { bg: '#fef3c7', text: '#92400e' },
   'Plaćeno odsustvo': { bg: '#d1fae5', text: '#065f46' }
 };
+
+// Shared team-absence calendar card — used on both the Dashboard and the
+// admin Zahtevi page (so admins can see who's off while deciding on a
+// pending request), driven by the same #cal-grid/#cal-month-label markup
+// and the global currentMonth/currentYear state.
+function calendarCardHtml(title = '📅 Kalendar odsustva') {
+  return `
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header">
+        <div class="card-title">${title}</div>
+        <div style="margin-left:auto;display:flex;gap:.5rem">
+          <button class="btn btn-secondary btn-sm" id="cal-today">Danas</button>
+          <button class="btn btn-secondary btn-sm" id="cal-prev">◀</button>
+          <button class="btn btn-secondary btn-sm" id="cal-next">▶</button>
+        </div>
+      </div>
+      <div class="card-body" style="padding-top:.5rem">
+        <div class="calendar-nav">
+          <span class="calendar-month-label" id="cal-month-label"></span>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+    </div>`;
+}
+
+function wireCalendarNav() {
+  renderCalendar();
+  document.getElementById('cal-prev').onclick = () => {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+  };
+  document.getElementById('cal-next').onclick = () => {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    renderCalendar();
+  };
+  document.getElementById('cal-today').onclick = () => {
+    currentMonth = new Date().getMonth();
+    currentYear = new Date().getFullYear();
+    renderCalendar();
+  };
+  document.getElementById('cal-month-label').onclick = openYearPicker;
+}
 
 function renderCalendar() {
   const label = document.getElementById('cal-month-label');
@@ -3151,6 +3163,7 @@ function renderEmployeeDetail(id) {
   const emp = emps.find(e => e.id === id);
   if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
   const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+  const reservedDays = reservedAnnualDays(emp);
   const allHistory = [...(emp.leave_history||[]), ...(emp.leave_requests||[])].sort((a,b) => new Date(b.startDate)-new Date(a.startDate));
 
   const ringBlue = progressRing(emp.usedLeave||0, emp.annualLeave||20, '#3b82f6', 64);
@@ -3206,6 +3219,10 @@ function renderEmployeeDetail(id) {
           <div class="detail-item">
             <div class="detail-label">Preostalo</div>
             <div class="detail-value" style="${remaining<5?'color:var(--danger)':'color:var(--success)'}">${remaining} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Rezervisano (buduće)</div>
+            <div class="detail-value text-muted">${reservedDays} dana</div>
           </div>
           <div class="detail-item">
             <div class="detail-label">Preostalo slobodnih dana</div>
@@ -3495,7 +3512,7 @@ function renderRequests() {
       <div class="table-wrap">
         ${allRequests.length ? `<table class="responsive-stack">
           <thead>
-            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Status</th><th>Akcije</th></tr>
+            <tr><th>Radnik</th><th>Tip</th><th>Od</th><th>Do</th><th>Dana</th><th>Preostalo (uklj. rezervacije)</th><th>Status</th><th>Akcije</th></tr>
           </thead>
           <tbody>
             ${allRequests.map(({emp, req}) => `
@@ -3510,6 +3527,7 @@ function renderRequests() {
                 <td data-label="Od">${req.startDate}</td>
                 <td data-label="Do">${req.ongoing ? 'u toku' : req.endDate}</td>
                 <td data-label="Dana">${req.ongoing ? '—' : req.days}</td>
+                <td data-label="Preostalo (uklj. rezervacije)" class="text-sm text-muted">${effectiveAnnualRemaining(emp)} dana</td>
                 <td data-label="Status"><span class="badge badge-pending">⏳ Na čekanju</span></td>
                 <td class="td-actions">
                   <button class="btn btn-success btn-sm" onclick="approveRequest('${emp.id}','${req.id}')">✅ Odobri</button>
@@ -3524,46 +3542,105 @@ function renderRequests() {
             <div class="empty-state-sub">Svi zahtevi su obrađeni</div>
           </div>`}
       </div>
-    </div>`;
+    </div>
+    ${calendarCardHtml('📅 Ko je odsutan')}`;
+
+  wireCalendarNav();
 }
 
-// Applies the day-count side effects of an approved request to the
-// employee's counters. Shared between approving a pending request and
-// saving an edit to an already-approved history entry (which re-applies
-// after reversing the old counts).
-function applyApprovedDays(emp, req) {
+// Leave days are only meant to count against the balance once they're
+// actually taken — an approved request for next month shouldn't shrink
+// "Preostalo" today. So approving/editing a request only *allocates*
+// which pool it'll draw from (annual vs. free-day, decided now so the
+// free-day overflow logic sees other pending reservations too — see
+// reservedFreeDays below) and marks it daysApplied:false. It isn't
+// folded into emp.usedLeave/usedFreeDays until applyElapsedLeaveDeductions()
+// notices its date has arrived.
+function allocateApprovedDays(emp, req) {
   if (req.leaveType === 'Godišnji odmor') {
-    emp.usedLeave = (emp.usedLeave||0) + req.days;
+    req.annualDaysUsed = req.days;
+    req.freeDaysUsed = 0;
   } else if (req.leaveType === 'Slobodan dan') {
     const allowance = freeDaysAllowance(emp);
-    const remainingFree = Math.max(allowance - (emp.usedFreeDays||0), 0);
+    const committedFree = (emp.usedFreeDays||0) + reservedFreeDays(emp);
+    const remainingFree = Math.max(allowance - committedFree, 0);
     if (req.days <= remainingFree) {
-      emp.usedFreeDays = (emp.usedFreeDays||0) + req.days;
+      req.freeDaysUsed = req.days;
+      req.annualDaysUsed = 0;
     } else {
       const overflow = req.days - remainingFree;
-      emp.usedFreeDays = allowance;
-      emp.usedLeave = (emp.usedLeave||0) + overflow;
+      req.freeDaysUsed = remainingFree;
+      req.annualDaysUsed = overflow;
       addNotification(emp, `Iskorišćeni su svi slobodni dani (${allowance}). ${overflow} dan(a) od zahteva ${req.startDate} → ${req.endDate} je preneto i oduzeto od godišnjeg odmora.`);
     }
+  } else {
+    req.annualDaysUsed = 0;
+    req.freeDaysUsed = 0;
   }
+  req.daysApplied = false;
 }
 
-// Reverses applyApprovedDays — used when deleting or editing an approved
-// history entry, before either dropping it or re-applying it with new
-// values. Free-day usage isn't tagged with how much of a given request
-// came from the free-day pool vs. overflow, so this reverses from the
-// free-day counter first (up to what's available) and treats any
-// remainder as having come from annual leave, mirroring how it would
-// have been split going forward.
+// Reverses an already-applied allocation — used when deleting or editing
+// an approved history entry, before either dropping it or re-allocating
+// it with new values. No-op on the emp counters if the request's date
+// hadn't arrived yet (nothing was ever moved into them).
 function reverseApprovedDays(emp, req) {
-  if (req.leaveType === 'Godišnji odmor') {
-    emp.usedLeave = Math.max((emp.usedLeave||0) - req.days, 0);
-  } else if (req.leaveType === 'Slobodan dan') {
-    const fromFree = Math.min(emp.usedFreeDays||0, req.days);
-    emp.usedFreeDays = (emp.usedFreeDays||0) - fromFree;
-    const remainder = req.days - fromFree;
-    if (remainder > 0) emp.usedLeave = Math.max((emp.usedLeave||0) - remainder, 0);
+  if (req.daysApplied) {
+    emp.usedLeave = Math.max((emp.usedLeave||0) - (req.annualDaysUsed||0), 0);
+    emp.usedFreeDays = Math.max((emp.usedFreeDays||0) - (req.freeDaysUsed||0), 0);
   }
+  req.annualDaysUsed = 0;
+  req.freeDaysUsed = 0;
+  req.daysApplied = false;
+}
+
+// Sum of days from approved requests that are allocated but not yet
+// applied (their date hasn't arrived) — i.e. "reserved" future leave
+// that doesn't shrink Preostalo yet but should still be visible.
+function reservedAnnualDays(emp) {
+  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false ? (r.annualDaysUsed||0) : 0), 0);
+}
+function reservedFreeDays(emp) {
+  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false ? (r.freeDaysUsed||0) : 0), 0);
+}
+
+// Forward-looking balance: what's left after every currently-approved
+// reservation is eventually taken, not just what's been taken so far.
+function effectiveAnnualRemaining(emp) {
+  return (emp.annualLeave||20) - (emp.usedLeave||0) - reservedAnnualDays(emp);
+}
+
+// Runs at app start (and right after any approve/edit that might already
+// be backdated) to move due allocations from "reserved" into the
+// employee's actual usedLeave/usedFreeDays once their date has arrived.
+// Also migrates history entries that predate this feature (no
+// daysApplied field at all) — their days were already folded into the
+// counters under the old immediate-deduction logic, so they're marked
+// applied without touching the counters again.
+function applyElapsedLeaveDeductions() {
+  const today = new Date().toISOString().split('T')[0];
+  const emps = getEmployees();
+  let changed = false;
+  emps.forEach(emp => {
+    (emp.leave_history||[]).forEach(req => {
+      if (req.status !== 'approved' || req.ongoing) return;
+      if (req.leaveType !== 'Godišnji odmor' && req.leaveType !== 'Slobodan dan') return;
+      if (req.daysApplied === undefined) {
+        req.daysApplied = true;
+        req.annualDaysUsed = req.leaveType === 'Godišnji odmor' ? (req.days||0) : 0;
+        req.freeDaysUsed = req.leaveType === 'Slobodan dan' ? (req.days||0) : 0;
+        changed = true;
+        return;
+      }
+      if (req.daysApplied) return;
+      if ((req.endDate || req.startDate) > today) return;
+      emp.usedLeave = (emp.usedLeave||0) + (req.annualDaysUsed||0);
+      emp.usedFreeDays = (emp.usedFreeDays||0) + (req.freeDaysUsed||0);
+      req.daysApplied = true;
+      changed = true;
+    });
+  });
+  if (changed) saveEmployees(emps);
 }
 
 function approveRequest(empId, reqId) {
@@ -3578,10 +3655,11 @@ function approveRequest(empId, reqId) {
   emp.leave_history = emp.leave_history || [];
   emp.leave_history.push(req);
 
-  applyApprovedDays(emp, req);
+  allocateApprovedDays(emp, req);
   notifyEmployee(emp, 'Zahtev odobren', `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
 
   saveEmployees(emps);
+  applyElapsedLeaveDeductions();
   toast(`Zahtev odobren za ${emp.name}`, 'success');
   renderRequests();
   renderSidebar();
@@ -3598,7 +3676,7 @@ function deleteHistoryEntry(empId, reqId) {
   const idx = (emp.leave_history||[]).findIndex(r => r.id === reqId);
   if (idx === -1) return;
   const req = emp.leave_history[idx];
-  if (!confirm(`Obrisati ovaj zapis (${req.leaveType}, ${req.startDate} → ${req.ongoing ? 'u toku' : req.endDate})?${req.status === 'approved' ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
+  if (!confirm(`Obrisati ovaj zapis (${req.leaveType}, ${req.startDate} → ${req.ongoing ? 'u toku' : req.endDate})?${req.status === 'approved' && req.daysApplied ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
 
   if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(emp, req);
   emp.leave_history.splice(idx, 1);
@@ -3653,9 +3731,10 @@ document.getElementById('edit-history-confirm-btn').onclick = () => {
   req.startDate = startDate;
   req.endDate = endDate;
   req.days = days;
-  if (req.status === 'approved') applyApprovedDays(emp, req);
+  if (req.status === 'approved') allocateApprovedDays(emp, req);
 
   saveEmployees(emps);
+  applyElapsedLeaveDeductions();
   notifyEmployee(emp, 'Zahtev izmenjen', `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
   toast('Zapis izmenjen', 'success');
   closeEditHistoryModal();
@@ -4139,7 +4218,7 @@ function openQuickLeave(startStr, endStr) {
     if (s && en) {
       const days = Math.round((new Date(en) - new Date(s)) / 86400000) + 1;
       const emp = getEmployees().find(e => e.id === currentUser.employeeId);
-      const remaining = emp ? (emp.annualLeave||20) - (emp.usedLeave||0) : 0;
+      const remaining = emp ? effectiveAnnualRemaining(emp) : 0;
       if (days > 0) {
         info.textContent = `📅 ${days} dan(a) odsustva`;
         info.style.color = (type === 'Godišnji odmor' && days > remaining) ? 'var(--danger)' : 'var(--text2)';
@@ -4169,7 +4248,7 @@ function openQuickLeave(startStr, endStr) {
     const emps = getEmployees();
     const emp = emps.find(x => x.id === currentUser.employeeId);
     if (!emp) return;
-    const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+    const remaining = effectiveAnnualRemaining(emp);
     if (type === 'Godišnji odmor' && days > remaining) {
       toast(`Nemate dovoljno dana (preostalo: ${remaining})`, 'error'); return;
     }
@@ -4204,7 +4283,7 @@ function renderMyRequest() {
   const main = document.getElementById('main-content');
   const emp = getEmployees().find(e => e.id === currentUser.employeeId);
   if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
-  const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+  const remaining = effectiveAnnualRemaining(emp);
 
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podnesi zahtev</div></div>
@@ -4355,6 +4434,7 @@ function renderMyProfile() {
   const emp = getEmployees().find(e => e.id === currentUser.employeeId);
   if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
   const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
+  const reservedDays = reservedAnnualDays(emp);
   const freeRemaining = freeDaysRemaining(emp);
   const sickDaysTotal = computeSickDaysTotal(emp);
   const sickShortCount = computeSickShortCount(emp);
@@ -4386,6 +4466,10 @@ function renderMyProfile() {
           <div class="detail-item">
             <div class="detail-label">Preostalo odmora</div>
             <div class="detail-value" style="${remaining<5?'color:var(--danger)':''}">${remaining} dana</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Rezervisano (buduće)</div>
+            <div class="detail-value text-muted">${reservedDays} dana</div>
           </div>
           <div class="detail-item">
             <div class="detail-label">Preostalo slobodnih dana</div>
@@ -4748,6 +4832,7 @@ function startApp() {
   document.getElementById('app').style.display = 'block';
   currentPage = 'dashboard';
   initTheme();
+  applyElapsedLeaveDeductions();
   applyYearRollover();
   renderSidebar();
   renderPage();
