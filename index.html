@@ -2688,7 +2688,7 @@ function renderDashboard() {
 
   if (currentUser.role === 'admin') {
     const sickDaysTotal = emps.reduce((s, e) => s + computeSickDaysTotal(e), 0);
-    const sickShortTotal = emps.reduce((s, e) => s + computeSickShortCount(e), 0);
+    const sickShortTotal = emps.reduce((s, e) => s + computeSickShortDaysThisYear(e), 0);
 
     main.innerHTML = `
       <div class="page-header">
@@ -2726,7 +2726,7 @@ function renderDashboard() {
         <div class="stat-card red">
           <div class="stat-icon">🤒</div>
           <div class="stat-value" data-counter="${sickShortTotal}">0</div>
-          <div class="stat-label">Bolovanje do 2 dana (broj)</div>
+          <div class="stat-label">Bolovanje do 2 dana (dana, ove godine)</div>
         </div>
       </div>
       ${calendarCardHtml()}`;
@@ -2746,7 +2746,9 @@ function renderDashboard() {
     const myPending = (emp.leave_requests||[]).filter(r=>r.status==='pending').length;
     const freeRemaining = freeDaysRemaining(emp);
     const sickDaysTotal = computeSickDaysTotal(emp);
-    const sickShortCount = computeSickShortCount(emp);
+    const sickShortCount = computeSickShortDaysThisYear(emp);
+    const effAnnual = effectiveAnnualRemaining(emp);
+    const effFree = effectiveFreeDaysRemaining(emp);
 
     main.innerHTML = `
       <div class="page-header">
@@ -2761,11 +2763,13 @@ function renderDashboard() {
           <div class="stat-icon">📅</div>
           <div class="stat-value" data-counter="${remaining}">0</div>
           <div class="stat-label">Preostalo godišnjeg odmora</div>
+          ${effAnnual !== remaining ? `<div class="text-xs text-muted" style="margin-top:.25rem">Sa rezervacijama: ${effAnnual}</div>` : ''}
         </div>
         <div class="stat-card green">
           <div class="stat-icon">🗓️</div>
           <div class="stat-value" data-counter="${freeRemaining}">0</div>
           <div class="stat-label">Preostalo slobodnih dana</div>
+          ${effFree !== freeRemaining ? `<div class="text-xs text-muted" style="margin-top:.25rem">Sa rezervacijama: ${effFree}</div>` : ''}
         </div>
         <div class="stat-card yellow">
           <div class="stat-icon">⏳</div>
@@ -2780,7 +2784,7 @@ function renderDashboard() {
         <div class="stat-card red">
           <div class="stat-icon">🤒</div>
           <div class="stat-value" data-counter="${sickShortCount}">0</div>
-          <div class="stat-label">Bolovanje do 2 dana (broj)</div>
+          <div class="stat-label">Bolovanje do 2 dana (dana, ove godine)</div>
         </div>
       </div>
       <div class="card">
@@ -2823,13 +2827,22 @@ function computeSickDaysTotal(emp) {
   return total;
 }
 
-function computeSickShortCount(emp) {
+// Total days (not number of requests) of "Bolovanje (do 2 dana)" taken
+// in the current calendar year — e.g. three separate 2-day short-sick
+// requests count as 6, not 3.
+function computeSickShortDaysThisYear(emp) {
+  const year = new Date().getFullYear();
   const all = [...(emp.leave_history||[]), ...(emp.leave_requests||[])];
-  return all.filter(r => r.leaveType === 'Bolovanje (do 2 dana)' && r.status !== 'rejected').length;
+  return all.reduce((sum, r) => {
+    if (r.leaveType !== 'Bolovanje (do 2 dana)' || r.status === 'rejected') return sum;
+    if (new Date(r.startDate).getFullYear() !== year) return sum;
+    return sum + (r.days || 0);
+  }, 0);
 }
 
 function freeDaysAllowance(emp) { return emp.freeDaysAllowance ?? 3; }
 function freeDaysRemaining(emp) { return freeDaysAllowance(emp) - (emp.usedFreeDays || 0); }
+function effectiveFreeDaysRemaining(emp) { return freeDaysRemaining(emp) - reservedFreeDays(emp); }
 
 // Runs on every app start. For each employee, catches up any New Year's
 // (Jan 1st) rollovers they missed since the app was last opened:
@@ -3163,14 +3176,15 @@ function renderEmployeeDetail(id) {
   const emp = emps.find(e => e.id === id);
   if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
   const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
-  const reservedDays = reservedAnnualDays(emp);
+  const effAnnual = effectiveAnnualRemaining(emp);
   const allHistory = [...(emp.leave_history||[]), ...(emp.leave_requests||[])].sort((a,b) => new Date(b.startDate)-new Date(a.startDate));
 
   const ringBlue = progressRing(emp.usedLeave||0, emp.annualLeave||20, '#3b82f6', 64);
   const ringGreen = progressRing(remaining, emp.annualLeave||20, '#22c55e', 64);
   const sickTotal = computeSickDaysTotal(emp);
-  const sickShort = computeSickShortCount(emp);
+  const sickShort = computeSickShortDaysThisYear(emp);
   const freeRemaining = freeDaysRemaining(emp);
+  const effFree = effectiveFreeDaysRemaining(emp);
 
   // Timeline
   const timelineHtml = allHistory.length ? allHistory.map(r => `
@@ -3219,22 +3233,20 @@ function renderEmployeeDetail(id) {
           <div class="detail-item">
             <div class="detail-label">Preostalo</div>
             <div class="detail-value" style="${remaining<5?'color:var(--danger)':'color:var(--success)'}">${remaining} dana</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Rezervisano (buduće)</div>
-            <div class="detail-value text-muted">${reservedDays} dana</div>
+            ${effAnnual !== remaining ? `<div class="text-xs text-muted" style="margin-top:.15rem">Sa rezervacijama: ${effAnnual} dana</div>` : ''}
           </div>
           <div class="detail-item">
             <div class="detail-label">Preostalo slobodnih dana</div>
             <div class="detail-value" style="${freeRemaining<=0?'color:var(--danger)':''}">${freeRemaining} / ${freeDaysAllowance(emp)}</div>
+            ${effFree !== freeRemaining ? `<div class="text-xs text-muted" style="margin-top:.15rem">Sa rezervacijama: ${effFree}</div>` : ''}
           </div>
           <div class="detail-item">
             <div class="detail-label">Bolovanje (ukupno)</div>
             <div class="detail-value">${sickTotal} dana</div>
           </div>
           <div class="detail-item">
-            <div class="detail-label">Bolovanje do 2 dana</div>
-            <div class="detail-value">${sickShort}×</div>
+            <div class="detail-label">Bolovanje do 2 dana (ove godine)</div>
+            <div class="detail-value">${sickShort} dana</div>
           </div>
         </div>
         <div class="flex gap-3" style="justify-content:center;flex-wrap:wrap">
@@ -4434,10 +4446,11 @@ function renderMyProfile() {
   const emp = getEmployees().find(e => e.id === currentUser.employeeId);
   if (!emp) { main.innerHTML = '<p>Greška: profil nije pronađen.</p>'; return; }
   const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
-  const reservedDays = reservedAnnualDays(emp);
+  const effAnnual = effectiveAnnualRemaining(emp);
   const freeRemaining = freeDaysRemaining(emp);
+  const effFree = effectiveFreeDaysRemaining(emp);
   const sickDaysTotal = computeSickDaysTotal(emp);
-  const sickShortCount = computeSickShortCount(emp);
+  const sickShortCount = computeSickShortDaysThisYear(emp);
 
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Moj profil</div></div>
@@ -4466,22 +4479,20 @@ function renderMyProfile() {
           <div class="detail-item">
             <div class="detail-label">Preostalo odmora</div>
             <div class="detail-value" style="${remaining<5?'color:var(--danger)':''}">${remaining} dana</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">Rezervisano (buduće)</div>
-            <div class="detail-value text-muted">${reservedDays} dana</div>
+            ${effAnnual !== remaining ? `<div class="text-xs text-muted" style="margin-top:.15rem">Sa rezervacijama: ${effAnnual} dana</div>` : ''}
           </div>
           <div class="detail-item">
             <div class="detail-label">Preostalo slobodnih dana</div>
             <div class="detail-value" style="${freeRemaining<=0?'color:var(--danger)':''}">${freeRemaining} / ${freeDaysAllowance(emp)}</div>
+            ${effFree !== freeRemaining ? `<div class="text-xs text-muted" style="margin-top:.15rem">Sa rezervacijama: ${effFree}</div>` : ''}
           </div>
           <div class="detail-item">
             <div class="detail-label">Bolovanje (ukupno)</div>
             <div class="detail-value">${sickDaysTotal} dana</div>
           </div>
           <div class="detail-item">
-            <div class="detail-label">Bolovanje do 2 dana</div>
-            <div class="detail-value">${sickShortCount}×</div>
+            <div class="detail-label">Bolovanje do 2 dana (ove godine)</div>
+            <div class="detail-value">${sickShortCount} dana</div>
           </div>
         </div>
         <div style="display:flex;justify-content:center;gap:2rem;margin-top:1.5rem;flex-wrap:wrap">
