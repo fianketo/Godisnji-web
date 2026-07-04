@@ -689,6 +689,20 @@ body {
 
 .card-body { padding: 1.5rem; }
 
+/* ---------- Help / Uputstvo ---------- */
+.help-row {
+  display: flex;
+  gap: .85rem;
+  align-items: flex-start;
+  padding: .85rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.help-row:last-child { border-bottom: none; }
+.help-icon { font-size: 1.15rem; flex-shrink: 0; width: 1.5rem; text-align: center; }
+
 /* ---------- Stat Cards ---------- */
 .stats-grid {
   display: grid;
@@ -2405,14 +2419,16 @@ const ADMIN_NAV = [
   { id: 'requests', label: 'Zahtevi', icon: '📋', section: null, badge: true },
   { id: 'history', label: 'Istorija', icon: '📁', section: null },
   { id: 'reports', label: 'Izveštaji', icon: '📈', section: 'Analitika' },
-  { id: 'settings', label: 'Podešavanja', icon: '⚙️', section: null }
+  { id: 'settings', label: 'Podešavanja', icon: '⚙️', section: null },
+  { id: 'help', label: 'Uputstvo', icon: '❓', section: 'Podrška' }
 ];
 
 const EMPLOYEE_NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊', section: null },
   { id: 'my-calendar', label: 'Kalendar', icon: '📅', section: 'Odsustvo' },
   { id: 'my-request', label: 'Podnesi zahtev', icon: '📝', section: null },
-  { id: 'my-profile', label: 'Moj profil', icon: '👤', section: null }
+  { id: 'my-profile', label: 'Moj profil', icon: '👤', section: null },
+  { id: 'help', label: 'Uputstvo', icon: '❓', section: 'Podrška' }
 ];
 
 // An admin who is also an employee of the company (has their own employee
@@ -2641,7 +2657,8 @@ const PAGE_TITLES = {
   'my-request': 'Podnesi zahtev',
   'my-profile': 'Moj profil',
   'employee-detail': 'Detalji radnika',
-  'edit-employee': 'Izmeni radnika'
+  'edit-employee': 'Izmeni radnika',
+  'help': 'Uputstvo'
 };
 
 function renderPage() {
@@ -2661,6 +2678,7 @@ function renderPage() {
     case 'my-profile': renderMyProfile(); break;
     case 'employee-detail': renderEmployeeDetail(main._empId); break;
     case 'edit-employee': renderEditEmployee(main._empId); break;
+    case 'help': renderHelp(); break;
     default: renderDashboard();
   }
   applyRipple();
@@ -4016,6 +4034,67 @@ function renderSettings() {
         <button class="btn btn-secondary" style="margin-top:.75rem" onclick="toast('Firebase nije konfigurisan', 'warning')">Testiraj konekciju</button>
       </div>
     </div>`;
+}
+
+/* ================================================================
+   HELP / UPUTSTVO
+   ================================================================ */
+function helpRow(icon, title, text) {
+  return `<div class="help-row">
+    <span class="help-icon">${icon}</span>
+    <div><b style="color:var(--text)">${title}</b> — ${text}</div>
+  </div>`;
+}
+
+function renderHelp() {
+  const main = document.getElementById('main-content');
+  const isAdmin = currentUser.role === 'admin';
+
+  main.innerHTML = `
+    <div class="page-header"><div class="page-title">Uputstvo</div></div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">🔑 Prijava</div></div>
+      <div class="card-body">
+        <ol style="padding-left:1.25rem;display:flex;flex-direction:column;gap:.5rem;color:var(--text2)">
+          <li>Otvorite sajt aplikacije u browseru na telefonu ili računaru.</li>
+          <li>U polje <b style="color:var(--text)">Email ili korisničko ime</b> unesite svoj email — ili, ako nemate email na fajlu, korisničko ime koje vam je dao administrator (npr. <code>marko.nikolic</code>).</li>
+          <li>Unesite lozinku i pritisnite <b style="color:var(--text)">Prijava</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">👤 Svakodnevna upotreba</div></div>
+      <div class="card-body" style="padding:.25rem 1.5rem">
+        ${helpRow('📊', 'Dashboard', 'pregled koliko vam je dana godišnjeg i slobodnih dana preostalo, i koliko zahteva čeka na odgovor.')}
+        ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
+        ${helpRow('📅', 'Moj kalendar', 'kliknite ili prevucite preko dana da odmah zatražite odsustvo za taj period.')}
+        ${helpRow('👤', 'Moj profil', 'detaljan pregled iskorišćenih i rezervisanih dana, i istorija svih prethodnih zahteva.')}
+        ${helpRow('🔔', 'Obaveštenja', 'zvonce u vrhu ekrana javlja kad vam je zahtev odobren, odbijen ili izmenjen — uz email i podsetnik 7 dana pre početka odmora, ako je podešeno.')}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">💡 Korisno je znati</div></div>
+      <div class="card-body" style="padding:.25rem 1.5rem">
+        ${helpRow('🏖️', 'Vikendi se ne računaju u godišnji odmor', 'subota i nedelja se automatski izuzimaju iz broja dana — za slobodan dan se subota ipak računa.')}
+        ${helpRow('⏳', '"Rezervisano (buduće)"', 'dani koji su vam već odobreni, ali još nisu prošli — oduzimaju se od "Preostalo" tek kad taj datum stvarno dođe.')}
+      </div>
+    </div>
+
+    ${isAdmin ? `
+    <div class="card">
+      <div class="card-header"><div class="card-title">🛠️ Administracija</div></div>
+      <div class="card-body" style="padding:.25rem 1.5rem">
+        ${helpRow('➕', 'Dodaj radnika', 'unesite ime, lozinku i (opciono) email — bez email-a, radnik dobija korisničko ime za prijavu automatski.')}
+        ${helpRow('👥', 'Radnici', 'pregled svih radnika, sa opcijom da izmenite podatke (sektor, pozicija, dani odmora) ili obrišete radnika.')}
+        ${helpRow('📋', 'Zahtevi', 'odobrite ili odbijte zahteve na čekanju — upozorenje se prikazuje ako se period preklapa sa nekim ko je već odsutan, a kalendar ispod pokazuje ko je sve trenutno na odmoru.')}
+        ${helpRow('📁', 'Istorija', 'svaki već obrađen zahtev može naknadno da se izmeni ili obriše, npr. ako radnik promeni planove nakon odobrenja.')}
+        ${helpRow('📈', 'Izveštaji', 'grafikon iskorišćenosti odmora i tabela svih radnika, sa izvozom u CSV/PDF.')}
+        ${helpRow('⚙️', 'Podešavanja', 'pregled svih korisničkih naloga i uloga, izvoz/uvoz kompletnih podataka aplikacije u JSON.')}
+      </div>
+    </div>` : ''}`;
 }
 
 function deleteUser(userId) {
