@@ -11,7 +11,8 @@ Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez bui
 - **Korisnički profil** – svaki zaposleni ima *Moj profil* sa ličnim podacima i istorijom odsustava, i *Moj zahtev* gde sam prijavljuje odsustvo (tip, datumi, automatski obračun radnih dana, razlog) — ide Adminu na odobrenje.
 - **Zajednički kalendar** – na *Kontrolnoj tabli* svi vide ko je odsutan (mesečni/nedeljni/dnevni prikaz), boje po tipu odsustva, status (odobreno/na čekanju).
 - **Statistika** – kartice (broj zaposlenih, ko je danas odsutan, zahtevi na čekanju, prosek preostalih dana) + Admin stranica *Izveštaji* sa grafikonom i izvozom u CSV/PDF.
-- **Upravljanje zahtevima** (Admin) – odobravanje/odbijanje.
+- **Upravljanje zahtevima** (Admin) – odobravanje/odbijanje, uz kalendar ispod liste zahteva koji odmah pokazuje ko je sve trenutno odsutan.
+- **Odloženo oduzimanje dana** – kad se zahtev odobri, dani se ne oduzimaju od "Preostalo" odmah, nego tek kad taj datum stvarno prođe. Do tada se odobreno-ali-još-neiskorišćeno odsustvo vidi posebno kao "Rezervisano (buduće)" (na *Moj profil*, *Detalji radnika*, i kao kolona u *Zahtevi*), a "Preostalo" uvek pokazuje realno stanje na dan danas.
 - **Godišnji obračun** – 1. januara svako dobija novih 20 dana godišnjeg odmora **plus** ono što mu je ostalo od prethodne godine (ne propada). Slobodni dani se **ne prenose** — svake godine se vraćaju na podrazumevanih 3 (admin može da promeni broj po zaposlenom u *Dodaj radnika*). Ovo se automatski primeni čim neko prvi put otvori aplikaciju posle Nove godine — nema potrebe za ručnim resetom.
 - Tamna/svetla tema (lokalno po uređaju), izvoz/uvoz svih podataka (JSON).
 
