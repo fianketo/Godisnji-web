@@ -2813,6 +2813,30 @@ function todayDateOnly() {
   return new Date(new Date().toISOString().split('T')[0]);
 }
 
+// Annual leave and free days are counted in working days, not calendar
+// days — selecting 2 weeks on the calendar for "Godišnji odmor" shouldn't
+// burn 14 days when only the ~10 weekdays in that range count. Weekends
+// never count against "Godišnji odmor" (Serbian labor law counts it in
+// radni dani); Saturday can still count against "Slobodan dan" since
+// some employees work Saturdays — only Sunday is always excluded there.
+// Every other type (Bolovanje, Plaćeno odsustvo) counts plain calendar
+// days, unchanged.
+function countLeaveDays(start, end, leaveType) {
+  if (leaveType !== 'Godišnji odmor' && leaveType !== 'Slobodan dan') {
+    return Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+  }
+  let count = 0;
+  const cur = new Date(start);
+  const last = new Date(end);
+  while (cur <= last) {
+    const dow = cur.getDay(); // 0 = Sunday, 6 = Saturday
+    const excluded = leaveType === 'Godišnji odmor' ? (dow === 0 || dow === 6) : dow === 0;
+    if (!excluded) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+
 function computeSickDaysTotal(emp) {
   const all = [...(emp.leave_history||[]), ...(emp.leave_requests||[])];
   let total = 0;
@@ -3730,7 +3754,7 @@ document.getElementById('edit-history-confirm-btn').onclick = () => {
   const startDate = document.getElementById('edit-history-start').value;
   const endDate = document.getElementById('edit-history-end').value;
   if (!startDate || !endDate) { toast('Unesite oba datuma', 'warning'); return; }
-  const days = Math.round((new Date(endDate) - new Date(startDate)) / 86400000) + 1;
+  const days = countLeaveDays(startDate, endDate, leaveType);
   if (days <= 0) { toast('Nevalidni datumi', 'error'); return; }
 
   const emps = getEmployees();
@@ -4228,7 +4252,7 @@ function openQuickLeave(startStr, endStr) {
       return;
     }
     if (s && en) {
-      const days = Math.round((new Date(en) - new Date(s)) / 86400000) + 1;
+      const days = countLeaveDays(s, en, type);
       const emp = getEmployees().find(e => e.id === currentUser.employeeId);
       const remaining = emp ? effectiveAnnualRemaining(emp) : 0;
       if (days > 0) {
@@ -4254,7 +4278,7 @@ function openQuickLeave(startStr, endStr) {
     if (!start || (!end && !isSick)) { toast('Izaberi datume', 'error'); return; }
 
     const ongoing = isSick && !end;
-    const days = ongoing ? null : Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+    const days = ongoing ? null : countLeaveDays(start, end, type);
     if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
 
     const emps = getEmployees();
@@ -4360,7 +4384,7 @@ function renderMyRequest() {
       return;
     }
     if (s && e2) {
-      const days = Math.round((new Date(e2) - new Date(s)) / 86400000) + 1;
+      const days = countLeaveDays(s, e2, type);
       if (days > 0) {
         info.textContent = `📅 ${days} dan(a) odsustva`;
         info.style.color = (type === 'Godišnji odmor' && days > remaining) ? 'var(--danger)' : 'var(--text2)';
@@ -4382,7 +4406,7 @@ function renderMyRequest() {
     if (!start || (!end && !isSick)) { toast('Izaberi datume', 'error'); return; }
 
     const ongoing = isSick && !end;
-    const days = ongoing ? null : Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+    const days = ongoing ? null : countLeaveDays(start, end, type);
     if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
 
     if (type === 'Godišnji odmor' && days > remaining) {
