@@ -17,6 +17,7 @@ Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez bui
 - **Vikendi se ne računaju u godišnji odmor** – kad se bira period za "Godišnji odmor" (na kalendaru ili u formi), subota i nedelja se automatski izuzimaju iz broja dana (npr. 2 nedelje Mon-Pet = 10 dana, ne 14). Za "Slobodan dan" se izuzima samo nedelja — subota se računa, jer neki radnici rade subotom. Bolovanje i plaćeno odsustvo i dalje broje sve kalendarske dane.
 - **Godišnji obračun** – 1. januara svako dobija novih 20 dana godišnjeg odmora **plus** ono što mu je ostalo od prethodne godine (ne propada). Slobodni dani se **ne prenose** — svake godine se vraćaju na podrazumevanih 3 (admin može da promeni broj po zaposlenom u *Dodaj radnika*). Ovo se automatski primeni čim neko prvi put otvori aplikaciju posle Nove godine — nema potrebe za ručnim resetom.
 - Tamna/svetla tema (lokalno po uređaju), izvoz/uvoz svih podataka (JSON).
+- **Video pozadina na login ekranu** – `login-bg.mp4` (+ `login-bg-poster.jpg` kao statična slika dok se video učita / za korisnike sa uključenim "smanji animacije"). Da zameniš video, samo prekopiraj svoj fajl preko `login-bg.mp4` — drži ga ispod ~5MB (720p, bez zvuka) da se brzo učita na mobilnom.
 
 ## Podešavanje Firebase-a (jednom, ~5-10 min, besplatno, bez kartice)
 

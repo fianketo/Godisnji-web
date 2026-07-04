@@ -119,59 +119,28 @@ body {
 
 #register-screen { display: none; }
 
-/* Animated "aurora" background — CSS-only, no video/image assets needed */
-.aurora-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: .55;
-  pointer-events: none;
-  will-change: transform;
-}
-.aurora-blob.b1 {
-  width: 480px; height: 480px;
-  top: -140px; left: -120px;
-  background: radial-gradient(circle, #06b6d4, transparent 70%);
-  animation: auroraDrift1 22s ease-in-out infinite;
-}
-.aurora-blob.b2 {
-  width: 440px; height: 440px;
-  bottom: -140px; right: -100px;
-  background: radial-gradient(circle, #8b5cf6, transparent 70%);
-  animation: auroraDrift2 26s ease-in-out infinite;
-}
-.aurora-blob.b3 {
-  width: 360px; height: 360px;
-  top: 45%; left: 58%;
-  background: radial-gradient(circle, #22d3ee, transparent 70%);
-  animation: auroraDrift3 30s ease-in-out infinite;
-}
-.aurora-grid {
+/* Looping ocean video background, with a dark scrim so the glass login
+   card stays readable over bright/light parts of the footage. */
+.login-bg-video {
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at 50% 40%, black, transparent 75%);
-  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.login-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6,10,20,.55), rgba(6,10,20,.75));
+  z-index: 0;
 }
 
-@keyframes auroraDrift1 {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(70px, 90px) scale(1.15); }
-}
-@keyframes auroraDrift2 {
-  0%, 100% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(-80px, -60px) scale(1.1); }
-}
-@keyframes auroraDrift3 {
-  0%, 100% { transform: translate(0,0) scale(.95); }
-  50% { transform: translate(-50px, 60px) scale(1.05); }
-}
-
+/* Respect reduced-motion: hide the video, fall back to the plain dark
+   background + poster frame already set as the <video>'s poster. */
 @media (prefers-reduced-motion: reduce) {
-  .aurora-blob { animation: none !important; }
+  .login-bg-video { display: none; }
+  #login-screen, #register-screen { background: #060a14 url('login-bg-poster.jpg') center/cover; }
 }
 
 .login-card {
@@ -1686,10 +1655,10 @@ textarea { resize: vertical; min-height: 80px; }
      LOGIN SCREEN
      ============================================================ -->
 <div id="login-screen">
-  <div class="aurora-blob b1"></div>
-  <div class="aurora-blob b2"></div>
-  <div class="aurora-blob b3"></div>
-  <div class="aurora-grid"></div>
+  <video class="login-bg-video" autoplay muted loop playsinline preload="auto" poster="login-bg-poster.jpg">
+    <source src="login-bg.mp4" type="video/mp4">
+  </video>
+  <div class="login-bg-overlay"></div>
   <div class="login-card">
     <div class="login-logo">
       <h1>☀️ OdmorPro</h1>
@@ -1722,10 +1691,10 @@ textarea { resize: vertical; min-height: 80px; }
      REGISTER SCREEN (self-service registration)
      ============================================================ -->
 <div id="register-screen">
-  <div class="aurora-blob b1"></div>
-  <div class="aurora-blob b2"></div>
-  <div class="aurora-blob b3"></div>
-  <div class="aurora-grid"></div>
+  <video class="login-bg-video" autoplay muted loop playsinline preload="auto" poster="login-bg-poster.jpg">
+    <source src="login-bg.mp4" type="video/mp4">
+  </video>
+  <div class="login-bg-overlay"></div>
   <div class="login-card">
     <div class="login-logo">
       <h1>☀️ OdmorPro</h1>
