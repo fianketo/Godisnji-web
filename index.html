@@ -9,7 +9,9 @@
      "Add to Home Screen", instead of a generic browser bookmark. -->
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<!-- iOS Safari doesn't rasterize SVG for the home-screen icon, so this
+     needs an actual PNG (icon.svg alone silently produces no icon). -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#06b6d4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5007,6 +5009,15 @@ function startApp() {
    ================================================================ */
 seedData();
 initTheme();
+
+// Registering a service worker is what makes the browser actually offer
+// the "Add to Home Screen" install prompt (a manifest with icons alone
+// isn't enough) — see sw.js for what it does and doesn't cache.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+  });
+}
 
 // Self-service registration is only meant for the one-time admin bootstrap
 // in Firebase mode (first registrant becomes admin) — every employee after
