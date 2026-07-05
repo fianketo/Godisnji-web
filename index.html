@@ -130,11 +130,15 @@ body {
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  /* The dark scrim needed for text contrast flattens the video's own
+     color — push saturation/contrast back up so it doesn't read as
+     washed out. */
+  filter: saturate(1.4) contrast(1.1);
 }
 .login-bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(6,10,20,.45), rgba(6,10,20,.62));
+  background: linear-gradient(180deg, rgba(6,10,20,.32), rgba(6,10,20,.5));
   z-index: 0;
 }
 
