@@ -1088,6 +1088,10 @@ textarea { resize: vertical; min-height: 80px; }
   background: var(--primary-light);
 }
 
+.cal-day.has-events { cursor: pointer; }
+.cal-day.has-events:hover { background: var(--bg); }
+.cal-day.has-events.today:hover { background: var(--primary-light); }
+
 .cal-day-num {
   font-size: .75rem;
   font-weight: 700;
@@ -1918,6 +1922,22 @@ textarea { resize: vertical; min-height: 80px; }
 </div>
 
 <!-- ============================================================
+     DAY EVENTS MODAL (full list of who's out on a given calendar day
+     — the day cells only show 1-2 names + "+N" to stay compact)
+     ============================================================ -->
+<div id="day-events-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-title" id="day-events-title">Odsutni</span>
+      <button class="modal-close" id="day-events-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="day-events-list" class="timeline"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      YEAR PICKER
      ============================================================ -->
 <!-- Quick-add leave modal (employee calendar) -->
@@ -2106,6 +2126,7 @@ let currentUser = null;
 let currentPage = 'dashboard';
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
+let calendarEventsCache = {};
 let rejectCallback = null;
 let cmdSelectedIndex = -1;
 let cmdResults = [];
@@ -3053,6 +3074,7 @@ function renderCalendar() {
       }
     });
   });
+  calendarEventsCache = events;
 
   // Prev month filler
   for (let i = 0; i < startDow; i++) {
@@ -3072,9 +3094,10 @@ function renderCalendar() {
       const c = LEAVE_COLORS[ev.type] || { bg: '#e0e7ff', text: '#3730a3' };
       return `<div class="cal-event" style="background:${c.bg};color:${c.text}" title="${ev.name}">${ev.name.split(' ')[0]}</div>`;
     }).join('');
-    if (dayEvents.length > 2) evHtml += `<div class="cal-event" style="background:var(--border);color:var(--text2)">+${dayEvents.length-2}</div>`;
+    if (dayEvents.length > 2) evHtml += `<div class="cal-event cal-event-more" style="background:var(--border);color:var(--text2)">+${dayEvents.length-2}</div>`;
 
-    html += `<div class="cal-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}">
+    const hasEvents = dayEvents.length > 0;
+    html += `<div class="cal-day ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''} ${hasEvents ? 'has-events' : ''}" ${hasEvents ? `onclick="openDayEventsModal('${dateStr}')"` : ''}>
       <div class="cal-day-num">${day}</div>
       ${evHtml}
     </div>`;
@@ -3089,6 +3112,31 @@ function renderCalendar() {
 
   grid.innerHTML = html;
 }
+
+// Day cells only show 1-2 names + "+N" to stay compact — tapping a day
+// that has anyone out opens this with the full list instead.
+function openDayEventsModal(dateStr) {
+  const dayEvents = calendarEventsCache[dateStr] || [];
+  if (!dayEvents.length) return;
+  document.getElementById('day-events-title').textContent = `Odsutni — ${formatDate(new Date(dateStr))}`;
+  document.getElementById('day-events-list').innerHTML = dayEvents.map(ev => {
+    const c = LEAVE_COLORS[ev.type] || { bg: '#e0e7ff', text: '#3730a3' };
+    return `<div class="timeline-item">
+      <div class="timeline-title">${ev.name}</div>
+      <div class="timeline-sub"><span class="badge" style="background:${c.bg};color:${c.text}">${ev.type}</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('day-events-overlay').classList.remove('hidden');
+}
+
+function closeDayEventsModal() {
+  document.getElementById('day-events-overlay').classList.add('hidden');
+}
+
+document.getElementById('day-events-close').onclick = closeDayEventsModal;
+document.getElementById('day-events-overlay').addEventListener('click', e => {
+  if (e.target.id === 'day-events-overlay') closeDayEventsModal();
+});
 
 /* ================================================================
    YEAR PICKER
@@ -4772,6 +4820,7 @@ document.addEventListener('keydown', e => {
     closeRejectModal();
     closeQuickLeave();
     closeEditHistoryModal();
+    closeDayEventsModal();
     document.getElementById('year-picker-overlay').classList.add('hidden');
     return;
   }
