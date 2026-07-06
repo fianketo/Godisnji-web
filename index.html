@@ -1999,6 +1999,7 @@ textarea { resize: vertical; min-height: 80px; }
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-functions-compat.js"></script>
 
 <!-- ============================================================
      EMAILJS SDK — sends the approval/rejection/edit emails straight
@@ -2116,6 +2117,23 @@ async function createAuthAccountFor(email, password) {
     return cred.user.uid;
   } finally {
     await secondaryApp.delete();
+  }
+}
+
+// Deletes a person's Firebase Auth login. The client SDK can only ever
+// delete the *currently signed-in* account, never someone else's, so
+// this calls a small Cloud Function (functions/index.js, deployed
+// separately — see README) that does it with Admin SDK privileges.
+// Without it, a deleted employee's email/username stays permanently
+// stuck ("already in use") since Auth never actually forgets them.
+// Fails silently if the function isn't deployed — the employee/user
+// records are already removed either way by the caller.
+async function deleteAuthAccountForUid(uid) {
+  if (!FIREBASE_ENABLED || !uid) return;
+  try {
+    await firebase.functions().httpsCallable('deleteAuthUser')({ uid });
+  } catch (err) {
+    console.error('deleteAuthUser failed (Cloud Function may not be deployed — see README):', err);
   }
 }
 
@@ -3262,10 +3280,21 @@ function renderEmployeeTable(emps) {
   }).join('');
 }
 
-function deleteEmployee(id) {
-  if (!confirm('Obrisati radnika?')) return;
-  let emps = getEmployees().filter(e => e.id !== id);
+async function deleteEmployee(id) {
+  if (!confirm('Obrisati radnika? Ovo briše i njegov nalog za prijavu.')) return;
+  const emps = getEmployees().filter(e => e.id !== id);
   saveEmployees(emps);
+
+  // Employees and their login ("users") record are separate lists — also
+  // remove the linked login, otherwise it's left behind able to log in
+  // with no employee data attached, and its email/username stays stuck.
+  const users = getUsers();
+  const linkedUser = users.find(u => u.employeeId === id);
+  if (linkedUser) {
+    saveUsers(users.filter(u => u.id !== linkedUser.id));
+    await deleteAuthAccountForUid(linkedUser.uid);
+  }
+
   renderEmployees();
   toast('Radnik obrisan', 'success');
 }
@@ -4151,15 +4180,20 @@ function renderHelp() {
     </div>` : ''}`;
 }
 
-function deleteUser(userId) {
-  if (!confirm('Obrisati korisnika?')) return;
-  let users = getUsers().filter(u => u.id !== userId);
-  saveUsers(users);
+async function deleteUser(userId) {
+  if (!confirm('Obrisati korisnika? Ovo briše i njegov nalog za prijavu i podatke radnika.')) return;
+  const users = getUsers();
+  const user = users.find(u => u.id === userId);
+  saveUsers(users.filter(u => u.id !== userId));
+
+  // Mirror of deleteEmployee — same person, same cleanup, just reached
+  // from the other list (Podešavanja instead of Radnici).
+  if (user && user.employeeId) {
+    saveEmployees(getEmployees().filter(e => e.id !== user.employeeId));
+  }
+  if (user) await deleteAuthAccountForUid(user.uid);
+
   renderSettings();
-  // Note: in Firebase mode this only revokes the person's profile/role —
-  // their Firebase Auth login itself can't be deleted from the client SDK
-  // (that needs the Admin SDK / a server). They'll be auto-signed-out with
-  // an error on their next login attempt since no profile will match.
   toast('Korisnik obrisan', 'success');
 }
 

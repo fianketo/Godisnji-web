@@ -58,6 +58,20 @@ Bez ovog koraka, obaveštenja o odobrenju/odbijanju/izmeni zahteva stižu samo u
 4. **Account → General** → zapamti **Public Key**.
 5. Otvori `index.html`, pronađi `const EMAILJS_CONFIG = { ... }` (odmah ispod Firebase podešavanja), i zameni sve tri placeholder vrednosti (`YOUR_PUBLIC_KEY`, `YOUR_SERVICE_ID`, `YOUR_TEMPLATE_ID`) pravim vrednostima iz koraka 2-4. Sačuvaj.
 
+## Potpuno brisanje naloga radnika (Cloud Function, opciono, ~10 min)
+
+Kad obrišeš radnika (iz *Radnici* ili *Podešavanja*), aplikacija odmah briše njegov profil i podatke — ali njegov **nalog za prijavu** (Firebase Authentication) ne može da se obriše iz samog browsera, to zahteva server-side pristup. Bez ovog koraka, ako kasnije pokušaš da napraviš novog radnika sa **istim** email-om ili automatskim korisničkim imenom, Firebase će ga odbiti jer "već postoji" (iako je radnik odavno obrisan iz aplikacije).
+
+Ovaj korak to rešava — postavlja malu Cloud Function (`functions/index.js`) koja stvarno briše nalog za prijavu kad obrišeš radnika:
+
+1. **Nadogradi Firebase projekat na Blaze plan** (Firebase Console → dugme "Upgrade" dole levo). Blaze je plati-po-potrošnji, ali za ovoliko malu upotrebu (par brisanja mesečno) trošak ostaje 0.
+2. Instaliraj Firebase CLI (jednom, na svom računaru): `npm install -g firebase-tools`
+3. Uloguj se: `firebase login`
+4. Iz root foldera projekta (gde je `firebase.json`) pokreni: `firebase deploy --only functions`
+5. Gotovo — `.firebaserc` već pokazuje na projekat `odmorpro`. Ako ti se projekat drugačije zove, izmeni `"default"` vrednost u `.firebaserc` pre deploy-a.
+
+Bez ovog koraka, brisanje radnika i dalje radi normalno (profil i podaci se uklanjaju) — samo se sam nalog za prijavu ne oslobađa za ponovnu upotrebu.
+
 ## Postavljanje na besplatan GitHub Pages
 
 1. Napravi nalog na [github.com](https://github.com) ako ga nemaš.
