@@ -3508,7 +3508,7 @@ function renderAddEmployee() {
       emps.push(newEmp);
       saveEmployees(emps);
       const users = getUsers();
-      users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
+      users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, password: pwd, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
       saveUsers(users);
       if (generatedUsername) {
         alert(`Radnik dodat!\n\nZa prijavu recite radniku da unese:\nKorisničko ime: ${generatedUsername}\nLozinka: ${pwd}`);
@@ -4075,22 +4075,38 @@ function renderReports() {
 /* ================================================================
    SETTINGS
    ================================================================ */
+// Populated fresh by renderSettings() and read by togglePasswordVisibility()
+// — kept out of the HTML itself (rather than a data-* attribute) so a
+// password containing a quote character can't break the markup.
+let settingsPasswordMap = {};
+
 function renderSettings() {
   const main = document.getElementById('main-content');
   const users = getUsers();
   const emps = getEmployees();
+  settingsPasswordMap = {};
+  users.forEach(u => { if (u.password) settingsPasswordMap[u.id] = u.password; });
 
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podešavanja</div></div>
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-header"><div class="card-title">👥 Korisnici sistema</div></div>
+      <p class="text-sm text-muted" style="padding:0 1.5rem;margin-top:-.5rem">Lozinka je vidljiva samo za naloge napravljene (ili čija je lozinka postavljena) nakon uvođenja ove opcije.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Ime</th><th>Email</th><th>Uloga</th><th>Akcija</th></tr></thead>
+          <thead><tr><th>Ime</th><th>Email</th><th>Lozinka</th><th>Uloga</th><th>Akcija</th></tr></thead>
           <tbody>
             ${users.map(u => `<tr>
               <td>${u.name}</td>
               <td>${u.email}</td>
+              <td>
+                ${u.password
+                  ? `<span style="display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap">
+                       <span class="pw-mask" id="pw-${u.id}">••••••••</span>
+                       <button class="btn btn-secondary btn-sm" style="padding:.2rem .5rem" onclick="togglePasswordVisibility('${u.id}')" title="Prikaži/sakrij">👁️</button>
+                     </span>`
+                  : `<span class="text-muted text-xs">nepoznato</span>`}
+              </td>
               <td><span class="badge badge-info">${u.role === 'admin' ? '👑 Admin' : '👤 Radnik'}</span></td>
               <td>
                 ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Obriši</button>` : '—'}
@@ -4117,6 +4133,12 @@ function renderSettings() {
         <button class="btn btn-secondary" style="margin-top:.75rem" onclick="toast('Firebase nije konfigurisan', 'warning')">Testiraj konekciju</button>
       </div>
     </div>`;
+}
+
+function togglePasswordVisibility(userId) {
+  const el = document.getElementById('pw-' + userId);
+  if (!el) return;
+  el.textContent = el.textContent === '••••••••' ? (settingsPasswordMap[userId] || '') : '••••••••';
 }
 
 /* ================================================================
@@ -5029,7 +5051,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
 
     employees.push(newEmp);
     saveEmployees(employees);
-    const newUser = { id: 'u' + newEmp.id, uid: cred.user.uid, email, role: cloudUsers.length === 0 ? 'admin' : 'employee', name, employeeId: newEmp.id };
+    const newUser = { id: 'u' + newEmp.id, uid: cred.user.uid, email, password: pass, role: cloudUsers.length === 0 ? 'admin' : 'employee', name, employeeId: newEmp.id };
     const mergedUsers = cloudUsers.length ? cloudUsers.concat([newUser]) : users.concat([newUser]);
     saveUsers(mergedUsers);
     toast('Nalog uspešno kreiran! Dobrodošli.', 'success');

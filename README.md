@@ -44,7 +44,7 @@ Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez bui
 
 Pravila iz koraka 4 (`auth != null`) znače da **bilo koji prijavljeni korisnik može da čita i menja sve podatke** (nema razdvajanja po ulogama na nivou baze — to app radi na UI nivou). Za malu firmu sa poverljivim timom ovo je uobičajeno i prihvatljivo (slično deljenom Excel fajlu koji svi članovi tima mogu da menjaju). Ako ti zatreba stroža podela (npr. da običan zaposleni ne može direktno da piše u bazu mimo aplikacije), to zahteva finije Firebase security rules po ulozi — javi ako ti to zatreba.
 
-Lozinke se **ne čuvaju** u našoj bazi — njima upravlja Firebase Authentication (industrijski standard, hashovano), aplikacija samo čuva ime/email/ulogu/vezu ka profilu zaposlenog.
+Stvarnu prijavu i dalje proverava Firebase Authentication (industrijski standard, hashovano) — ali aplikacija **dodatno čuva čitljivu kopiju lozinke** u bazi (vidljivu adminu u *Podešavanja*), po eksplicitnom zahtevu, radi lakšeg administriranja male firme. Ovo je svestan bezbednosni kompromis: ako baza ikad bude neovlašćeno dostupna, sve sačuvane lozinke su odmah čitljive (za razliku od heševa koje inače čuva Firebase). Vidljivo je samo za naloge napravljene nakon uvođenja ove opcije — stariji nalozi ostaju "nepoznato".
 
 Ako ne podesiš Firebase (ostaviš placeholder vrednosti u `FIREBASE_CONFIG`), aplikacija i dalje radi normalno u lokalnom demo režimu (admin/admin123, podaci samo na tom uređaju).
 
