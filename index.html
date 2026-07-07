@@ -2300,6 +2300,23 @@ function makeAvatar(name, size = '') {
   return `<div class="avatar ${size}" style="background:${color}">${initials}</div>`;
 }
 
+// Pastel pill colors, one per person, same order/hash as AVATAR_COLORS so a
+// person's avatar and calendar pills stay visually correlated.
+const PERSON_PILL_COLORS = [
+  { bg: '#dbeafe', text: '#1d4ed8' },
+  { bg: '#ede9fe', text: '#6d28d9' },
+  { bg: '#fce7f3', text: '#be185d' },
+  { bg: '#fef3c7', text: '#b45309' },
+  { bg: '#d1fae5', text: '#047857' },
+  { bg: '#fee2e2', text: '#b91c1c' },
+  { bg: '#cffafe', text: '#0e7490' },
+  { bg: '#ecfccb', text: '#4d7c0f' }
+];
+
+function personColor(name) {
+  return PERSON_PILL_COLORS[Math.abs(nameHash(name)) % PERSON_PILL_COLORS.length];
+}
+
 /* ================================================================
    ANIMATED COUNTER
    ================================================================ */
@@ -3109,8 +3126,8 @@ function renderCalendar() {
     const dayEvents = events[dateStr] || [];
 
     let evHtml = dayEvents.slice(0, 2).map(ev => {
-      const c = LEAVE_COLORS[ev.type] || { bg: '#e0e7ff', text: '#3730a3' };
-      return `<div class="cal-event" style="background:${c.bg};color:${c.text}" title="${ev.name}">${ev.name.split(' ')[0]}</div>`;
+      const c = personColor(ev.name);
+      return `<div class="cal-event" style="background:${c.bg};color:${c.text}" title="${ev.name} – ${ev.type}">${ev.name.split(' ')[0]}</div>`;
     }).join('');
     if (dayEvents.length > 2) evHtml += `<div class="cal-event cal-event-more" style="background:var(--border);color:var(--text2)">+${dayEvents.length-2}</div>`;
 
@@ -4329,7 +4346,7 @@ function renderMyCalendar() {
       const dayEvs = eventsMap[dateStr] || [];
 
       let evHtml = dayEvs.slice(0,2).map(ev => {
-        const c = LEAVE_COLORS[ev.leaveType] || { bg: '#e0e7ff', text: '#3730a3' };
+        const c = personColor(ev.name);
         const statusDot = ev.status === 'approved' ? '' : ev.status === 'rejected' ? '❌ ' : '⏳ ';
         const label = ev.name.split(' ')[0];
         const bold = ev.isMe ? 'font-weight:700;' : '';
