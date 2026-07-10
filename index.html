@@ -2218,7 +2218,13 @@ function cloudPush(key, arr) {
   });
   lastKnownCloud[key] = arr;
   if (Object.keys(updates).length === 0) return;
-  firebaseDB.ref(key).update(updates).catch(console.error);
+  firebaseDB.ref(key).update(updates).catch(err => {
+    console.error(err);
+    // Otherwise a dropped write (e.g. a network hiccup) looks identical to
+    // success — the change survives locally but never reaches the shared
+    // database, silently vanishing for everyone else.
+    toast('Izmena nije sačuvana na serveru (greška u mreži) — osvežite stranicu i pokušajte ponovo.', 'error', 6000);
+  });
 }
 
 function cloudListen(key, cb) {
@@ -3587,8 +3593,13 @@ function renderAddEmployee() {
         toast(authErrorSr(ex), 'error');
         return;
       }
-      emps.push(newEmp);
-      saveEmployees(emps);
+      // Re-read after the await instead of reusing the pre-await snapshot —
+      // the realtime listener may have picked up someone else's concurrent
+      // edit while we were waiting on Auth, and pushing the stale copy
+      // would silently overwrite it.
+      const freshEmps = getEmployees();
+      freshEmps.push(newEmp);
+      saveEmployees(freshEmps);
       const users = getUsers();
       users.push({ id: 'u' + newEmp.id, uid, email: newEmp.email, password: pwd, role: 'employee', name: newEmp.name, employeeId: newEmp.id });
       saveUsers(users);
@@ -5133,8 +5144,13 @@ document.getElementById('register-form').addEventListener('submit', async e => {
       lastKnownCloud.users = cloudUsers;
     } catch (ex) { /* if the read fails, fall back to treating as non-first */ cloudUsers = users; }
 
-    employees.push(newEmp);
-    saveEmployees(employees);
+    // Re-read after the awaits above instead of reusing the pre-await
+    // `employees` snapshot — someone else may have concurrently changed a
+    // record while we were waiting on Auth/the cloud read, and pushing the
+    // stale copy would silently overwrite it.
+    const freshEmployees = getEmployees();
+    freshEmployees.push(newEmp);
+    saveEmployees(freshEmployees);
     const newUser = { id: 'u' + newEmp.id, uid: cred.user.uid, email, password: pass, role: cloudUsers.length === 0 ? 'admin' : 'employee', name, employeeId: newEmp.id };
     const mergedUsers = cloudUsers.length ? cloudUsers.concat([newUser]) : users.concat([newUser]);
     saveUsers(mergedUsers);
