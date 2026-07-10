@@ -2180,14 +2180,79 @@ function saveUsers(arr) {
   if (firebaseDB) cloudPush('users', arr);
 }
 
-function cloudPush(key, data) {
+// Firebase stores /employees and /users keyed by record id (an object),
+// not as a raw array — that's what lets cloudPush() below touch only the
+// records that actually changed. Some snapshots may still be array-shaped
+// (a read taken before this ever ran), so accept both.
+function normalizeCloudArray(val) {
+  if (Array.isArray(val)) return val;
+  if (val && typeof val === 'object') return Object.values(val);
+  return [];
+}
+
+// Last full snapshot known to match the server for each collection — null
+// until either the realtime listener delivers its first value or
+// refreshCloudBaseline() runs at login. cloudPush() diffs against this to
+// write only the records that actually changed, instead of overwriting the
+// whole collection blindly — which is what used to let one person's save
+// silently wipe another person's concurrent change (a new request, an
+// approval, a day count) whenever two sessions were open around the same
+// time.
+let lastKnownCloud = { employees: null, users: null };
+
+function cloudPush(key, arr) {
   if (!firebaseDB) return;
-  firebaseDB.ref(key).set(data).catch(console.error);
+  const prevById = {};
+  (lastKnownCloud[key] || []).forEach(item => { if (item && item.id) prevById[item.id] = item; });
+  const updates = {};
+  const seenIds = new Set();
+  arr.forEach(item => {
+    if (!item || !item.id) return;
+    seenIds.add(item.id);
+    const prevJson = prevById.hasOwnProperty(item.id) ? JSON.stringify(prevById[item.id]) : null;
+    const nextJson = JSON.stringify(item);
+    if (nextJson !== prevJson) updates[item.id] = item;
+  });
+  Object.keys(prevById).forEach(id => {
+    if (!seenIds.has(id)) updates[id] = null;
+  });
+  lastKnownCloud[key] = arr;
+  if (Object.keys(updates).length === 0) return;
+  firebaseDB.ref(key).update(updates).catch(console.error);
 }
 
 function cloudListen(key, cb) {
   if (!firebaseDB) return;
-  firebaseDB.ref(key).on('value', snap => cb(snap.val() || []));
+  firebaseDB.ref(key).on('value', snap => {
+    const arr = normalizeCloudArray(snap.val());
+    lastKnownCloud[key] = arr;
+    cb(arr);
+  });
+}
+
+// Fetches the current server state once (rather than waiting on the
+// realtime listener's first async callback) so login-time logic — elapsed
+// leave deductions, year rollover — runs against fresh data, and so
+// cloudPush() already has a real baseline before its very first save of
+// the session. Without this, that first save would have no baseline yet
+// and would fall back to pushing every locally-known record, which could
+// clobber a record someone else changed moments earlier from another
+// device.
+async function refreshCloudBaseline() {
+  try {
+    const [empSnap, userSnap] = await Promise.all([
+      firebaseDB.ref('employees').once('value'),
+      firebaseDB.ref('users').once('value')
+    ]);
+    const emps = normalizeCloudArray(empSnap.val());
+    const users = normalizeCloudArray(userSnap.val());
+    lastKnownCloud.employees = emps;
+    lastKnownCloud.users = users;
+    localStorage.setItem('employees', JSON.stringify(emps));
+    localStorage.setItem('users', JSON.stringify(users));
+  } catch (ex) {
+    console.error('Osvežavanje podataka iz baze nije uspelo, koristi se lokalna kopija:', ex);
+  }
 }
 
 /* ================================================================
@@ -4937,7 +5002,8 @@ document.getElementById('login-form').addEventListener('submit', async e => {
         // page-reload session restore below.
         try {
           const snap = await firebaseDB.ref('users').once('value');
-          const cloudUsers = snap.val() || [];
+          const cloudUsers = normalizeCloudArray(snap.val());
+          lastKnownCloud.users = cloudUsers;
           localStorage.setItem('users', JSON.stringify(cloudUsers));
           profile = cloudUsers.find(u => u.uid === cred.user.uid);
         } catch (ex) { /* fall through to sign-out below */ }
@@ -4950,7 +5016,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
       }
       err.style.display = 'none';
       currentUser = profile;
-      startApp();
+      await startApp();
     } catch (ex) {
       err.textContent = authErrorSr(ex);
       err.style.display = 'block';
@@ -4966,7 +5032,7 @@ document.getElementById('login-form').addEventListener('submit', async e => {
   }
   err.style.display = 'none';
   currentUser = user;
-  startApp();
+  await startApp();
 });
 
 document.getElementById('logout-btn').addEventListener('click', logout);
@@ -5063,7 +5129,8 @@ document.getElementById('register-form').addEventListener('submit', async e => {
     let cloudUsers = [];
     try {
       const snap = await firebaseDB.ref('users').once('value');
-      cloudUsers = snap.val() || [];
+      cloudUsers = normalizeCloudArray(snap.val());
+      lastKnownCloud.users = cloudUsers;
     } catch (ex) { /* if the read fails, fall back to treating as non-first */ cloudUsers = users; }
 
     employees.push(newEmp);
@@ -5074,7 +5141,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
     toast('Nalog uspešno kreiran! Dobrodošli.', 'success');
     document.getElementById('register-screen').style.display = 'none';
     currentUser = newUser;
-    startApp();
+    await startApp();
     return;
   }
 
@@ -5088,7 +5155,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
   toast('Nalog uspešno kreiran! Dobrodošli.', 'success');
   document.getElementById('register-screen').style.display = 'none';
   currentUser = newUser;
-  startApp();
+  await startApp();
 });
 
 /* ================================================================
@@ -5101,27 +5168,24 @@ function startCloudListeners() {
   if (cloudListenersActive || !firebaseDB) return;
   cloudListenersActive = true;
   cloudListen('employees', data => {
-    if (data && Array.isArray(data)) {
-      localStorage.setItem('employees', JSON.stringify(data));
-      renderSidebar();
-      renderPage();
-    }
+    localStorage.setItem('employees', JSON.stringify(data));
+    renderSidebar();
+    renderPage();
   });
   cloudListen('users', data => {
-    if (data && Array.isArray(data)) {
-      localStorage.setItem('users', JSON.stringify(data));
-      renderSidebar();
-      renderPage();
-    }
+    localStorage.setItem('users', JSON.stringify(data));
+    renderSidebar();
+    renderPage();
   });
 }
 
-function startApp() {
+async function startApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('register-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   currentPage = 'dashboard';
   initTheme();
+  if (firebaseDB) await refreshCloudBaseline();
   applyElapsedLeaveDeductions();
   applyYearRollover();
   sendUpcomingLeaveReminders();
@@ -5174,7 +5238,8 @@ if (FIREBASE_ENABLED) {
     if (!profile) {
       try {
         const snap = await firebaseDB.ref('users').once('value');
-        const cloudUsers = snap.val() || [];
+        const cloudUsers = normalizeCloudArray(snap.val());
+        lastKnownCloud.users = cloudUsers;
         localStorage.setItem('users', JSON.stringify(cloudUsers));
         profile = cloudUsers.find(u => u.uid === user.uid);
       } catch (ex) { /* fall through to sign-out below */ }
@@ -5184,7 +5249,7 @@ if (FIREBASE_ENABLED) {
       return;
     }
     currentUser = profile;
-    startApp();
+    await startApp();
   });
 }
 </script>
