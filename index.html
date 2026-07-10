@@ -4507,10 +4507,16 @@ function renderMyCalendar() {
 
   drawMyCal();
   document.getElementById('my-cal-month-label').onclick = openYearPicker;
-  document.getElementById('my-cal-prev').onclick = () => { currentMonth--; if (currentMonth<0){currentMonth=11;currentYear--;} drawMyCal(); setupDrag(); };
-  document.getElementById('my-cal-next').onclick = () => { currentMonth++; if (currentMonth>11){currentMonth=0;currentYear++;} drawMyCal(); setupDrag(); };
-  document.getElementById('my-cal-today').onclick = () => { currentMonth=new Date().getMonth(); currentYear=new Date().getFullYear(); drawMyCal(); setupDrag(); };
+  document.getElementById('my-cal-prev').onclick = () => { currentMonth--; if (currentMonth<0){currentMonth=11;currentYear--;} drawMyCal(); };
+  document.getElementById('my-cal-next').onclick = () => { currentMonth++; if (currentMonth>11){currentMonth=0;currentYear++;} drawMyCal(); };
+  document.getElementById('my-cal-today').onclick = () => { currentMonth=new Date().getMonth(); currentYear=new Date().getFullYear(); drawMyCal(); };
   document.getElementById('my-cal-add').onclick = () => openQuickLeave(todayStr());
+  // Called once — the listeners below are delegated on the persistent
+  // #my-cal-grid container (e.target.closest('[data-date]')), so they
+  // keep working against freshly-regenerated day cells after drawMyCal()
+  // replaces the grid's inner HTML. Re-calling this on every month
+  // navigation used to stack duplicate listeners on the same node,
+  // making touch-drag selection fire multiple times and misbehave.
   setupDrag();
 
   function setupDrag() {
