@@ -1132,6 +1132,13 @@ textarea { resize: vertical; min-height: 80px; }
   cursor: pointer;
 }
 
+/* Still-pending request shown on the team calendar — visually distinct
+   ("tentative") from an already-approved, confirmed absence. */
+.cal-event-pending {
+  opacity: .6;
+  border: 1px dashed currentColor;
+}
+
 /* Year picker */
 .year-picker-overlay {
   position: fixed;
@@ -2479,7 +2486,7 @@ function openCloseSickModal(empId, reqId) {
   if (!req) return;
   closeSickTarget = { empId, reqId };
   const dateInput = document.getElementById('close-sick-date');
-  dateInput.value = new Date().toISOString().split('T')[0];
+  dateInput.value = todayStr();
   dateInput.min = req.startDate;
   document.getElementById('close-sick-info').textContent = `Bolovanje počelo: ${req.startDate}`;
   document.getElementById('close-sick-overlay').classList.remove('hidden');
@@ -2656,6 +2663,14 @@ function renderBottomNav() {
 
 function navigateTo(page) {
   currentPage = page;
+  // Reset the shared calendar viewport on every real navigation, so
+  // browsing forward/back on one page's calendar doesn't leave every
+  // other calendar-bearing page silently opening on that same month
+  // next time it's visited. Cloud-listener-driven re-renders of the
+  // CURRENT page go through renderPage() directly, not this function,
+  // so in-page month browsing during a single visit is unaffected.
+  currentMonth = new Date().getMonth();
+  currentYear = new Date().getFullYear();
   renderSidebar();
   renderPage();
 }
@@ -2943,7 +2958,7 @@ function renderDashboard() {
 }
 
 function isOnLeaveToday(emp) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayStr();
   const covers = r => r.status === 'approved' && r.startDate <= today && (r.ongoing || r.endDate >= today);
   return (emp.leave_history||[]).some(covers) || (emp.leave_requests||[]).some(covers);
 }
@@ -2954,29 +2969,48 @@ function rangesOverlap(aStart, aEnd, bStart, bEnd) {
   return aStart <= bE && bStart <= aE;
 }
 
-// Other employees whose already-approved leave overlaps the given
-// (pending) request's dates — shown on Zahtevi so the admin can see
-// team conflicts before approving, not just visually via the calendar.
+// Other employees whose leave overlaps the given (pending) request's
+// dates — both already-approved AND still-pending requests, so the admin
+// sees a conflict even when two people request the same period before
+// either has been decided, not just after one is already approved.
+// Shown on Zahtevi so the admin can catch team conflicts before
+// approving, not just visually via the calendar.
 function overlappingCoworkers(emp, req) {
   const emps = getEmployees();
-  const names = [];
+  const conflicts = [];
+  const seen = new Set();
   emps.forEach(other => {
     if (other.id === emp.id) return;
-    (other.leave_history||[]).forEach(r => {
-      if (r.status !== 'approved') return;
-      if (rangesOverlap(req.startDate, req.ongoing ? null : req.endDate, r.startDate, r.ongoing ? null : r.endDate)) {
-        names.push(other.name);
-      }
+    const candidates = [
+      ...(other.leave_history||[]).filter(r => r.status === 'approved'),
+      ...(other.leave_requests||[]).filter(r => r.status === 'pending')
+    ];
+    candidates.forEach(r => {
+      if (!rangesOverlap(req.startDate, req.ongoing ? null : req.endDate, r.startDate, r.ongoing ? null : r.endDate)) return;
+      const key = other.name + '|' + r.status;
+      if (seen.has(key)) return;
+      seen.add(key);
+      conflicts.push({ name: other.name, status: r.status });
     });
   });
-  return [...new Set(names)];
+  return conflicts;
 }
 
 /* ================================================================
    SICK LEAVE / FREE DAYS / NOTIFICATIONS
    ================================================================ */
+// Local calendar-day string (YYYY-MM-DD) for "now" — NOT new Date().
+// toISOString(), which returns the UTC date and would read as yesterday
+// for roughly the first 1-2 hours after local midnight in Serbia
+// (UTC+1/+2, ahead of UTC), silently misdating "today" everywhere leave
+// status/reminders/calendar highlighting depend on it.
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function todayDateOnly() {
-  return new Date(new Date().toISOString().split('T')[0]);
+  return new Date(todayStr());
 }
 
 // Annual leave and free days are counted in working days, not calendar
@@ -3038,8 +3072,8 @@ function effectiveFreeDaysRemaining(emp) { return freeDaysRemaining(emp) - reser
 // (Jan 1st) rollovers they missed since the app was last opened:
 //   - Godišnji odmor: neiskorišćeni dani iz prethodne godine se PRENOSE
 //     (annualLeave postaje ostatak + 20 novih dana, usedLeave se resetuje).
-//   - Slobodni dani: NE prenose se — svake godine se vraća na podrazumevani
-//     broj (3), bez obzira koliko je ostalo.
+//   - Slobodni dani: NE prenose se — iskorišćeni dani se resetuju na 0,
+//     ali konfigurisani broj dana (freeDaysAllowance) ostaje isti.
 // The `while` loop handles employees who haven't opened the app in more
 // than one calendar year (catches up multiple years at once, one at a time).
 function applyYearRollover() {
@@ -3058,7 +3092,9 @@ function applyYearRollover() {
       const remainingAnnual = Math.max(0, (emp.annualLeave || 0) - (emp.usedLeave || 0));
       emp.annualLeave = remainingAnnual + 20;
       emp.usedLeave = 0;
-      emp.freeDaysAllowance = 3;
+      // Only the used-count resets — freeDaysAllowance is a per-employee
+      // configured limit (admins can set it above/below the default 3),
+      // not a per-year counter, so it must survive rollover unchanged.
       emp.usedFreeDays = 0;
       emp.lastRolloverYear++;
       changed = true;
@@ -3162,20 +3198,23 @@ function renderCalendar() {
   let startDow = (firstDay.getDay() + 6) % 7;
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const prevDays = new Date(currentYear, currentMonth, 0).getDate();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayDateStr = todayStr();
   const emps = getEmployees();
 
-  // Collect all leave events
+  // Collect all leave events — both confirmed (approved) absences and
+  // still-pending requests (shown in a distinct faded/dashed style below)
+  // so the admin can spot two people tentatively booking the same period
+  // before either request has been decided.
   const events = {};
   emps.forEach(emp => {
     const all = [...(emp.leave_requests||[]), ...(emp.leave_history||[])];
-    all.filter(r => r.status === 'approved').forEach(r => {
+    all.filter(r => r.status === 'approved' || r.status === 'pending').forEach(r => {
       let d = new Date(r.startDate);
       const end = r.ongoing ? todayDateOnly() : new Date(r.endDate);
       while (d <= end) {
         const key = d.toISOString().split('T')[0];
         if (!events[key]) events[key] = [];
-        events[key].push({ name: emp.name, type: r.leaveType });
+        events[key].push({ name: emp.name, type: r.leaveType, pending: r.status === 'pending' });
         d.setDate(d.getDate() + 1);
       }
     });
@@ -3193,12 +3232,14 @@ function renderCalendar() {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
     const dow = (new Date(currentYear, currentMonth, day).getDay() + 6) % 7;
     const isWeekend = dow >= 5;
-    const isToday = dateStr === todayStr;
+    const isToday = dateStr === todayDateStr;
     const dayEvents = events[dateStr] || [];
 
     let evHtml = dayEvents.slice(0, 2).map(ev => {
       const c = personColor(ev.name);
-      return `<div class="cal-event" style="background:${c.bg};color:${c.text}" title="${ev.name} – ${ev.type}">${ev.name.split(' ')[0]}</div>`;
+      const pendingClass = ev.pending ? ' cal-event-pending' : '';
+      const pendingTitle = ev.pending ? ' (na čekanju)' : '';
+      return `<div class="cal-event${pendingClass}" style="background:${c.bg};color:${c.text}" title="${ev.name} – ${ev.type}${pendingTitle}">${ev.pending ? '⏳ ' : ''}${ev.name.split(' ')[0]}</div>`;
     }).join('');
     if (dayEvents.length > 2) evHtml += `<div class="cal-event cal-event-more" style="background:var(--border);color:var(--text2)">+${dayEvents.length-2}</div>`;
 
@@ -3229,7 +3270,7 @@ function openDayEventsModal(dateStr) {
     const c = LEAVE_COLORS[ev.type] || { bg: '#e0e7ff', text: '#3730a3' };
     return `<div class="timeline-item">
       <div class="timeline-title">${ev.name}</div>
-      <div class="timeline-sub"><span class="badge" style="background:${c.bg};color:${c.text}">${ev.type}</span></div>
+      <div class="timeline-sub"><span class="badge" style="background:${c.bg};color:${c.text}">${ev.type}</span>${ev.pending ? ' <span class="text-xs text-muted">⏳ na čekanju</span>' : ''}</div>
     </div>`;
   }).join('');
   document.getElementById('day-events-overlay').classList.remove('hidden');
@@ -3769,7 +3810,7 @@ function renderRequests() {
                     ${makeAvatar(emp.name)}
                     <div>
                       <span style="font-weight:600">${emp.name}</span>
-                      ${overlaps.length ? `<div class="text-xs" style="color:var(--warning)">⚠️ Preklapa se: ${overlaps.join(', ')}</div>` : ''}
+                      ${overlaps.length ? `<div class="text-xs" style="color:var(--warning)">⚠️ Preklapa se: ${overlaps.map(o => o.status === 'pending' ? `${o.name} (na čekanju)` : o.name).join(', ')}</div>` : ''}
                     </div>
                   </div>
                 </td>
@@ -3812,8 +3853,17 @@ function allocateApprovedDays(emp, req) {
     req.annualDaysUsed = req.days;
     req.freeDaysUsed = 0;
   } else if (req.leaveType === 'Slobodan dan') {
+    // usedFreeDays only tracks the CURRENT year's usage (it resets every
+    // rollover) — a request dated for a different year must be judged
+    // against that year's own fresh allowance, not against this year's
+    // already-committed count, otherwise a free day requested for next
+    // year gets wrongly docked from annual leave just because this
+    // year's allowance happens to be used up already.
+    const reqYear = new Date(req.startDate).getFullYear();
+    const curYear = new Date().getFullYear();
     const allowance = freeDaysAllowance(emp);
-    const committedFree = (emp.usedFreeDays||0) + reservedFreeDays(emp);
+    const usedInReqYear = reqYear === curYear ? (emp.usedFreeDays||0) : 0;
+    const committedFree = usedInReqYear + reservedFreeDays(emp, reqYear);
     const remainingFree = Math.max(allowance - committedFree, 0);
     if (req.days <= remainingFree) {
       req.freeDaysUsed = req.days;
@@ -3848,11 +3898,15 @@ function reverseApprovedDays(emp, req) {
 // Sum of days from approved requests that are allocated but not yet
 // applied (their date hasn't arrived) — i.e. "reserved" future leave
 // that doesn't shrink Preostalo yet but should still be visible.
-function reservedAnnualDays(emp) {
-  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false ? (r.annualDaysUsed||0) : 0), 0);
+// Scoped to a single calendar year by default (the current one) since
+// usedLeave/usedFreeDays themselves only ever represent that year's
+// usage — a reservation dated for a different year shouldn't count
+// against this year's balance (or vice versa).
+function reservedAnnualDays(emp, year = new Date().getFullYear()) {
+  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false && new Date(r.startDate).getFullYear() === year ? (r.annualDaysUsed||0) : 0), 0);
 }
-function reservedFreeDays(emp) {
-  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false ? (r.freeDaysUsed||0) : 0), 0);
+function reservedFreeDays(emp, year = new Date().getFullYear()) {
+  return (emp.leave_history||[]).reduce((s, r) => s + (r.status === 'approved' && r.daysApplied === false && new Date(r.startDate).getFullYear() === year ? (r.freeDaysUsed||0) : 0), 0);
 }
 
 // Forward-looking balance: what's left after every currently-approved
@@ -3869,7 +3923,7 @@ function effectiveAnnualRemaining(emp) {
 // counters under the old immediate-deduction logic, so they're marked
 // applied without touching the counters again.
 function applyElapsedLeaveDeductions() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayStr();
   const emps = getEmployees();
   let changed = false;
   emps.forEach(emp => {
@@ -3900,10 +3954,13 @@ function applyElapsedLeaveDeductions() {
 // Backdated/already-started approvals are marked sent without notifying
 // — a "your leave starts in 7 days" reminder makes no sense in the past.
 function sendUpcomingLeaveReminders() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayStr();
   const in7 = new Date();
   in7.setDate(in7.getDate() + 7);
-  const in7Str = in7.toISOString().split('T')[0];
+  // Local-date formatting, not toISOString() — same UTC-lag reason as
+  // todayStr() above, since near local midnight this instant's UTC date
+  // can still be one day behind the intended local target date.
+  const in7Str = `${in7.getFullYear()}-${String(in7.getMonth()+1).padStart(2,'0')}-${String(in7.getDate()).padStart(2,'0')}`;
   const remindableTypes = ['Godišnji odmor', 'Slobodan dan', 'Plaćeno odsustvo'];
   const emps = getEmployees();
   let changed = false;
@@ -4121,7 +4178,7 @@ function renderReports() {
           </thead>
           <tbody>
             ${emps.map(e => {
-              const rem = (e.annualLeave||20) - (e.usedLeave||0);
+              const rem = effectiveAnnualRemaining(e);
               const pct = Math.round(((e.usedLeave||0) / (e.annualLeave||20)) * 100);
               return `<tr>
                 <td class="td-primary">
@@ -4388,7 +4445,7 @@ function renderMyCalendar() {
     let startDow = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const prevDays = new Date(currentYear, currentMonth, 0).getDate();
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayDateStr = todayStr();
 
     // Build events map: approved from ALL employees + own pending/rejected
     const allEmps = getEmployees();
@@ -4418,7 +4475,7 @@ function renderMyCalendar() {
       const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const dow = (new Date(currentYear, currentMonth, day).getDay() + 6) % 7;
       const isWeekend = dow >= 5;
-      const isToday = dateStr === todayStr;
+      const isToday = dateStr === todayDateStr;
       const dayEvs = eventsMap[dateStr] || [];
 
       let evHtml = dayEvs.slice(0,2).map(ev => {
@@ -4453,7 +4510,7 @@ function renderMyCalendar() {
   document.getElementById('my-cal-prev').onclick = () => { currentMonth--; if (currentMonth<0){currentMonth=11;currentYear--;} drawMyCal(); setupDrag(); };
   document.getElementById('my-cal-next').onclick = () => { currentMonth++; if (currentMonth>11){currentMonth=0;currentYear++;} drawMyCal(); setupDrag(); };
   document.getElementById('my-cal-today').onclick = () => { currentMonth=new Date().getMonth(); currentYear=new Date().getFullYear(); drawMyCal(); setupDrag(); };
-  document.getElementById('my-cal-add').onclick = () => openQuickLeave(new Date().toISOString().split('T')[0]);
+  document.getElementById('my-cal-add').onclick = () => openQuickLeave(todayStr());
   setupDrag();
 
   function setupDrag() {
@@ -5113,7 +5170,7 @@ document.getElementById('register-form').addEventListener('submit', async e => {
     name, email,
     position: '',
     department: '',
-    startDate: new Date().toISOString().split('T')[0],
+    startDate: todayStr(),
     annualLeave: 20,
     usedLeave: 0,
     freeDaysAllowance: 3,
