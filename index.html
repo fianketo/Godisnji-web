@@ -5278,7 +5278,11 @@ initTheme();
 // isn't enough) — see sw.js for what it does and doesn't cache.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+    // updateViaCache: 'none' — makes sure the browser always checks
+    // sw.js itself against the network for updates instead of a cached
+    // copy, so a deployed fix to the worker's own caching behavior
+    // actually reaches installed devices promptly.
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(err => console.error('SW registration failed:', err));
   });
 }
 
