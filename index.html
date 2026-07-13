@@ -5240,6 +5240,47 @@ document.getElementById('register-form').addEventListener('submit', async e => {
 /* ================================================================
    APP START
    ================================================================ */
+// A remote update (anyone else's request/approval/edit) rebuilds the whole
+// page via renderPage(), which replaces #main-content's DOM nodes outright.
+// If that lands while the user is mid-click — mouse/finger already down on
+// a button, not yet released — the node they're pressing gets swapped out
+// from under them and the click is silently lost (no error, nothing
+// happens), which is especially easy to hit on a page like Zahtevi once
+// more than a couple of people are using the app at once. Deferring the
+// re-render until the gesture finishes avoids destroying the element
+// mid-click; native click firing happens synchronously right after
+// mouseup/touchend, before this deferred render runs, so the click still
+// lands normally.
+let userInteractionActive = false;
+let pendingRemoteRender = null;
+document.addEventListener('mousedown', () => { userInteractionActive = true; }, true);
+document.addEventListener('touchstart', () => { userInteractionActive = true; }, true);
+function endUserInteraction() {
+  userInteractionActive = false;
+  if (pendingRemoteRender) {
+    const fn = pendingRemoteRender;
+    pendingRemoteRender = null;
+    // mouseup/touchend fire *before* the click event that actually invokes
+    // the button's own onclick — rendering synchronously here would still
+    // destroy the target node right before that click gets a chance to
+    // run. Pushing it to a macrotask lets the pending click finish first.
+    setTimeout(() => { if (currentUser) fn(); }, 0);
+  }
+}
+document.addEventListener('mouseup', endUserInteraction, true);
+document.addEventListener('touchend', endUserInteraction, true);
+document.addEventListener('touchcancel', endUserInteraction, true);
+
+function renderRemoteUpdate(fn) {
+  // A render can end up deferred across a logout (interaction in progress
+  // right as the user signs out) — by the time it would fire, currentUser
+  // is gone and renderDashboard()/renderPage() would throw against a
+  // screen that's no longer showing the app. Drop it instead.
+  if (!currentUser) return;
+  if (userInteractionActive) { pendingRemoteRender = fn; return; }
+  fn();
+}
+
 let cloudListenersActive = false;
 function startCloudListeners() {
   // Guarded so a page-load session restore (onAuthStateChanged) and an
@@ -5248,13 +5289,11 @@ function startCloudListeners() {
   cloudListenersActive = true;
   cloudListen('employees', data => {
     localStorage.setItem('employees', JSON.stringify(data));
-    renderSidebar();
-    renderPage();
+    renderRemoteUpdate(() => { renderSidebar(); renderPage(); });
   });
   cloudListen('users', data => {
     localStorage.setItem('users', JSON.stringify(data));
-    renderSidebar();
-    renderPage();
+    renderRemoteUpdate(() => { renderSidebar(); renderPage(); });
   });
 }
 
