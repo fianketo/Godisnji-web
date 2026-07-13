@@ -2234,6 +2234,66 @@ function cloudPush(key, arr) {
   });
 }
 
+// Applies `mutate(emp)` to employee `empId` both locally (localStorage +
+// instant UI) and, if cloud sync is on, atomically against whatever the
+// *server* currently holds for that employee via a Firebase transaction —
+// not against our local copy, which can be stale. Firebase re-runs the
+// transaction automatically if the server value changes underneath it, so
+// a change made to the SAME employee from another device/tab in the same
+// instant (an employee submitting a request from their phone while an
+// admin approves a different one of their requests from a desktop, say)
+// can no longer be silently discarded by one device's write blindly
+// replacing the whole employee record — which is what let approved or
+// pending requests vanish, or get duplicated, under real concurrent use
+// (multiple people/devices in the same company at once, which is the
+// normal case, not an edge case).
+//
+// `mutate` must be a pure function of the employee object — look things
+// up by id, don't close over request objects captured before the call —
+// since it runs once against our local copy and, separately, against
+// whatever the server's live value turns out to be (possibly more than
+// once, if Firebase has to retry the transaction). Keep side effects that
+// shouldn't repeat (sending an email, etc.) out of it; addNotification()
+// is fine since it's meant to end up persisted like any other field.
+function mutateEmployee(empId, mutate) {
+  const emps = getEmployees();
+  const emp = emps.find(e => e.id === empId);
+  if (!emp) return null;
+  mutate(emp);
+  localStorage.setItem('employees', JSON.stringify(emps));
+
+  if (firebaseDB) {
+    firebaseDB.ref('employees/' + empId).transaction(current => {
+      if (current == null) return undefined; // deleted elsewhere — nothing to merge into, abort
+      const draft = JSON.parse(JSON.stringify(current));
+      mutate(draft);
+      return draft;
+    }).then(result => {
+      if (!result.committed || !result.snapshot.exists()) return;
+      // Fold the server's authoritative post-merge value back into our
+      // local cache so it matches what's now on the server exactly (this
+      // matters as the baseline for the *next* mutation/diff), and make
+      // sure the screen reflects it too.
+      const serverEmp = result.snapshot.val();
+      const emps2 = getEmployees();
+      const idx = emps2.findIndex(e => e.id === empId);
+      if (idx !== -1 && JSON.stringify(emps2[idx]) !== JSON.stringify(serverEmp)) {
+        emps2[idx] = serverEmp;
+        localStorage.setItem('employees', JSON.stringify(emps2));
+        renderRemoteUpdate(() => { renderSidebar(); renderPage(); });
+      }
+      if (lastKnownCloud.employees) {
+        const cIdx = lastKnownCloud.employees.findIndex(e => e.id === empId);
+        if (cIdx !== -1) lastKnownCloud.employees[cIdx] = serverEmp;
+      }
+    }).catch(err => {
+      console.error(err);
+      toast('Izmena nije sačuvana na serveru (greška u mreži) — osvežite stranicu i pokušajte ponovo.', 'error', 6000);
+    });
+  }
+  return emp;
+}
+
 function cloudListen(key, cb) {
   if (!firebaseDB) return;
   firebaseDB.ref(key).on('value', snap => {
@@ -2507,18 +2567,20 @@ document.getElementById('close-sick-confirm-btn').onclick = () => {
   if (!closeSickTarget) return;
   const end = document.getElementById('close-sick-date').value;
   if (!end) { toast('Izaberite datum', 'warning'); return; }
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === closeSickTarget.empId);
-  if (!emp) return;
-  const req = [...(emp.leave_requests||[]), ...(emp.leave_history||[])].find(r => r.id === closeSickTarget.reqId);
-  if (!req) return;
-  if (new Date(end) < new Date(req.startDate)) {
+  const emp0 = getEmployees().find(e => e.id === closeSickTarget.empId);
+  const req0 = emp0 && [...(emp0.leave_requests||[]), ...(emp0.leave_history||[])].find(r => r.id === closeSickTarget.reqId);
+  if (!req0) return;
+  if (new Date(end) < new Date(req0.startDate)) {
     toast('Datum ne može biti pre početka bolovanja', 'error'); return;
   }
-  req.endDate = end;
-  req.days = Math.round((new Date(end) - new Date(req.startDate)) / 86400000) + 1;
-  req.ongoing = false;
-  saveEmployees(emps);
+  const { empId, reqId } = closeSickTarget;
+  mutateEmployee(empId, e => {
+    const req = [...(e.leave_requests||[]), ...(e.leave_history||[])].find(r => r.id === reqId);
+    if (!req) return;
+    req.endDate = end;
+    req.days = Math.round((new Date(end) - new Date(req.startDate)) / 86400000) + 1;
+    req.ongoing = false;
+  });
   toast('Bolovanje je zatvoreno', 'success');
   closeCloseSickModal();
   renderSidebar();
@@ -3979,21 +4041,22 @@ function sendUpcomingLeaveReminders() {
 }
 
 function approveRequest(empId, reqId) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === empId);
-  if (!emp) return;
-  const idx = emp.leave_requests.findIndex(r => r.id === reqId);
-  if (idx === -1) return;
-  const req = emp.leave_requests.splice(idx, 1)[0];
-  req.status = 'approved';
-  req.approvedAt = new Date().toISOString();
-  emp.leave_history = emp.leave_history || [];
-  emp.leave_history.push(req);
+  let approvedReq = null;
+  const emp = mutateEmployee(empId, e => {
+    const idx = (e.leave_requests || []).findIndex(r => r.id === reqId);
+    if (idx === -1) return;
+    const req = e.leave_requests.splice(idx, 1)[0];
+    req.status = 'approved';
+    req.approvedAt = new Date().toISOString();
+    e.leave_history = e.leave_history || [];
+    e.leave_history.push(req);
+    allocateApprovedDays(e, req);
+    addNotification(e, `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
+    approvedReq = req;
+  });
+  if (!emp || !approvedReq) return;
+  sendLeaveEmail(emp, 'Zahtev odobren', `Vaš zahtev za "${approvedReq.leaveType}" (${approvedReq.startDate}${approvedReq.ongoing ? ' – u toku' : ' → ' + approvedReq.endDate}) je odobren.`);
 
-  allocateApprovedDays(emp, req);
-  notifyEmployee(emp, 'Zahtev odobren', `Vaš zahtev za "${req.leaveType}" (${req.startDate}${req.ongoing ? ' – u toku' : ' → ' + req.endDate}) je odobren.`);
-
-  saveEmployees(emps);
   applyElapsedLeaveDeductions();
   toast(`Zahtev odobren za ${emp.name}`, 'success');
   renderRequests();
@@ -4005,18 +4068,21 @@ function approveRequest(empId, reqId) {
    approved/rejected request)
    ================================================================ */
 function deleteHistoryEntry(empId, reqId) {
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === empId);
-  if (!emp) return;
-  const idx = (emp.leave_history||[]).findIndex(r => r.id === reqId);
-  if (idx === -1) return;
-  const req = emp.leave_history[idx];
-  if (!confirm(`Obrisati ovaj zapis (${req.leaveType}, ${req.startDate} → ${req.ongoing ? 'u toku' : req.endDate})?${req.status === 'approved' && req.daysApplied ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
+  const emp0 = getEmployees().find(e => e.id === empId);
+  const req0 = emp0 && (emp0.leave_history||[]).find(r => r.id === reqId);
+  if (!req0) return;
+  if (!confirm(`Obrisati ovaj zapis (${req0.leaveType}, ${req0.startDate} → ${req0.ongoing ? 'u toku' : req0.endDate})?${req0.status === 'approved' && req0.daysApplied ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
 
-  if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(emp, req);
-  emp.leave_history.splice(idx, 1);
-  saveEmployees(emps);
-  notifyEmployee(emp, 'Zapis obrisan', `Administrator je obrisao vaš zapis za "${req.leaveType}" (${req.startDate}${req.ongoing ? '' : ' → ' + req.endDate}).`);
+  const emp = mutateEmployee(empId, e => {
+    const idx = (e.leave_history||[]).findIndex(r => r.id === reqId);
+    if (idx === -1) return;
+    const req = e.leave_history[idx];
+    if (req.status === 'approved' && !req.ongoing) reverseApprovedDays(e, req);
+    e.leave_history.splice(idx, 1);
+    addNotification(e, `Administrator je obrisao vaš zapis za "${req0.leaveType}" (${req0.startDate}${req0.ongoing ? '' : ' → ' + req0.endDate}).`);
+  });
+  if (!emp) return;
+  sendLeaveEmail(emp, 'Zapis obrisan', `Administrator je obrisao vaš zapis za "${req0.leaveType}" (${req0.startDate}${req0.ongoing ? '' : ' → ' + req0.endDate}).`);
   toast('Zapis obrisan', 'success');
   if (currentPage === 'employee-detail') renderEmployeeDetail(empId);
   else if (currentPage === 'history') renderHistory();
@@ -4056,21 +4122,24 @@ document.getElementById('edit-history-confirm-btn').onclick = () => {
   const days = countLeaveDays(startDate, endDate, leaveType);
   if (days <= 0) { toast('Nevalidni datumi', 'error'); return; }
 
-  const emps = getEmployees();
-  const emp = emps.find(e => e.id === editHistoryTarget.empId);
-  const req = emp && (emp.leave_history||[]).find(r => r.id === editHistoryTarget.reqId);
-  if (!req) { closeEditHistoryModal(); return; }
+  const { empId, reqId } = editHistoryTarget;
+  let found = false;
+  const emp = mutateEmployee(empId, e => {
+    const req = (e.leave_history||[]).find(r => r.id === reqId);
+    if (!req) return;
+    if (req.status === 'approved') reverseApprovedDays(e, req);
+    req.leaveType = leaveType;
+    req.startDate = startDate;
+    req.endDate = endDate;
+    req.days = days;
+    if (req.status === 'approved') allocateApprovedDays(e, req);
+    addNotification(e, `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
+    found = true;
+  });
+  if (!emp || !found) { closeEditHistoryModal(); return; }
+  sendLeaveEmail(emp, 'Zahtev izmenjen', `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
 
-  if (req.status === 'approved') reverseApprovedDays(emp, req);
-  req.leaveType = leaveType;
-  req.startDate = startDate;
-  req.endDate = endDate;
-  req.days = days;
-  if (req.status === 'approved') allocateApprovedDays(emp, req);
-
-  saveEmployees(emps);
   applyElapsedLeaveDeductions();
-  notifyEmployee(emp, 'Zahtev izmenjen', `Administrator je izmenio vaš zahtev za "${leaveType}" na ${startDate} → ${endDate}.`);
   toast('Zapis izmenjen', 'success');
   closeEditHistoryModal();
   if (currentPage === 'employee-detail') renderEmployeeDetail(editHistoryTarget.empId);
@@ -4080,19 +4149,21 @@ document.getElementById('edit-history-confirm-btn').onclick = () => {
 
 function showRejectModal(empId, reqId) {
   openRejectModal((reason) => {
-    const emps = getEmployees();
-    const emp = emps.find(e => e.id === empId);
-    if (!emp) return;
-    const idx = emp.leave_requests.findIndex(r => r.id === reqId);
-    if (idx === -1) return;
-    const req = emp.leave_requests.splice(idx, 1)[0];
-    req.status = 'rejected';
-    req.rejectedAt = new Date().toISOString();
-    req.rejectionReason = reason;
-    emp.leave_history = emp.leave_history || [];
-    emp.leave_history.push(req);
-    notifyEmployee(emp, 'Zahtev odbijen', `Vaš zahtev za "${req.leaveType}" (${req.startDate}) je odbijen. Razlog: ${reason}`);
-    saveEmployees(emps);
+    let rejectedReq = null;
+    const emp = mutateEmployee(empId, e => {
+      const idx = (e.leave_requests || []).findIndex(r => r.id === reqId);
+      if (idx === -1) return;
+      const req = e.leave_requests.splice(idx, 1)[0];
+      req.status = 'rejected';
+      req.rejectedAt = new Date().toISOString();
+      req.rejectionReason = reason;
+      e.leave_history = e.leave_history || [];
+      e.leave_history.push(req);
+      addNotification(e, `Vaš zahtev za "${req.leaveType}" (${req.startDate}) je odbijen. Razlog: ${reason}`);
+      rejectedReq = req;
+    });
+    if (!emp || !rejectedReq) return;
+    sendLeaveEmail(emp, 'Zahtev odbijen', `Vaš zahtev za "${rejectedReq.leaveType}" (${rejectedReq.startDate}) je odbijen. Razlog: ${reason}`);
     toast(`Zahtev odbijen za ${emp.name}`, 'error');
     renderRequests();
     renderSidebar();
@@ -4674,8 +4745,7 @@ function openQuickLeave(startStr, endStr) {
     const days = ongoing ? null : countLeaveDays(start, end, type);
     if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
 
-    const emps = getEmployees();
-    const emp = emps.find(x => x.id === currentUser.employeeId);
+    const emp = getEmployees().find(x => x.id === currentUser.employeeId);
     if (!emp) return;
     const remaining = effectiveAnnualRemaining(emp);
     if (type === 'Godišnji odmor' && days > remaining) {
@@ -4684,8 +4754,7 @@ function openQuickLeave(startStr, endStr) {
     if (type === 'Bolovanje (do 2 dana)' && days > 2) {
       toast('Ovaj tip bolovanja je ograničen na 2 dana. Za duže odsustvo koristite "Bolovanje".', 'error'); return;
     }
-    emp.leave_requests = emp.leave_requests || [];
-    emp.leave_requests.push({
+    const newReq = {
       id: 'r' + Date.now(),
       leaveType: type,
       startDate: start,
@@ -4695,8 +4764,11 @@ function openQuickLeave(startStr, endStr) {
       note: document.getElementById('ql-note').value,
       status: 'pending',
       submittedAt: new Date().toISOString()
+    };
+    mutateEmployee(currentUser.employeeId, e => {
+      e.leave_requests = e.leave_requests || [];
+      e.leave_requests.push(newReq);
     });
-    saveEmployees(emps);
     closeQuickLeave();
     toast('Zahtev podnet!', 'success');
     renderSidebar();
@@ -4808,10 +4880,7 @@ function renderMyRequest() {
     if (type === 'Bolovanje (do 2 dana)' && days > 2) {
       toast('Ovaj tip bolovanja je ograničen na 2 dana. Za duže odsustvo koristite "Bolovanje".', 'error'); return;
     }
-    const emps2 = getEmployees();
-    const e2 = emps2.find(x => x.id === currentUser.employeeId);
-    e2.leave_requests = e2.leave_requests || [];
-    e2.leave_requests.push({
+    const newReq = {
       id: 'r' + Date.now(),
       leaveType: type,
       startDate: start,
@@ -4821,8 +4890,11 @@ function renderMyRequest() {
       note: document.getElementById('req-note').value,
       status: 'pending',
       submittedAt: new Date().toISOString()
+    };
+    mutateEmployee(currentUser.employeeId, e2 => {
+      e2.leave_requests = e2.leave_requests || [];
+      e2.leave_requests.push(newReq);
     });
-    saveEmployees(emps2);
     toast('Zahtev podnet!', 'success');
     renderSidebar();
     renderMyRequest();
