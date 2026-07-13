@@ -5264,7 +5264,7 @@ function endUserInteraction() {
     // the button's own onclick — rendering synchronously here would still
     // destroy the target node right before that click gets a chance to
     // run. Pushing it to a macrotask lets the pending click finish first.
-    setTimeout(fn, 0);
+    setTimeout(() => { if (currentUser) fn(); }, 0);
   }
 }
 document.addEventListener('mouseup', endUserInteraction, true);
@@ -5272,6 +5272,11 @@ document.addEventListener('touchend', endUserInteraction, true);
 document.addEventListener('touchcancel', endUserInteraction, true);
 
 function renderRemoteUpdate(fn) {
+  // A render can end up deferred across a logout (interaction in progress
+  // right as the user signs out) — by the time it would fire, currentUser
+  // is gone and renderDashboard()/renderPage() would throw against a
+  // screen that's no longer showing the app. Drop it instead.
+  if (!currentUser) return;
   if (userInteractionActive) { pendingRemoteRender = fn; return; }
   fn();
 }
