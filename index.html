@@ -2191,10 +2191,32 @@ function saveUsers(arr) {
 // not as a raw array — that's what lets cloudPush() below touch only the
 // records that actually changed. Some snapshots may still be array-shaped
 // (a read taken before this ever ran), so accept both.
+// A record from before cloud writes were keyed by the record's own id
+// (see cloudPush below) can still be sitting in the database under its
+// old plain array-index key ("4") alongside a newer copy under its real
+// id ("e1783368761871") — both carry the same `id` field, since that
+// field was always part of the record itself, independent of where it's
+// stored. Nothing writes to the old index-keyed slot anymore, so if both
+// exist the id-keyed one is always the current one; keep that copy and
+// drop the stale twin instead of surfacing both as separate employees
+// (which is what caused requests to silently land in — and appear to
+// save into — a frozen duplicate instead of the real record, and made
+// approved leave show up twice in history/on the calendar).
 function normalizeCloudArray(val) {
   if (Array.isArray(val)) return val;
-  if (val && typeof val === 'object') return Object.values(val);
-  return [];
+  if (!val || typeof val !== 'object') return [];
+  const byId = {};
+  const isPreferredCopy = {};
+  Object.keys(val).forEach(key => {
+    const item = val[key];
+    if (!item || !item.id) return;
+    const preferred = key === item.id;
+    if (!byId.hasOwnProperty(item.id) || (preferred && !isPreferredCopy[item.id])) {
+      byId[item.id] = item;
+      isPreferredCopy[item.id] = preferred;
+    }
+  });
+  return Object.values(byId);
 }
 
 // Last full snapshot known to match the server for each collection — null
