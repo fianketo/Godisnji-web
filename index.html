@@ -5347,18 +5347,24 @@ document.getElementById('register-form').addEventListener('submit', async e => {
 // lands normally.
 let userInteractionActive = false;
 let pendingRemoteRender = null;
+let pendingRemoteRenderSafety = null;
 document.addEventListener('mousedown', () => { userInteractionActive = true; }, true);
 document.addEventListener('touchstart', () => { userInteractionActive = true; }, true);
+function flushPendingRemoteRender() {
+  if (pendingRemoteRenderSafety) { clearTimeout(pendingRemoteRenderSafety); pendingRemoteRenderSafety = null; }
+  if (!pendingRemoteRender) return;
+  const fn = pendingRemoteRender;
+  pendingRemoteRender = null;
+  if (currentUser) fn();
+}
 function endUserInteraction() {
   userInteractionActive = false;
   if (pendingRemoteRender) {
-    const fn = pendingRemoteRender;
-    pendingRemoteRender = null;
     // mouseup/touchend fire *before* the click event that actually invokes
     // the button's own onclick — rendering synchronously here would still
     // destroy the target node right before that click gets a chance to
     // run. Pushing it to a macrotask lets the pending click finish first.
-    setTimeout(() => { if (currentUser) fn(); }, 0);
+    setTimeout(flushPendingRemoteRender, 0);
   }
 }
 document.addEventListener('mouseup', endUserInteraction, true);
@@ -5371,7 +5377,20 @@ function renderRemoteUpdate(fn) {
   // is gone and renderDashboard()/renderPage() would throw against a
   // screen that's no longer showing the app. Drop it instead.
   if (!currentUser) return;
-  if (userInteractionActive) { pendingRemoteRender = fn; return; }
+  if (userInteractionActive) {
+    pendingRemoteRender = fn;
+    // Safety net: mousedown/touchstart can fire without a matching
+    // mouseup/touchend ever reaching us (released over a native <select>
+    // dropdown, outside the browser window, a scrollbar drag, etc.) —
+    // without this, userInteractionActive would stay stuck "true" and a
+    // remote update (someone else's new/approved request) would just sit
+    // there invisibly until the admin happened to click something else,
+    // looking exactly like it never arrived until the page is refreshed.
+    // A real click always resolves in well under this window.
+    if (pendingRemoteRenderSafety) clearTimeout(pendingRemoteRenderSafety);
+    pendingRemoteRenderSafety = setTimeout(() => { userInteractionActive = false; flushPendingRemoteRender(); }, 2000);
+    return;
+  }
   fn();
 }
 
