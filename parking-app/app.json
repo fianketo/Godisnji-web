@@ -7,6 +7,9 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "platforms": ["android", "web"],
+    "splash": {
+      "backgroundColor": "#0b1626"
+    },
     "android": {
       "package": "rs.parkingns.app",
       "permissions": [
