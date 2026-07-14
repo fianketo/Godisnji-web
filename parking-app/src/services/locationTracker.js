@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,17 +15,20 @@ import { createSession, closeSession, getActiveSession } from "./historyService"
 import { notifyParked } from "./notificationService";
 
 // Must be defined at module scope so it survives app restarts / headless JS.
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-  if (error) {
-    console.warn("Location task error:", error.message);
-    return;
-  }
-  const { locations } = data || {};
-  if (!locations || locations.length === 0) return;
+// expo-task-manager has no web implementation, so this only runs on native.
+if (Platform.OS !== "web") {
+  TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+    if (error) {
+      console.warn("Location task error:", error.message);
+      return;
+    }
+    const { locations } = data || {};
+    if (!locations || locations.length === 0) return;
 
-  const location = locations[locations.length - 1];
-  await handleLocationUpdate(location);
-});
+    const location = locations[locations.length - 1];
+    await handleLocationUpdate(location);
+  });
+}
 
 async function readMotionState() {
   const raw = await AsyncStorage.getItem(STORAGE_KEYS.MOTION_STATE);
@@ -109,11 +113,17 @@ export async function requestLocationPermissions() {
   if (foreground.status !== "granted") {
     return { granted: false, background: false };
   }
+  if (Platform.OS === "web") {
+    return { granted: true, background: false };
+  }
   const background = await Location.requestBackgroundPermissionsAsync();
   return { granted: true, background: background.status === "granted" };
 }
 
 export async function startTracking() {
+  // Background location tasks are Android/iOS-only (no web implementation).
+  if (Platform.OS === "web") return;
+
   const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
   if (hasStarted) return;
 
@@ -130,6 +140,8 @@ export async function startTracking() {
 }
 
 export async function stopTracking() {
+  if (Platform.OS === "web") return;
+
   const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
   if (hasStarted) {
     await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
