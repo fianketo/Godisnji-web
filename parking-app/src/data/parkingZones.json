@@ -1,0 +1,65 @@
+{
+  "_disclaimer": "Ručno unesen, ILUSTRATIVAN skup zona/ulica/cena za Novi Sad, sastavljen na osnovu javno dostupnih informacija sa parkingns.rs (jul 2026). Pre realne upotrebe OBAVEZNO proveri i ažuriraj cene, brojeve za SMS i granice zona na https://parkingns.rs/ jer se mogu promeniti.",
+  "city": "Novi Sad",
+  "currency": "RSD",
+  "generalWorkingHours": {
+    "monFri": "07:00-21:00",
+    "sat": "07:00-14:00",
+    "sun": "besplatno (nema naplate)"
+  },
+  "zones": [
+    {
+      "id": "crvena",
+      "name": "Crvena zona",
+      "pricePerHour": 55,
+      "maxDurationMinutes": 120,
+      "smsNumber": "8211",
+      "smsHint": "Pošalji SMS sa registarskom oznakom vozila na broj 8211.",
+      "streets": [
+        "Zmaj Jovina",
+        "Dunavska",
+        "Modene",
+        "Pašićeva",
+        "Njegoševa",
+        "Jevrejska",
+        "Ilije Ognjanovića",
+        "Nikole Pašića"
+      ]
+    },
+    {
+      "id": "plava",
+      "name": "Plava zona",
+      "pricePerHour": 45,
+      "maxDurationMinutes": null,
+      "smsNumber": "8212",
+      "smsHint": "Pošalji SMS sa registarskom oznakom vozila na broj 8212.",
+      "streets": [
+        "Bulevar Mihajla Pupina",
+        "Bulevar cara Lazara",
+        "Laze Telečkog",
+        "Stražilovska",
+        "Radnička",
+        "Bulevar Oslobođenja",
+        "Vase Stajića"
+      ]
+    },
+    {
+      "id": "bela",
+      "name": "Bela zona",
+      "pricePerHour": 30,
+      "maxDurationMinutes": null,
+      "smsNumber": "8218",
+      "smsDailyNumber": "8215",
+      "smsHint": "Pošalji SMS sa registarskom oznakom vozila na broj 8218 (za ceo dan: 8215).",
+      "streets": [
+        "Futoška",
+        "Temerinska",
+        "Kisačka",
+        "Novosadskog sajma",
+        "Rumenačka",
+        "Cara Dušana",
+        "Sentandrejski put"
+      ]
+    }
+  ]
+}
