@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalog analiza — BIOTEST</title>
+<meta name="description" content="Pretražite preko 900 laboratorijskih analiza BIOTEST-a po nazivu ili kategoriji, sa cenom i vremenom obrade, i izračunajte ukupnu cenu izabranih analiza.">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e7c86">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Preskoči na sadržaj</a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">🧪</span>
+      <span>BIOTEST<span class="brand-sub">Zavod za laboratorijsku dijagnostiku</span></span>
+    </a>
+    <nav aria-label="Glavna navigacija">
+      <ul class="nav-links">
+        <li><a href="index.html">Početna</a></li>
+        <li><a href="katalog.html" class="active">Katalog analiza</a></li>
+        <li><a href="lokacije.html">Lokacije</a></li>
+        <li><a href="popusti.html">Popusti</a></li>
+        <li><a href="saveti.html">Zdravstveni saveti</a></li>
+        <li><a href="o-nama.html">O nama / Kontakt</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="tel:+38121505913" class="btn btn-outline btn-sm">📞 <span class="long">Pozovi</span></a>
+      <button class="nav-toggle" aria-label="Meni" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="section-tight">
+  <div class="container">
+    <div class="section-header" style="margin-bottom:24px; max-width: 720px;">
+      <span class="eyebrow">Cenovnik</span>
+      <h1>Katalog analiza</h1>
+      <p>Pretražite preko 900 laboratorijskih analiza po nazivu ili kategoriji. Označite analize koje vas zanimaju — kalkulator odmah sabira cenu i procenjuje vreme za rezultate.</p>
+    </div>
+
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="search-input" placeholder="Pretraži analize, npr. TSH, glukoza, KKS...">
+      </div>
+      <div class="select-wrap">
+        <select id="category-select">
+          <option value="">Sve kategorije</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="clear-filters" type="button">Poništi</button>
+    </div>
+
+    <p class="results-meta" id="results-meta">Učitavanje kataloga...</p>
+
+    <div class="katalog-grid">
+      <div id="catalog-list">
+        <div class="empty-state"><p>Učitavanje analiza...</p></div>
+      </div>
+
+      <aside class="calc-panel" id="calc-panel">
+        <div class="calc-header">
+          <h3>🧮 Kalkulator</h3>
+          <button class="btn btn-ghost btn-sm" id="calc-close" aria-label="Zatvori kalkulator">✕</button>
+        </div>
+        <p id="calc-count" style="font-size:0.85rem; color: var(--color-text-faint); margin: 4px 0 0;">Nije izabrana nijedna analiza.</p>
+        <div class="calc-items" id="calc-items"></div>
+
+        <div class="calc-code-row">
+          <input type="text" id="discount-input" placeholder="Popust kod (opciono)" aria-label="Popust kod">
+          <button class="btn btn-outline btn-sm" id="apply-code" type="button">Primeni</button>
+        </div>
+        <p class="calc-code-msg" id="calc-code-msg"></p>
+
+        <div class="calc-summary-row"><span>Međuzbir</span><span id="calc-subtotal">0 RSD</span></div>
+        <div class="calc-summary-row" id="calc-discount-row" style="display:none;">
+          <span>Popust (<span id="calc-discount-percent"></span>%)</span>
+          <span class="discount-value" id="calc-discount-amount">-0 RSD</span>
+        </div>
+        <div class="calc-summary-row total"><span>Ukupno</span><span id="calc-total">0 RSD</span></div>
+        <div class="calc-summary-row"><span>Procenjeno vreme</span><span id="calc-time">—</span></div>
+
+        <a href="lokacije.html" class="btn btn-primary btn-block" style="margin-top:12px;">📍 Dođite u laboratoriju</a>
+        <p class="field-hint" style="margin-top:10px;">Nemate popust kod? <a href="popusti.html">Preuzmite ga ovde</a>.</p>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<div class="mobile-calc-bar" id="mobile-calc-bar">
+  <span id="mobile-calc-summary">0 analiza izabrano</span>
+  <button class="btn btn-primary btn-sm" id="mobile-calc-open" type="button">Otvori kalkulator</button>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="brand-mark">🧪</span> BIOTEST</div>
+        <p>Zavod za laboratorijsku dijagnostiku. Precizni rezultati, ljudski pristup — u srcu Novog Sada.</p>
+      </div>
+      <div>
+        <h4>Navigacija</h4>
+        <ul class="footer-links">
+          <li><a href="katalog.html">Katalog analiza</a></li>
+          <li><a href="lokacije.html">Lokacije</a></li>
+          <li><a href="popusti.html">Popusti i promocije</a></li>
+          <li><a href="saveti.html">Zdravstveni saveti</a></li>
+          <li><a href="o-nama.html">O nama / Kontakt</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul class="footer-links">
+          <li>📍 Koste Abraševića 31, Novi Sad</li>
+          <li><a href="tel:+38121505913">📞 021/505-913</a></li>
+          <li><a href="tel:+38121506095">📞 021/506-095</a></li>
+          <li><a href="tel:+38121503724">📞 021/503-724</a></li>
+          <li><a href="mailto:biotest.novi.sad@gmail.com">✉️ biotest.novi.sad@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> BIOTEST — Zavod za laboratorijsku dijagnostiku</span>
+      <span>Sajt je informativnog karaktera i ne predstavlja zamenu za lekarski savet.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/catalog.js"></script>
+<script src="assets/js/discount.js"></script>
+<script src="assets/js/katalog-page.js"></script>
+</body>
+</html>

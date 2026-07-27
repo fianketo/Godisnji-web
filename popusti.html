@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Popusti i promocije — BIOTEST</title>
+<meta name="description" content="Preuzmite jedinstveni popust kod za BIOTEST laboratoriju — bez naloga i lozinke. Ostavite ime i kontakt i kod se odmah prikazuje na ekranu.">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e7c86">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a href="#main" class="skip-link">Preskoči na sadržaj</a>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark">🧪</span>
+      <span>BIOTEST<span class="brand-sub">Zavod za laboratorijsku dijagnostiku</span></span>
+    </a>
+    <nav aria-label="Glavna navigacija">
+      <ul class="nav-links">
+        <li><a href="index.html">Početna</a></li>
+        <li><a href="katalog.html">Katalog analiza</a></li>
+        <li><a href="lokacije.html">Lokacije</a></li>
+        <li><a href="popusti.html" class="active">Popusti</a></li>
+        <li><a href="saveti.html">Zdravstveni saveti</a></li>
+        <li><a href="o-nama.html">O nama / Kontakt</a></li>
+      </ul>
+    </nav>
+    <div class="nav-cta">
+      <a href="tel:+38121505913" class="btn btn-outline btn-sm">📞 <span class="long">Pozovi</span></a>
+      <button class="nav-toggle" aria-label="Meni" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Popusti i promocije</span>
+        <h1>Preuzmite svoj popust kod</h1>
+        <p>Ostavite ime i telefon ili email i odmah dobijate jedinstveni popust kod od <strong data-discount-percent>10</strong>% na sve laboratorijske analize. Bez naloga i lozinke.</p>
+      </div>
+
+      <div class="discount-columns">
+        <div class="card">
+          <form id="discount-form">
+            <div class="field">
+              <label for="name">Ime i prezime</label>
+              <input type="text" id="name" required placeholder="npr. Marko Marković">
+            </div>
+            <div class="field">
+              <label for="contact">Telefon ili email</label>
+              <input type="text" id="contact" required placeholder="npr. 06X/XXX-XXXX ili email adresa">
+            </div>
+            <button class="btn btn-accent btn-block" type="submit">🎁 Preuzmi popust kod</button>
+            <p class="field-hint">Kod je namenjen za ličnu upotrebu prilikom sledeće posete laboratoriji.</p>
+          </form>
+        </div>
+
+        <div>
+          <div id="code-result" style="display:none;">
+            <div class="code-display">
+              <div>Vaš popust kod</div>
+              <div class="code-value" id="code-value">BIO-000000-00</div>
+              <div><span data-discount-percent>10</span>% popusta na sve analize</div>
+            </div>
+            <p class="field-hint text-center" style="margin-top:14px;">Sačuvajte ili napravite screenshot — kod pokažite na šalteru prilikom plaćanja. Kod možete uneti i u <a href="katalog.html">kalkulator</a> da odmah vidite cenu sa popustom.</p>
+          </div>
+          <div id="code-placeholder" style="height:100%;">
+            <div class="card text-center" style="height:100%; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+              <div class="icon-badge" style="margin: 0 auto 14px;">🎁</div>
+              <p style="margin:0;">Vaš kod će se pojaviti ovde.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 32px;">
+        <h3 class="mt-0">Kako se koristi popust kod?</h3>
+        <ol style="color: var(--color-text-muted); padding-left: 20px; margin:0;">
+          <li>Popunite formu iznad i dobijte svoj kod.</li>
+          <li>Otvorite <a href="katalog.html">Katalog analiza</a>, izaberite šta vam treba i unesite kod u kalkulator da vidite cenu sa popustom.</li>
+          <li>Dođite u laboratoriju i pokažite kod na šalteru prilikom plaćanja.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><span class="brand-mark">🧪</span> BIOTEST</div>
+        <p>Zavod za laboratorijsku dijagnostiku. Precizni rezultati, ljudski pristup — u srcu Novog Sada.</p>
+      </div>
+      <div>
+        <h4>Navigacija</h4>
+        <ul class="footer-links">
+          <li><a href="katalog.html">Katalog analiza</a></li>
+          <li><a href="lokacije.html">Lokacije</a></li>
+          <li><a href="popusti.html">Popusti i promocije</a></li>
+          <li><a href="saveti.html">Zdravstveni saveti</a></li>
+          <li><a href="o-nama.html">O nama / Kontakt</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Kontakt</h4>
+        <ul class="footer-links">
+          <li>📍 Koste Abraševića 31, Novi Sad</li>
+          <li><a href="tel:+38121505913">📞 021/505-913</a></li>
+          <li><a href="tel:+38121506095">📞 021/506-095</a></li>
+          <li><a href="tel:+38121503724">📞 021/503-724</a></li>
+          <li><a href="mailto:biotest.novi.sad@gmail.com">✉️ biotest.novi.sad@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> BIOTEST — Zavod za laboratorijsku dijagnostiku</span>
+      <span>Sajt je informativnog karaktera i ne predstavlja zamenu za lekarski savet.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/discount.js"></script>
+<script src="assets/js/popusti-page.js"></script>
+</body>
+</html>
