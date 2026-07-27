@@ -8,15 +8,17 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 
 ## Struktura sajta
 
-- `index.html` — Početna (hero, promocija, zašto Biotest, teaser saveta)
+- `index.html` — Početna (hero, promocija, zašto Biotest, teaser bloga)
 - `katalog.html` — Katalog analiza: pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
 - `lokacije.html` — Mapa (Leaflet + OpenStreetMap) i kontakt kartica
 - `popusti.html` — Preuzimanje popust koda (ime + kontakt → jedinstveni kod na ekranu)
-- `saveti.html` — Rotirajući zdravstveni saveti (statični tekstovi)
+- `blog.html` — Lista blog objava (kartice sa slikom-bannerom, kategorijom i kratkim opisom)
+- `clanak.html` — Pojedinačni blog članak, učitava se preko `?slug=` iz URL-a
 - `o-nama.html` — O laboratoriji + kontakt forma (mailto)
 - `assets/css/style.css` — jedan CSS fajl, ceo dizajn sistem (boje, tipografija, komponente)
 - `assets/js/` — `main.js` (navigacija, service worker), `catalog.js` (učitavanje JSON-a), `discount.js` (popust kodovi), i po jedan fajl za logiku svake stranice
 - `data/biotest-analize.json` — katalog analiza (26 kategorija, ~940 analiza), učitava se kao statički JSON
+- `data/blog-posts.json` — blog objave, učitava se kao statički JSON
 
 ## Ažuriranje cenovnika
 
@@ -31,6 +33,30 @@ Da izmeniš cenu, vreme ili dodaš/obrišeš analizu — samo izmeni ovaj fajl (
 ## Kalkulator i vreme obrade
 
 Kalkulator (na `katalog.html`) sabira cene izabranih analiza i prikazuje **najduže** vreme obrade među njima. Pošto se vreme u cenovniku beleži veoma različito ("4h", "2-3 dana", "do 15 dana", "45 min."...), `assets/js/catalog.js` sadrži `parseTimeToHours()` koja sve to pretvara u približan broj sati radi poređenja — u kalkulatoru se onda prikazuje originalan tekst analize sa najdužim vremenom (ne prepravljen broj), da ostane čitljivo i tačno.
+
+## Blog — kako dodati novu objavu
+
+Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije ka najstarijoj. Da dodaš novu objavu, dodaj novi objekat na **vrh** niza (bez pravljenja novog HTML fajla):
+
+```json
+{
+  "slug": "kratak-jedinstven-url-deo",
+  "title": "Naslov objave",
+  "category": "Kategorija za značku",
+  "banner": "teal",
+  "emoji": "🩸",
+  "date": "2026-08-01",
+  "excerpt": "Kratak opis za karticu na listi (1-2 rečenice).",
+  "catalogQuery": "reč za pretragu u katalogu (dugme 'Pronađi u katalogu')",
+  "sourceLabel": "Naziv izvora (opciono, prikazuje se kao napomena na dnu članka)",
+  "sourceUrl": "https://... (opciono)",
+  "body": ["Prvi pasus.", "Drugi pasus.", "..."]
+}
+```
+
+`banner` bira boju bannera — dostupne vrednosti: `gold`, `teal`, `rose`, `deep`, `slate`, `coral` (definisane u `assets/css/style.css` pod `.tip-banner--*`). `slug` mora biti jedinstven — koristi se u URL-u `clanak.html?slug=...`.
+
+**Važna napomena o autorskim pravima:** tekst objava treba da bude originalan (napisan svojim rečima), čak i kada se koristi kao inspiracija strani članak — direktno kopiranje/prevod tuđeg teksta krši autorska prava. `sourceLabel`/`sourceUrl` služe da se navede opšti izvor informacija (kao referenca), ne da se citira ili prepiše ceo tekst.
 
 ## Popust kodovi — kako rade (bez baze)
 

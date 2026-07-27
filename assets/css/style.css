@@ -705,6 +705,13 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .tip-read-more svg { width: 16px; height: 16px; transition: transform 0.15s; }
 .tip-read-more:hover svg { transform: translateX(3px); }
 
+/* ---------- Blog article ---------- */
+.article-body p {
+  color: var(--color-text);
+  font-size: 1.02rem;
+  line-height: 1.75;
+}
+
 /* ---------- Contact ---------- */
 .contact-grid {
   display: grid;

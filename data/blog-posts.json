@@ -1,0 +1,116 @@
+[
+  {
+    "slug": "secer-hba1c",
+    "title": "Šećer u krvi i HbA1c: kako da otkrijete dijabetes pre nego što vas iznenadi",
+    "category": "Metabolizam",
+    "banner": "coral",
+    "emoji": "🍬",
+    "date": "2026-07-25",
+    "excerpt": "Dijabetes tipa 2 godinama nema simptoma. Dve jednostavne analize — glukoza i HbA1c — mogu da ga otkriju dok se lako drži pod kontrolom.",
+    "catalogQuery": "HbA1c",
+    "sourceLabel": "Mayo Clinic Laboratories i MedlinePlus",
+    "sourceUrl": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/",
+    "body": [
+      "Povišen šećer u krvi je jedan od onih problema koji dugo ne bole. Tip 2 dijabetesa se često razvija godinama pre nego što se pojave prvi simptomi — pojačana žeđ, umor, česti odlasci u toalet — a do tada su krvni sudovi, bubrezi i oči već izloženi oštećenju. Zato se dijabetes najčešće ne \"oseti\" na vreme, nego se otkrije na redovnom sistematskom pregledu.",
+      "Za proveru se koriste dve različite, ali komplementarne analize. Glukoza našte pokazuje trenutni nivo šećera u krvi u momentu vađenja krvi — osetljiva je na to da li ste jeli, da li ste bili pod stresom, da li ste dobro spavali. HbA1c (glikozilirani hemoglobin) je druga priča: on pokazuje prosečan nivo šećera u poslednja dva do tri meseca, jer meri koliki procenat hemoglobina u eritrocitima je \"zašećeren\". To ga čini otpornijim na dnevne oscilacije i pouzdanijim pokazateljem dugoročne kontrole.",
+      "Vrednost HbA1c ispod 5,7% smatra se urednom. Između 5,7% i 6,4% govori o predijabetesu — stanju u kojem šećer još nije dovoljno visok da bi se govorilo o dijabetesu, ali jeste povišen u odnosu na normalu, i u ovoj fazi promena ishrane i redovna fizička aktivnost mogu potpuno da vrate vrednosti u normalu. Vrednost 6,5% i više ukazuje na dijabetes, uz preporuku da se nalaz potvrdi ponovljenim merenjem.",
+      "Ko bi trebalo redovno da proverava šećer? Pre svega osobe sa dijabetesom u bližoj porodici, osobe sa prekomernom telesnom masom, oni koji vode sedeći način života, kao i svi posle 40-45 godina, čak i bez simptoma — upravo zato što je rana faza tiha. Dobra vest je da je predijabetes, za razliku od već razvijenog dijabetesa, često u potpunosti reverzibilan uz blagovremenu promenu navika.",
+      "U BIOTEST laboratoriji, glukoza i HbA1c spadaju u standardne, brzo dostupne analize biohemije — dovoljno je jedno vađenje krvi da dobijete i trenutnu i tromesečnu sliku šećera."
+    ]
+  },
+  {
+    "slug": "dehidracija-leti",
+    "title": "Dehidracija i elektroliti leti: zašto se topli dani osećaju gore nego što mislite",
+    "category": "Sezonski saveti",
+    "banner": "gold",
+    "emoji": "💧",
+    "date": "2026-07-18",
+    "excerpt": "Na velikoj vrućini gubite i vodu i minerale — a umor, grčevi u mišićima i glavobolja često su prvi znak da je ravnoteža poremećena.",
+    "catalogQuery": "natrijum",
+    "sourceLabel": "kliničke preporuke o letnjoj dehidraciji i ravnoteži elektrolita",
+    "sourceUrl": "https://medlineplus.gov/ency/article/002415.htm",
+    "body": [
+      "Na velikoj vrućini telo se hladi znojenjem — i to je odlično dok se ne pretera. U vrelim, vlažnim uslovima, uz fizičku aktivnost napolju, moguće je izgubiti i više od litra tečnosti na sat, a sa njom odlazi i so: znoj sadrži natrijum, kalijum i hlor, minerale koji se zajedničkim imenom zovu elektroliti.",
+      "Ovi minerali nisu samo \"so u organizmu\" — oni održavaju ravnotežu tečnosti između ćelija i krvi, omogućavaju mišićima da se kontrahuju i opuštaju, i učestvuju u sprovođenju nervnih impulsa, uključujući i rad srca. Kada se izgube u većoj količini nego što se nadoknade, prvi znaci su suva usta, žeđ, umor, glavobolja i tamnija boja mokraće. Ako se stanje produbi, mogu se javiti grčevi u mišićima, mučnina, ubrzan ili nepravilan rad srca, pa i nesvestica — što je već znak toplotne iscrpljenosti kojoj treba posvetiti ozbiljnu pažnju.",
+      "Problem je što se blaga dehidracija lako pripiše \"običnom\" letnjem umoru, pa prođe neprimećena danima. Kod starijih osoba, dece, i osoba koje uzimaju lekove za pritisak ili diuretike, rizik je dodatno povećan jer je njihov mehanizam žeđi ili bubrežne regulacije često oslabljen.",
+      "Kada posumnjate da je u pitanju poremećaj ravnoteže tečnosti i minerala, a ne samo vrućina, analiza elektrolita u krvi (natrijum, kalijum, hlor) uz osnovnu biohemiju daje jasan odgovor — i lekaru omogućava da proceni da li je potrebna samo bolja hidratacija ili nešto ozbiljnije.",
+      "Praktičan savet za letnje dane: pijte vodu redovno tokom dana, ne čekajte žeđ kao signal, a posle intenzivnog znojenja (sport, rad napolju) uz vodu unesite i malo soli i kalijuma — na primer kroz obrok ili voće poput banane, a ne isključivo kroz čistu vodu."
+    ]
+  },
+  {
+    "slug": "vitamin-d",
+    "title": "Vitamin D: koliko ga stvarno imate i zašto to nije samo \"zimska tema\"",
+    "category": "Vitamini",
+    "banner": "deep",
+    "emoji": "☀️",
+    "date": "2026-07-10",
+    "excerpt": "I leti, uz svo sunce, veliki broj ljudi ima nedostatak vitamina D — a to utiče na kosti, mišiće i imunitet mnogo pre nego što postane vidljivo.",
+    "catalogQuery": "vitamin D",
+    "sourceLabel": "Mayo Clinic i NIH Office of Dietary Supplements",
+    "sourceUrl": "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/expert-answers/vitamin-d-deficiency/faq-20058397",
+    "body": [
+      "Vitamin D se često vezuje isključivo za zimu i nedostatak sunca, ali istina je nešto složenija. Telo najveći deo vitamina D stvara u koži pod uticajem sunčeve svetlosti, no na to koliko će se ga zapravo stvoriti utiču boja kože, godine, telesna masa, upotreba kreme za sunčanje i jednostavno — koliko vremena realno provodimo napolju, nezavisno od godišnjeg doba. Zbog toga nedostatak vitamina D nije redak ni tokom leta, posebno kod ljudi koji rade u zatvorenom prostoru veći deo dana.",
+      "Preporučeni dnevni unos iznosi 600 internacionalnih jedinica (IU) za većinu odraslih uzrasta 1-70 godina, odnosno 800 IU za osobe starije od 70 godina. Kada je unos ili stvaranje vitamina D dugoročno nedovoljno, posledice se ne osećaju odmah — one se grade godinama. Kosti postaju tanje i lomljivije, što je povezano sa osteoporozom, a kod izraženog i produženog nedostatka mogu se javiti bolovi u kostima i mišićima, veći rizik od preloma, pa i omekšavanje kostiju (osteomalacija kod odraslih, rahitis kod dece).",
+      "Određene grupe su pod povećanim rizikom od nedostatka: osobe starije od 65 godina, osobe sa gojaznošću, osobe tamnije puti (koja prirodno usporava sintezu vitamina D u koži), odojčad na isključivo dojenju bez dodatka vitamina D, kao i osobe sa bolestima creva koje ometaju resorpciju masti (a vitamin D se, kao rastvorljiv u mastima, upravo tako i apsorbuje).",
+      "Kako izgleda nedostatak u svakodnevnom životu? Često nespecifično — hronični umor, opšta slabost, bolovi u kostima ili leđima, sporiji oporavak posle fizičke aktivnosti. Upravo zato što su znaci nejasni, jedini pouzdan način da se utvrdi stvarno stanje jeste analiza krvi (S-Vitamin D total).",
+      "Dobra vest je da se nedostatak lako koriguje, uz preporuku lekara o dozi nadoknade prilagođenoj vašem nalazu — ali prvi korak je uvek merenje, ne nagađanje."
+    ]
+  },
+  {
+    "slug": "kompletna-krvna-slika",
+    "title": "Kompletna krvna slika: jedna analiza, a otkriva anemiju, infekciju i još mnogo toga",
+    "category": "Krvna slika",
+    "banner": "teal",
+    "emoji": "🩸",
+    "date": "2026-07-02",
+    "excerpt": "KKS je verovatno najčešće rađena laboratorijska analiza na svetu — i nije slučajno, jer u jednom vađenju krvi otkriva tragove desetina različitih stanja.",
+    "catalogQuery": "KKS",
+    "sourceLabel": "Cleveland Clinic",
+    "sourceUrl": "https://my.clevelandclinic.org/health/diagnostics/4053-complete-blood-count",
+    "body": [
+      "Kompletna krvna slika (KKS) meri broj i veličinu vaših crvenih krvnih zrnaca (eritrocita), belih krvnih zrnaca (leukocita) i trombocita, kao i koncentraciju hemoglobina i hematokrit — procenat zapremine krvi koji čine eritrociti. Zvuči tehnički, ali svaki od ovih parametara priča drugačiju priču o vašem zdravlju.",
+      "Eritrociti i hemoglobin nose kiseonik do tkiva. Kada su njihove vrednosti snižene, govorimo o anemiji — stanju koje se najčešće oseti kao umor, bledilo i otežano podnošenje napora, a uzrok može biti nedostatak gvožđa, folne kiseline ili vitamina B12, hronična bolest, ili gubitak krvi koji nije uvek očigledan. Leukociti su, s druge strane, \"vojska\" imunog sistema — njihov porast često prati infekciju ili upalu, dok pad broja može ukazivati na oslabljen imunitet ili, u ređim slučajevima, na ozbiljnija stanja koštane srži. Trombociti učestvuju u zgrušavanju krvi; i previše i premalo trombocita nosi rizik — jedno za krvarenje, drugo za zgrušavanje.",
+      "Zbog ove širine, KKS se koristi i kao dijagnostički alat kada već postoji sumnja na problem, i kao skrining test kod potpuno zdravih ljudi — jer može ukazati na fluktuacije u volumenu tečnosti (npr. dehidraciju), gubitak krvi koji još nije primetan, alergijske reakcije, ili početne znake infekcije, čak i pre nego što se pojave jasni simptomi.",
+      "Upravo zato se KKS preporučuje kao deo redovne godišnje kontrole zdravlja, nezavisno od toga da li se trenutno osećate dobro — mnoge promene u krvnoj slici razvijaju se postepeno i tiho, a rano otkrivanje gotovo uvek znači lakše i brže lečenje.",
+      "Rezultat KKS-a dolazi sa referentnim vrednostima za svaki parametar, ali tumačenje kompletne slike — posebno kada je nekoliko vrednosti istovremeno van okvira — uvek treba prepustiti lekaru koji poznaje vašu kliničku sliku."
+    ]
+  },
+  {
+    "slug": "holesterol-i-srce",
+    "title": "Holesterol i zdravlje srca: šta zapravo znače LDL, HDL i trigliceridi",
+    "category": "Srce",
+    "banner": "rose",
+    "emoji": "❤️",
+    "date": "2026-06-20",
+    "excerpt": "Povišen holesterol godinama ne boli — a upravo je to najveći rizik. Lipidni status jednom godišnje pokazuje gde stojite pre nego što postane problem.",
+    "catalogQuery": "holesterol",
+    "sourceLabel": "MedlinePlus, CDC i Johns Hopkins Medicine",
+    "sourceUrl": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+    "body": [
+      "Lipidni status (ili \"lipidni panel\") je jednostavna analiza krvi koja meri četiri vrednosti: ukupni holesterol, LDL holesterol, HDL holesterol i trigliceride. Iako se sve četiri često spominju zajedno, one ne igraju istu ulogu — i baš zato je važno razumeti šta svaka od njih znači.",
+      "LDL holesterol se neformalno naziva \"loš\" holesterol jer, kada je povišen, doprinosi stvaranju naslaga (plaka) u zidovima krvnih sudova. Vremenom te naslage sužavaju arterije i povećavaju rizik od srčanog i moždanog udara. HDL holesterol je, nasuprot tome, \"dobar\" holesterol — on pomaže da se višak holesterola ukloni iz krvotoka, pa viša vrednost HDL-a (60 mg/dL i više) deluje zaštitno. Trigliceridi su treći tip masti u krvi; kada su povišeni, a posebno kada je uz to HDL nizak ili LDL visok, rizik od srčanog udara i moždanog udara dodatno raste.",
+      "Ono što ovu temu čini podmuklom jeste da povišen holesterol, sam po sebi, ne izaziva nikakve simptome — nema bol, nema upozorenje. Prvi \"simptom\" je, u najgorem slučaju, sam srčani ili moždani udar, kada je šteta na krvnim sudovima već napravljena tokom godina. Zato se lipidni status ne radi kada nešto zaboli, nego preventivno, kao redovna godišnja provera, čak i kod ljudi koji se odlično osećaju.",
+      "Rezultati se uvek tumače u kontekstu — godina, pola, telesne mase, pušačkog statusa, porodične istorije srčanih bolesti i drugih faktora rizika. Ista vrednost LDL-a može biti prihvatljiva kod jedne osobe, a razlog za promenu navika ili terapiju kod druge. Zato konačnu procenu i eventualnu preporuku uvek daje lekar na osnovu kompletne slike, ne samo brojeva na nalazu.",
+      "Dobra vest je da se lipidni status, za razliku od nekih faktora rizika, dobrim delom može poboljšati promenom ishrane, redovnom fizičkom aktivnošću i, kada je potrebno, terapijom — ali prvi korak je uvek saznati gde tačno stojite."
+    ]
+  },
+  {
+    "slug": "alergije-na-polen",
+    "title": "Sezona alergija: kako da konačno saznate na šta ste alergični",
+    "category": "Alergije",
+    "banner": "slate",
+    "emoji": "🌾",
+    "date": "2026-06-05",
+    "excerpt": "Curenje nosa, kijanje i suzne oči svakog proleća i leta nisu \"obična prehlada\" — analiza IgE antitela može tačno da pokaže koji polen je krivac.",
+    "catalogQuery": "alergen",
+    "sourceLabel": "Cleveland Clinic",
+    "sourceUrl": "https://my.clevelandclinic.org/health/diseases/pollen-allergy",
+    "body": [
+      "Ako se svake godine u približno isto doba javljaju curenje nosa, kijanje, začepljenost i suzne, crvene oči, verovatno nije u pitanju čest \"letnji prehlad\" nego sezonska alergija na polen — reakcija imunog sistema na sitne čestice koje otpuštaju drveće, trave i korovi tokom cvetanja.",
+      "Kada je osoba alergična, imuni sistem pogrešno prepoznaje polen kao pretnju i reaguje stvaranjem povećane količine IgE antitela usmerenih upravo protiv tog alergena. Ta antitela su odgovorna za simptome koje osećamo — od blage nadraženosti sluznice do izraženih napada kijanja. Problem je što se, bez testiranja, često samo nagađa \"od čega mi je ovo\" — polen breze, trave, korova ambrozije ili nešto sasvim drugo poput kućne prašine.",
+      "Tu u igru ulazi analiza alergena iz krvi: merenjem specifičnih IgE antitela za pojedinačne alergene (određene vrste polena, ali i za kućnu prašinu, dlaku životinja i drugo) moguće je precizno utvrditi na šta je osoba zaista alergična, a na šta ne. To je posebno korisno kada se simptomi preklapaju sa nekoliko mogućih uzročnika istovremeno, ili kada neko sumnja na alergiju, ali standardna terapija za \"običnu prehladu\" ne pomaže.",
+      "Zašto je ovo bitno za svakodnevni život? Kada se tačno zna uzročnik, mnogo je lakše planirati — od toga da se prati polenska prognoza za taj konkretan polen i izbegava izlaganje u vrhuncu sezone, do toga da lekar propiše terapiju ciljanu prema pravom alergenu, umesto opšteg pristupa \"pokušaj pa vidi\".",
+      "U BIOTEST laboratoriji dostupan je širok panel analiza alergena — inhalatornih (polen, prašina, dlaka), nutritivnih i drugih — tako da se, u zavisnosti od simptoma, može testirati baš ono što je relevantno za konkretnu osobu."
+    ]
+  }
+]

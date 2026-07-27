@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lokacije — BIOTEST</title>
-<meta name="description" content="BIOTEST laboratorija — Koste Abraševića 31, Novi Sad. Radno vreme, telefoni i mapa.">
+<title>Blog — BIOTEST</title>
+<meta name="description" content="BIOTEST blog: članci o vitaminu D, kompletnoj krvnoj slici, holesterolu, alergijama, dehidraciji i šećeru u krvi — objašnjeno razumljivim jezikom.">
 <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0e7c86">
-<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -25,9 +24,9 @@
       <ul class="nav-links">
         <li><a href="index.html">Početna</a></li>
         <li><a href="katalog.html">Katalog analiza</a></li>
-        <li><a href="lokacije.html" class="active">Lokacije</a></li>
+        <li><a href="lokacije.html">Lokacije</a></li>
         <li><a href="popusti.html">Popusti</a></li>
-        <li><a href="blog.html">Blog</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
         <li><a href="o-nama.html">O nama / Kontakt</a></li>
       </ul>
     </nav>
@@ -44,61 +43,16 @@
   <section class="section">
     <div class="container">
       <div class="section-header">
-        <span class="eyebrow">Gde se nalazimo</span>
-        <h1>Lokacije</h1>
-        <p>Posetite nas u centru Novog Sada. Nalazimo se na adresi Koste Abraševića 31.</p>
+        <span class="eyebrow">Blog</span>
+        <h1>Korisno je znati</h1>
+        <p>Razumljivi tekstovi o analizama i zdravstvenim temama koje nas najčešće pitate — bez stručnog žargona.</p>
       </div>
 
-      <div class="location-grid">
-        <div id="map" role="img" aria-label="Mapa lokacije BIOTEST laboratorije, Koste Abraševića 31, Novi Sad"></div>
-
-        <div class="card">
-          <h3 class="mt-0">BIOTEST — Koste Abraševića 31</h3>
-
-          <div class="info-row">
-            <div class="icon-badge">📍</div>
-            <div>
-              <h4>Adresa</h4>
-              <p>Koste Abraševića 31, 21000 Novi Sad</p>
-            </div>
-          </div>
-
-          <div class="info-row">
-            <div class="icon-badge">🕒</div>
-            <div>
-              <h4>Radno vreme</h4>
-              <p>
-                Ponedeljak – petak: 07:00 – 19:00<br>
-                Subota: 08:00 – 14:00<br>
-                Nedelja: ne radimo
-              </p>
-              <p class="field-hint" style="margin-top:2px;">* Okvirno radno vreme — biće ažurirano tačnim podacima.</p>
-            </div>
-          </div>
-
-          <div class="info-row">
-            <div class="icon-badge">📞</div>
-            <div>
-              <h4>Telefoni</h4>
-              <p>
-                <a href="tel:+38121505913">021/505-913</a><br>
-                <a href="tel:+38121506095">021/506-095</a><br>
-                <a href="tel:+38121503724">021/503-724</a>
-              </p>
-            </div>
-          </div>
-
-          <div class="info-row">
-            <div class="icon-badge">✉️</div>
-            <div>
-              <h4>Email</h4>
-              <p><a href="mailto:biotest.novi.sad@gmail.com">biotest.novi.sad@gmail.com</a></p>
-            </div>
-          </div>
-
-          <a href="tel:+38121505913" class="btn btn-primary btn-block" style="margin-top:8px;">📞 Pozovi laboratoriju</a>
-        </div>
+      <div class="tips-grid" id="blog-grid">
+        <p class="empty-state">Učitavanje objava...</p>
       </div>
+
+      <p class="text-center field-hint" style="margin-top: 28px;">Ovi tekstovi su opšteg, informativnog karaktera i ne zamenjuju konsultaciju sa lekarom. Za tumačenje vaših nalaza uvek se obratite svom lekaru.</p>
     </div>
   </section>
 </main>
@@ -138,8 +92,14 @@
   </div>
 </footer>
 
-<script src="assets/vendor/leaflet/leaflet.js"></script>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/lokacije-page.js"></script>
+<script src="assets/js/blog.js"></script>
+<script>
+  window.Biotest.loadBlogPosts().then((posts) => {
+    document.getElementById('blog-grid').innerHTML = posts.map((p) => window.Biotest.blogCardHtml(p)).join('');
+  }).catch((err) => {
+    document.getElementById('blog-grid').innerHTML = `<p class="empty-state">⚠️ Greška pri učitavanju bloga: ${err.message}</p>`;
+  });
+</script>
 </body>
 </html>

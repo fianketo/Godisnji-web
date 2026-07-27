@@ -10,19 +10,22 @@ const SHELL_ASSETS = [
   './katalog.html',
   './lokacije.html',
   './popusti.html',
-  './saveti.html',
+  './blog.html',
+  './clanak.html',
   './o-nama.html',
   './manifest.json',
   './assets/css/style.css',
   './assets/js/main.js',
   './assets/js/catalog.js',
   './assets/js/discount.js',
+  './assets/js/blog.js',
   './assets/icons/icon.svg',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/vendor/leaflet/leaflet.css',
   './assets/vendor/leaflet/leaflet.js',
-  './data/biotest-analize.json'
+  './data/biotest-analize.json',
+  './data/blog-posts.json'
 ];
 
 self.addEventListener('install', (event) => {
