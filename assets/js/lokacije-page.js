@@ -67,7 +67,12 @@
         });
       });
 
+      // Fokus mape je na Novi Sad (5 od 6 lokacija) — Novi Bečej i dalje ima marker
+      // i dostupan je klikom na svoju karticu, ali ne razvlači početni zum.
+      const FOCUS_CITY = 'Novi Sad';
+      const focusMarkers = [];
       const markers = [];
+
       for (const loc of locations) {
         const cached = localStorage.getItem(cacheKey(loc));
         const startCoords = cached ? JSON.parse(cached) : (CITY_FALLBACK_COORDS[loc.city] || CITY_FALLBACK_COORDS['Novi Sad']);
@@ -75,23 +80,31 @@
           .bindPopup(`<strong>${loc.name}</strong><br>${loc.address}`);
         loc.marker = marker;
         markers.push(marker);
+        if (loc.city === FOCUS_CITY) focusMarkers.push(marker);
 
         if (!cached) {
           geocode(loc).then((coords) => {
             if (coords) {
               localStorage.setItem(cacheKey(loc), JSON.stringify(coords));
               marker.setLatLng(coords);
-              map.fitBounds(L.featureGroup(markers).getBounds().pad(0.15));
+              fitToFocusCity();
             }
           });
         }
       }
 
-      if (markers.length) {
-        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.15));
-      } else {
-        map.setView(CITY_FALLBACK_COORDS['Novi Sad'], 13);
+      function fitToFocusCity() {
+        const group = focusMarkers.length ? focusMarkers : markers;
+        if (group.length === 1) {
+          map.setView(group[0].getLatLng(), 15);
+        } else if (group.length > 1) {
+          map.fitBounds(L.featureGroup(group).getBounds().pad(0.2));
+        } else {
+          map.setView(CITY_FALLBACK_COORDS[FOCUS_CITY], 13);
+        }
       }
+
+      fitToFocusCity();
     })
     .catch(() => {
       listEl.innerHTML = '<p class="empty-state">⚠️ Greška pri učitavanju lokacija.</p>';
