@@ -18,7 +18,9 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 - `assets/css/style.css` — jedan CSS fajl, ceo dizajn sistem (boje, tipografija, komponente)
 - `assets/js/` — `main.js` (navigacija, service worker), `catalog.js` (učitavanje JSON-a), `discount.js` (popust kodovi), i po jedan fajl za logiku svake stranice
 - `data/biotest-analize.json` — katalog analiza (26 kategorija, ~940 analiza), učitava se kao statički JSON
+- `data/test-descriptions.json` — kratki i dugi opisi za deo analiza (koristi ih katalog)
 - `data/blog-posts.json` — blog objave, učitava se kao statički JSON
+- `data/locations.json` — sve lokacije laboratorije (adresa, telefoni, radno vreme)
 
 ## Ažuriranje cenovnika
 
