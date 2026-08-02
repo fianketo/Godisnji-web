@@ -75,21 +75,23 @@
         <p id="calc-count" style="font-size:0.85rem; color: var(--color-text-faint); margin: 4px 0 0;">Nije izabrana nijedna analiza.</p>
         <div class="calc-items" id="calc-items"></div>
 
-        <div class="calc-code-row">
-          <input type="text" id="discount-input" placeholder="Popust kod (opciono)" aria-label="Popust kod">
-          <button class="btn btn-outline btn-sm" id="apply-code" type="button">Primeni</button>
-        </div>
-        <p class="calc-code-msg" id="calc-code-msg"></p>
+        <div class="calc-summary" id="calc-summary">
+          <div class="calc-code-row">
+            <input type="text" id="discount-input" placeholder="Popust kod (opciono)" aria-label="Popust kod">
+            <button class="btn btn-outline btn-sm" id="apply-code" type="button">Primeni</button>
+          </div>
+          <p class="calc-code-msg" id="calc-code-msg"></p>
 
-        <div class="calc-summary-row" id="calc-discount-row" style="display:none;">
-          <span>Popust (<span id="calc-discount-percent"></span>%)</span>
-          <span class="discount-value" id="calc-discount-amount">-0 RSD</span>
-        </div>
-        <div class="calc-summary-row total"><span>Ukupno</span><span id="calc-total">0 RSD</span></div>
-        <div class="calc-summary-row"><span>Procenjeno vreme</span><span id="calc-time">—</span></div>
+          <div class="calc-summary-row" id="calc-discount-row" style="display:none;">
+            <span>Popust (<span id="calc-discount-percent"></span>%)</span>
+            <span class="discount-value" id="calc-discount-amount">-0 RSD</span>
+          </div>
+          <div class="calc-summary-row total"><span>Ukupno</span><span id="calc-total">0 RSD</span></div>
+          <div class="calc-summary-row"><span>Procenjeno vreme</span><span id="calc-time">—</span></div>
 
-        <a href="lokacije.html" class="btn btn-primary btn-block" style="margin-top:12px;">📍 Dođite u laboratoriju</a>
-        <p class="field-hint" style="margin-top:10px;">Nemate popust kod? <a href="popusti.html">Preuzmite ga ovde</a>.</p>
+          <a href="lokacije.html" class="btn btn-primary btn-block" style="margin-top:12px;">📍 Dođite u laboratoriju</a>
+          <p class="field-hint" style="margin-top:10px;">Nemate popust kod? <a href="popusti.html">Preuzmite ga ovde</a>.</p>
+        </div>
       </aside>
     </div>
   </div>
