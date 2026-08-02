@@ -29,7 +29,14 @@
   const mobileSummary = document.getElementById('mobile-calc-summary');
   const mobileOpenBtn = document.getElementById('mobile-calc-open');
 
+  const detailBackdrop = document.getElementById('detail-backdrop');
+  const detailDrawer = document.getElementById('detail-drawer');
+  const detailDrawerBody = document.getElementById('detail-drawer-body');
+  const detailDrawerFooter = document.getElementById('detail-drawer-footer');
+  const detailDrawerClose = document.getElementById('detail-drawer-close');
+
   let allTests = [];
+  let descriptions = {};
   let selected = new Map(); // id -> test
   let appliedDiscount = false;
 
@@ -83,6 +90,14 @@
     listEl.querySelectorAll('input[type="checkbox"][data-id]').forEach((cb) => {
       cb.addEventListener('change', onCheckboxChange);
     });
+    listEl.querySelectorAll('[data-readmore]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const test = allTests.find((t) => t.id === btn.getAttribute('data-readmore'));
+        if (test) openDetailDrawer(test);
+      });
+    });
   }
 
   function rowHtml(test) {
@@ -90,14 +105,65 @@
     const rowChecked = selected.has(test.id) ? ' checked' : '';
     const instrument = test.instrument ? `<span> · ${test.instrument}</span>` : '';
     const time = test.time || 'po dogovoru';
+    const desc = descriptions[test.name];
+    const descHtml = desc
+      ? `<p class="test-desc">${desc.short}</p><button type="button" class="test-readmore-btn" data-readmore="${test.id}">Pročitaj više →</button>`
+      : '';
     return `<label class="test-row${rowChecked}" data-row-id="${test.id}">
       <input type="checkbox" data-id="${test.id}" ${checked}>
-      <span class="test-name"><strong>${test.name}</strong><span>${test.category}${instrument}</span></span>
+      <span class="test-name"><strong>${test.name}</strong><span>${test.category}${instrument}</span>${descHtml}</span>
       <span class="test-meta">
         <span class="test-time">⏱ ${time}</span>
         <span class="test-price">${formatPrice(test.price)}</span>
       </span>
     </label>`;
+  }
+
+  function openDetailDrawer(test) {
+    const desc = descriptions[test.name];
+    if (!desc) return;
+    const instrument = test.instrument ? ` · ${test.instrument}` : '';
+    detailDrawerBody.innerHTML = `
+      <span class="eyebrow">${test.category}</span>
+      <h2>${test.name}</h2>
+      <div class="test-meta-row">
+        <span>⏱ ${test.time || 'po dogovoru'}</span>
+        <span>${instrument.replace(' · ', '')}</span>
+      </div>
+      <div class="article-body"><p>${desc.long}</p></div>
+    `;
+    const isSelected = selected.has(test.id);
+    detailDrawerFooter.innerHTML = `
+      <span class="test-price">${formatPrice(test.price)}</span>
+      <button type="button" class="btn btn-primary" style="flex:1;" id="drawer-toggle-btn">
+        ${isSelected ? '✓ U kalkulatoru' : '+ Dodaj u kalkulator'}
+      </button>
+    `;
+    document.getElementById('drawer-toggle-btn').addEventListener('click', () => {
+      toggleSelected(test.id);
+      openDetailDrawer(test); // re-render footer state
+    });
+    detailBackdrop.classList.add('open');
+    detailDrawer.classList.add('open');
+  }
+
+  function closeDetailDrawer() {
+    detailBackdrop.classList.remove('open');
+    detailDrawer.classList.remove('open');
+  }
+
+  function toggleSelected(id) {
+    const test = allTests.find((t) => t.id === id);
+    if (selected.has(id)) {
+      selected.delete(id);
+    } else {
+      selected.set(id, test);
+    }
+    const cb = listEl.querySelector(`input[data-id="${id}"]`);
+    if (cb) cb.checked = selected.has(id);
+    const row = listEl.querySelector(`[data-row-id="${id}"]`);
+    if (row) row.classList.toggle('checked', selected.has(id));
+    renderCalc();
   }
 
   function onCheckboxChange(e) {
@@ -209,12 +275,22 @@
     calcPanel.classList.remove('mobile-open');
   });
 
+  detailDrawerClose.addEventListener('click', closeDetailDrawer);
+  detailBackdrop.addEventListener('click', closeDetailDrawer);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDetailDrawer();
+  });
+
   // Ako korisnik stigne sa ?q=naziv (npr. iz pretrage na Početnoj), popuni pretragu.
   const params = new URLSearchParams(location.search);
   if (params.get('q')) searchInput.value = params.get('q');
 
-  window.Biotest.loadCatalog().then(({ categories, tests }) => {
+  Promise.all([
+    window.Biotest.loadCatalog(),
+    fetch('data/test-descriptions.json').then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
+  ]).then(([{ categories, tests }, descMap]) => {
     allTests = tests;
+    descriptions = descMap;
     renderCategoryOptions(categories);
     renderList();
     renderCalc();

@@ -25,7 +25,8 @@ const SHELL_ASSETS = [
   './assets/vendor/leaflet/leaflet.css',
   './assets/vendor/leaflet/leaflet.js',
   './data/biotest-analize.json',
-  './data/blog-posts.json'
+  './data/blog-posts.json',
+  './data/test-descriptions.json'
 ];
 
 self.addEventListener('install', (event) => {

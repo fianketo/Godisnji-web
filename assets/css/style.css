@@ -488,11 +488,56 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .test-name { flex: 1; min-width: 0; }
 .test-name strong { display: block; font-size: 0.96rem; color: var(--color-text); }
 .test-name span { font-size: 0.8rem; color: var(--color-text-faint); }
+.test-desc { font-size: 0.82rem; color: var(--color-text-muted); margin: 4px 0 0; }
+.test-readmore-btn {
+  background: none; border: none; padding: 0; margin-top: 4px;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 700;
+  color: var(--color-primary-dark); cursor: pointer;
+}
+.test-readmore-btn:hover { color: var(--color-accent-dark); text-decoration: underline; }
 .test-meta { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
 .test-time { font-size: 0.84rem; color: var(--color-text-muted); white-space: nowrap; }
 .test-price { font-family: var(--font-heading); font-weight: 700; color: var(--color-primary-dark); white-space: nowrap; min-width: 72px; text-align: right; }
 
 .empty-state { text-align: center; padding: 48px 20px; color: var(--color-text-faint); }
+
+/* ---------- Test detail drawer (slide-in "Pročitaj više") ---------- */
+.detail-backdrop {
+  position: fixed; inset: 0; background: rgba(10, 30, 35, 0.45);
+  z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+}
+.detail-backdrop.open { opacity: 1; pointer-events: auto; }
+
+.detail-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: 440px; max-width: 92vw;
+  background: #fff; z-index: 201; box-shadow: -16px 0 40px rgba(6, 42, 46, 0.18);
+  transform: translateX(100%); transition: transform 0.25s ease;
+  display: flex; flex-direction: column;
+}
+.detail-drawer.open { transform: translateX(0); }
+
+.detail-drawer-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; border-bottom: 1px solid var(--color-border); flex-shrink: 0;
+}
+.detail-drawer-close {
+  background: none; border: none; font-size: 1.3rem; line-height: 1; cursor: pointer;
+  color: var(--color-text-muted); padding: 4px 8px; border-radius: var(--radius-sm);
+}
+.detail-drawer-close:hover { background: var(--color-bg-soft); color: var(--color-text); }
+
+.detail-drawer-body { padding: 22px; overflow-y: auto; flex: 1; }
+.detail-drawer-body h2 { font-size: 1.3rem; margin-bottom: 4px; }
+.detail-drawer-body .test-meta-row {
+  display: flex; gap: 16px; margin: 10px 0 20px; font-size: 0.88rem; color: var(--color-text-muted);
+}
+.detail-drawer-body .article-body p { font-size: 0.96rem; }
+
+.detail-drawer-footer {
+  padding: 18px 22px; border-top: 1px solid var(--color-border); flex-shrink: 0;
+  display: flex; gap: 10px; align-items: center;
+}
+.detail-drawer-footer .test-price { font-size: 1.15rem; }
 
 /* ---------- Katalog layout ---------- */
 .katalog-grid {

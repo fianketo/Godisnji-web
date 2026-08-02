@@ -1,0 +1,202 @@
+{
+  "eK-KKS": {
+    "short": "Osnovna analiza krvne slike — eritrociti, leukociti, trombociti i hemoglobin.",
+    "long": "Kompletna krvna slika (KKS) meri broj i veličinu crvenih i belih krvnih zrnaca, trombocita i koncentraciju hemoglobina. Koristi se za otkrivanje anemije, infekcija, upala i poremećaja zgrušavanja, a preporučuje se i kao deo redovne godišnje kontrole."
+  },
+  "S-TSH": {
+    "short": "Osnovni skrining test funkcije štitne žlezde.",
+    "long": "TSH (tireostimulišući hormon) je hormon hipofize koji podstiče rad štitne žlezde. Povišena vrednost obično ukazuje na usporen rad štitne žlezde (hipotireozu), a snižena na ubrzan rad (hipertireozu). Najčešće je to prva analiza kojom se proverava rad štitne žlezde, a po potrebi se dopunjuje sa FT3, FT4 i antitelima."
+  },
+  "S-FT3": {
+    "short": "Slobodni trijodtironin — aktivni hormon štitne žlezde.",
+    "long": "FT3 je slobodna, biološki aktivna forma hormona T3. Radi se obično uz TSH i FT4 kada se sumnja na poremećaj funkcije štitne žlezde, posebno kod hipertireoze, gde FT3 može biti povišen i pre nego što se to vidi na TSH."
+  },
+  "S-FT4": {
+    "short": "Slobodni tiroksin — glavni hormon koji luči štitna žlezda.",
+    "long": "FT4 je slobodna forma tiroksina, hormona koji štitna žlezda najviše izlučuje. Zajedno sa TSH daje potpuniju sliku o tome da li štitna žlezda radi usporeno, ubrzano ili normalno."
+  },
+  "S-Glukoza": {
+    "short": "Nivo šećera u krvi u trenutku vađenja (obično našte).",
+    "long": "Glukoza našte je osnovna analiza za proveru metabolizma šećera. Povišene vrednosti mogu ukazivati na predijabetes ili dijabetes, dok snižene vrednosti (hipoglikemija) takođe zahtevaju pažnju. Za dugoročniju sliku koristi se HbA1c."
+  },
+  "S-Holesterol": {
+    "short": "Ukupni holesterol u krvi.",
+    "long": "Ukupni holesterol je zbir svih vrsta holesterola u krvi (LDL, HDL i deo iz triglicerida). Sam po sebi ne daje potpunu sliku rizika — zato se uvek tumači zajedno sa HDL, LDL i trigliceridima kao deo lipidnog statusa."
+  },
+  "S-HDL holesterol": {
+    "short": "\"Dobar\" holesterol koji štiti krvne sudove.",
+    "long": "HDL holesterol pomaže da se višak holesterola ukloni iz krvotoka i vrati u jetru. Više vrednosti HDL-a (60 mg/dL i više) deluju zaštitno protiv srčanih i moždanih udara, za razliku od LDL-a."
+  },
+  "S-LDL holesterol": {
+    "short": "\"Loš\" holesterol povezan sa rizikom od srčanih bolesti.",
+    "long": "LDL holesterol, kada je povišen, doprinosi stvaranju naslaga u zidovima krvnih sudova (ateroskleroza), što vremenom povećava rizik od srčanog i moždanog udara. Ciljne vrednosti zavise od ostalih faktora rizika, pa ih tumači lekar."
+  },
+  "S-Trigliceridi": {
+    "short": "Masti u krvi povezane sa ishranom i metaboličkim rizikom.",
+    "long": "Trigliceridi su glavna forma masti koju telo skladišti i koristi za energiju. Povišene vrednosti, posebno u kombinaciji sa niskim HDL-om, povećavaju rizik od srčanih bolesti, a često su povezane i sa ishranom bogatom šećerima i alkoholom."
+  },
+  "S-Kreatinin": {
+    "short": "Pokazatelj rada bubrega.",
+    "long": "Kreatinin je proizvod razgradnje mišića koji bubrezi izbacuju iz organizma. Povišena vrednost u krvi može ukazivati na smanjenu funkciju bubrega. Često se koristi zajedno sa eGFR za procenu brzine filtracije bubrega."
+  },
+  "S-Urea": {
+    "short": "Dodatni pokazatelj funkcije bubrega i metabolizma proteina.",
+    "long": "Urea nastaje razgradnjom proteina i izlučuje se preko bubrega. Povišene vrednosti mogu ukazivati na smanjenu funkciju bubrega, dehidraciju ili ishranu bogatu proteinima, a tumači se zajedno sa kreatininom."
+  },
+  "S-ALT": {
+    "short": "Enzim jetre — pokazatelj oštećenja jetrinih ćelija.",
+    "long": "ALT (alanin-aminotransferaza) se oslobađa u krv kada su ćelije jetre oštećene ili upaljene. Povišene vrednosti su čest prvi znak problema sa jetrom, ali se uvek tumače zajedno sa ostalim jetrinim analizama (AST, GGT, bilirubin)."
+  },
+  "S-AST": {
+    "short": "Enzim jetre i mišića — dopunska analiza uz ALT.",
+    "long": "AST (aspartat-aminotransferaza) se, slično kao ALT, oslobađa pri oštećenju jetre, ali se nalazi i u srčanom i skeletnom mišiću. Odnos AST/ALT pomaže lekaru da proceni verovatan uzrok povišenih vrednosti."
+  },
+  "S-GGT": {
+    "short": "Enzim osetljiv na alkohol i probleme sa žučnim putevima.",
+    "long": "GGT (gama-glutamil transferaza) je enzim jetre koji je posebno osetljiv na alkohol, određene lekove i probleme sa žučnim kanalima. Često se koristi da se razjasni uzrok povišenih ALT/AST vrednosti."
+  },
+  "S-CRP": {
+    "short": "Pokazatelj upale u organizmu.",
+    "long": "CRP (C-reaktivni protein) raste u krvi kada u telu postoji akutna upala ili infekcija. Koristan je za praćenje težine infekcije ili upalnog procesa, ali sam po sebi ne otkriva gde se upala nalazi."
+  },
+  "S-Feritin": {
+    "short": "Pokazatelj zaliha gvožđa u organizmu.",
+    "long": "Feritin pokazuje koliko gvožđa telo ima uskladišteno. Niske vrednosti su čest rani znak nedostatka gvožđa, pre nego što se razvije prava anemija, dok povišene vrednosti mogu biti znak upale ili preopterećenja gvožđem."
+  },
+  "S-Gvožđe": {
+    "short": "Trenutni nivo gvožđa u krvi.",
+    "long": "Analiza gvožđa u serumu pokazuje koliko gvožđa trenutno cirkuliše u krvi. Tumači se zajedno sa feritinom, TIBC-om i saturacijom transferina da bi se dobila potpuna slika o metabolizmu gvožđa."
+  },
+  "S-Vitamin D total": {
+    "short": "Ukupan nivo vitamina D u krvi.",
+    "long": "Vitamin D je važan za zdravlje kostiju, mišića i imunog sistema, a telo ga najviše stvara pod uticajem sunca. Nedostatak je čest, posebno kod ljudi koji malo vremena provode napolju, i može se lako korigovati suplementacijom po preporuci lekara."
+  },
+  "S-Vitamin B12": {
+    "short": "Vitamin ključan za krv i nervni sistem.",
+    "long": "Vitamin B12 je neophodan za stvaranje crvenih krvnih zrnaca i pravilan rad nervnog sistema. Nedostatak može dovesti do anemije, umora i trnjenja u rukama i nogama, a češći je kod vegetarijanaca/vegana i starijih osoba."
+  },
+  "S-PSA": {
+    "short": "Tumor marker za prostatu kod muškaraca.",
+    "long": "PSA (prostata-specifični antigen) se koristi za skrining i praćenje bolesti prostate. Povišene vrednosti ne znače automatski rak — mogu biti posledica uvećane prostate ili upale — pa se nalaz uvek tumači zajedno sa kliničkim pregledom."
+  },
+  "S-Free PSA": {
+    "short": "Dopunska analiza uz PSA za preciznije tumačenje.",
+    "long": "Free PSA meri slobodnu frakciju PSA i, u odnosu sa ukupnim PSA, pomaže lekaru da proceni verovatnoću da su povišene vrednosti PSA posledica benignog uvećanja prostate, a ne ozbiljnijeg stanja."
+  },
+  "S-CEA": {
+    "short": "Opšti tumor marker, često korišćen za praćenje terapije.",
+    "long": "CEA (karcinoembrionalni antigen) se najčešće koristi za praćenje toka lečenja kod već dijagnostikovanih bolesti, a ne kao samostalni skrining test, jer može biti povišen i iz drugih, benignih razloga (npr. pušenje)."
+  },
+  "S-CA 125": {
+    "short": "Tumor marker povezan sa jajnicima.",
+    "long": "CA 125 se najčešće koristi za praćenje lečenja i otkrivanje recidiva kod bolesti jajnika, ali može biti povišen i kod niza benignih ginekoloških stanja, pa se uvek tumači u kontekstu kliničke slike."
+  },
+  "S-CA 19-9": {
+    "short": "Tumor marker povezan sa pankreasom i digestivnim traktom.",
+    "long": "CA 19-9 se koristi prvenstveno za praćenje već dijagnostikovanih bolesti pankreasa i digestivnog trakta, ne kao samostalni skrining test u opštoj populaciji."
+  },
+  "S-Estradiol": {
+    "short": "Glavni ženski polni hormon.",
+    "long": "Estradiol je najvažniji estrogen i koristi se za procenu funkcije jajnika, praćenje ciklusa, menopauze i plodnosti, a radi se i kod muškaraca u specifičnim slučajevima."
+  },
+  "S-Testosteron": {
+    "short": "Glavni muški polni hormon.",
+    "long": "Testosteron se koristi za procenu funkcije testisa kod muškaraca (libido, energija, mišićna masa), a radi se i kod žena kada se sumnja na hormonski disbalans (npr. PCOS)."
+  },
+  "S-Prolaktin": {
+    "short": "Hormon hipofize povezan sa dojenjem i ciklusom.",
+    "long": "Prolaktin je hormon koji, između ostalog, reguliše laktaciju. Povišene vrednosti van trudnoće/dojenja mogu biti povezane sa nepravilnim ciklusom, neplodnošću ili, ređe, tumorom hipofize."
+  },
+  "S-Cortisol": {
+    "short": "Hormon stresa koji reguliše metabolizam.",
+    "long": "Kortizol se luči iz nadbubrežne žlezde i utiče na metabolizam, pritisak i odgovor na stres. Ima izraženi dnevni ritam, pa se vreme vađenja krvi obično uzima u obzir pri tumačenju nalaza."
+  },
+  "S-Insulin": {
+    "short": "Hormon koji reguliše šećer u krvi.",
+    "long": "Insulin omogućava ćelijama da iskoriste glukozu iz krvi. Analiza se često radi zajedno sa glukozom radi procene insulinske rezistencije (HOMA indeks), ranog pokazatelja rizika od dijabetesa tipa 2."
+  },
+  "eK-HbA1c": {
+    "short": "Prosečan nivo šećera u poslednja 2-3 meseca.",
+    "long": "HbA1c pokazuje koliki procenat hemoglobina je vezan za šećer, što odražava prosečnu vrednost glukoze u krvi tokom prethodna dva do tri meseca. Koristi se za dijagnozu i praćenje dijabetesa, jer je otporniji na dnevne oscilacije od obične glukoze."
+  },
+  "cP-D-Dimer": {
+    "short": "Pokazatelj procesa zgrušavanja krvi.",
+    "long": "D-Dimer raste kada u telu postoji aktivan proces stvaranja i razgradnje krvnih ugrušaka. Koristi se najčešće za isključivanje tromboze ili plućne embolije, u kombinaciji sa kliničkom procenom lekara."
+  },
+  "S-Homocystein": {
+    "short": "Aminokiselina povezana sa kardiovaskularnim rizikom.",
+    "long": "Povišen homocistein u krvi povezuje se sa povećanim rizikom od bolesti krvnih sudova, a često je posledica nedostatka folne kiseline ili vitamina B12, koji se lako koriguje suplementacijom."
+  },
+  "S-IgE - ukupni": {
+    "short": "Ukupna količina antitela povezanih sa alergijskim reakcijama.",
+    "long": "Ukupni IgE pokazuje opštu sklonost organizma ka alergijskim reakcijama. Za utvrđivanje tačnog alergena (polen, prašina, hrana...) potrebne su specifične IgE analize za pojedinačne alergene."
+  },
+  "U-Kompletan pregled urina": {
+    "short": "Osnovni pregled urina — fizičke, hemijske i mikroskopske osobine.",
+    "long": "Kompletan pregled urina proverava boju, pH, prisustvo proteina, glukoze, krvi, leukocita i drugih elemenata u mokraći. Koristan je skrining test za infekcije mokraćnih puteva, probleme sa bubrezima i metaboličke poremećaje."
+  },
+  "S-Krvna grupa": {
+    "short": "Određivanje ABO i Rh krvne grupe.",
+    "long": "Analiza krvne grupe je važna informacija za transfuziju krvi, hirurške zahvate i trudnoću (Rh faktor), i jednom određena vredi za ceo život."
+  },
+  "S-Amilaza": {
+    "short": "Enzim povezan sa radom pankreasa.",
+    "long": "Amilaza se najčešće koristi kada se sumnja na upalu pankreasa (pankreatitis) — u tom slučaju njena vrednost u krvi naglo raste."
+  },
+  "S-Bilirubin - ukupan": {
+    "short": "Pokazatelj rada jetre i razgradnje crvenih krvnih zrnaca.",
+    "long": "Bilirubin nastaje razgradnjom hemoglobina i obrađuje se u jetri. Povišene vrednosti mogu ukazivati na probleme sa jetrom, žučnim putevima ili ubrzanu razgradnju crvenih krvnih zrnaca, a vidljiv znak je žutica."
+  },
+  "S-Proteini ukupni": {
+    "short": "Ukupna količina proteina u krvi.",
+    "long": "Ukupni proteini (uglavnom albumini i globulini) odražavaju opšte stanje uhranjenosti, rad jetre i bubrega, kao i imunološki status. Za precizniju sliku obično se dopunjuje analizom albumina."
+  },
+  "S-Albumini": {
+    "short": "Najzastupljeniji protein u krvi, pokazatelj rada jetre i uhranjenosti.",
+    "long": "Albumini se stvaraju u jetri i imaju važnu ulogu u održavanju tečnosti u krvnim sudovima. Snižene vrednosti mogu ukazivati na bolest jetre, bubrega ili lošu uhranjenost."
+  },
+  "S-Acidum uricum": {
+    "short": "Mokraćna kiselina — povezana sa gihtom i bubrežnim kamenom.",
+    "long": "Povišena mokraćna kiselina može dovesti do gihta (bolno zapaljenje zglobova) i stvaranja bubrežnih kamenaca. Vrednost često raste uz određenu ishranu (crveno meso, alkohol) i gojaznost."
+  },
+  "S-Kalcijum - ukupni": {
+    "short": "Nivo kalcijuma u krvi.",
+    "long": "Kalcijum je važan za kosti, mišiće i nervni sistem. Poremećaji nivoa kalcijuma mogu biti povezani sa radom paratireoidnih žlezda, bubrega ili nedostatkom vitamina D."
+  },
+  "S-Magnezijum": {
+    "short": "Mineral važan za mišiće, nerve i srce.",
+    "long": "Magnezijum učestvuje u stotinama procesa u organizmu, uključujući rad mišića i srca. Nedostatak se može ispoljiti kao grčevi u mišićima, umor ili nepravilan srčani ritam."
+  },
+  "S-Natrijum": {
+    "short": "Elektrolit koji reguliše ravnotežu tečnosti.",
+    "long": "Natrijum je ključan elektrolit za ravnotežu tečnosti u organizmu i rad nervnog sistema. Poremećaji su često povezani sa dehidracijom, prekomernim unosom tečnosti ili radom bubrega."
+  },
+  "S-Kalijum": {
+    "short": "Elektrolit ključan za rad srca i mišića.",
+    "long": "Kalijum je posebno važan za pravilan rad srčanog mišića. I previsoke i preniske vrednosti mogu biti ozbiljne i zahtevaju brzu medicinsku pažnju."
+  },
+  "S-RF (reumatoidni faktor)": {
+    "short": "Antitelo povezano sa reumatoidnim artritisom.",
+    "long": "Reumatoidni faktor se koristi kao pomoćna analiza u dijagnostici reumatoidnog artritisa i drugih autoimunih stanja, uz kliničku sliku i dodatne analize."
+  },
+  "S-ASTO": {
+    "short": "Antitela na streptokoknu infekciju.",
+    "long": "ASTO raste posle infekcije streptokokom (npr. angina) i koristi se da se proveri da li je nedavna infekcija dovela do komplikacija poput reumatske groznice ili upale bubrega."
+  },
+  "S-AFP": {
+    "short": "Tumor marker i deo prenatalnog skrininga.",
+    "long": "AFP (alfa-fetoprotein) se koristi kao tumor marker kod bolesti jetre, ali i kao deo skrininga u trudnoći. Tumačenje uvek zavisi od konteksta u kom se analiza radi."
+  },
+  "S-Anti TPO": {
+    "short": "Antitela povezana sa autoimunim bolestima štitne žlezde.",
+    "long": "Anti-TPO antitela su povišena kod autoimunih bolesti štitne žlezde poput Hašimoto tiroiditisa. Rade se obično uz TSH kada se sumnja na autoimuni uzrok poremećaja štitne žlezde."
+  },
+  "S-Beta HCG": {
+    "short": "Hormon trudnoće.",
+    "long": "Beta HCG je hormon koji telo počinje da luči rano u trudnoći, pa se koristi za potvrdu trudnoće i praćenje njenog razvoja u ranim nedeljama."
+  },
+  "S-Folna kiselina": {
+    "short": "Vitamin B9, važan za krv i trudnoću.",
+    "long": "Folna kiselina je neophodna za stvaranje crvenih krvnih zrnaca i posebno je važna u trudnoći za pravilan razvoj nervnog sistema bebe. Nedostatak može dovesti do anemije."
+  }
+}

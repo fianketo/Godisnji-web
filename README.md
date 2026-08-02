@@ -30,6 +30,19 @@ Sve analize, cene i vremena obrade nalaze se u `data/biotest-analize.json`, grup
 
 Da izmeniš cenu, vreme ili dodaš/obrišeš analizu — samo izmeni ovaj fajl (validan JSON) i osveži stranicu, ništa drugo ne treba menjati. Nekoliko naziva ima mali ostatak teksta na kraju (artefakt automatske obrade PDF cenovnika, npr. zarez ili broj) — po potrebi ih ručno ispravi direktno u ovom fajlu.
 
+## Opisi analiza (Katalog)
+
+`data/test-descriptions.json` sadrži kratke opise (šta analiza meri + duže objašnjenje) za trenutno ~50 najtraženijih analiza, ključ je tačan `name` iz `biotest-analize.json`. Analiza koja ima opis dobija u katalogu kratku rečenicu ispod naziva i dugme **"Pročitaj više"** koje otvara bočni panel (kao na primeru koji je klijent poslao) sa dužim objašnjenjem i dugmetom "Dodaj u kalkulator". Analize bez opisa u ovom fajlu i dalje rade normalno, samo bez tog dodatka — dodavanje opisa je postepeno, nije potrebno pokriti svih ~940 odjednom.
+
+Da dodaš opis za još neku analizu:
+
+```json
+"Tačan naziv analize iz biotest-analize.json": {
+  "short": "Jedna kratka rečenica ispod naziva u listi.",
+  "long": "Duže objašnjenje (2-4 rečenice) koje se prikazuje u bočnom panelu."
+}
+```
+
 ## Kalkulator i vreme obrade
 
 Kalkulator (na `katalog.html`) sabira cene izabranih analiza i prikazuje **najduže** vreme obrade među njima. Pošto se vreme u cenovniku beleži veoma različito ("4h", "2-3 dana", "do 15 dana", "45 min."...), `assets/js/catalog.js` sadrži `parseTimeToHours()` koja sve to pretvara u približan broj sati radi poređenja — u kalkulatoru se onda prikazuje originalan tekst analize sa najdužim vremenom (ne prepravljen broj), da ostane čitljivo i tačno.
