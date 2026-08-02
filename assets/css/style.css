@@ -681,21 +681,23 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 /* ---------- Locations ---------- */
 #map {
   width: 100%;
-  height: 420px;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-sm);
 }
-.location-grid {
+.locations-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  align-items: start;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 @media (max-width: 900px) {
-  .location-grid { grid-template-columns: 1fr; }
-  #map { height: 300px; }
+  #map { height: 300px !important; }
 }
+@media (max-width: 720px) {
+  .locations-list { grid-template-columns: 1fr; }
+}
+.location-card { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+.location-card:hover { border-color: var(--color-border-strong); box-shadow: var(--shadow-md); }
 .info-row { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--color-bg-alt); }
 .info-row:last-child { border-bottom: none; }
 .info-row .icon-badge { margin-bottom: 0; flex-shrink: 0; }

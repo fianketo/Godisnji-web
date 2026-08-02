@@ -1,0 +1,50 @@
+[
+  {
+    "id": "koste-abrasevica",
+    "name": "BIOTEST — Koste Abraševića 31",
+    "address": "Koste Abraševića 31, 21000 Novi Sad",
+    "city": "Novi Sad",
+    "phones": ["021/503-724", "021/505-913", "021/506-095", "021/300-7804"],
+    "hours": "Ponedeljak – petak: 07:00 – 20:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+  },
+  {
+    "id": "micurinova",
+    "name": "BIOTEST — Mičurinova 32",
+    "address": "Mičurinova 32, 21000 Novi Sad",
+    "city": "Novi Sad",
+    "phones": ["021/532-100", "062/659-071"],
+    "hours": "Ponedeljak – petak: 07:00 – 20:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+  },
+  {
+    "id": "radnicka",
+    "name": "BIOTEST — Radnička 4a",
+    "address": "Radnička 4a, 21000 Novi Sad",
+    "city": "Novi Sad",
+    "phones": ["021/297-0733", "062/659-027"],
+    "hours": "Ponedeljak – petak: 07:00 – 20:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+  },
+  {
+    "id": "bulevar-oslobodjenja",
+    "name": "BIOTEST Centar — Bulevar oslobođenja 48/54",
+    "address": "Bulevar oslobođenja 48/54, 21000 Novi Sad",
+    "city": "Novi Sad",
+    "phones": ["021/261-1722", "060/665-9018"],
+    "hours": "Ponedeljak – petak: 07:00 – 20:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+  },
+  {
+    "id": "detelinara",
+    "name": "BIOTEST Detelinara — Veselina Masleše 56",
+    "address": "Veselina Masleše 56, 21000 Novi Sad",
+    "city": "Novi Sad",
+    "phones": ["021/6322-100", "064/6453-081"],
+    "hours": "Ponedeljak – petak: 07:00 – 15:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+  },
+  {
+    "id": "novi-becej",
+    "name": "BIOTEST Novi Bečej — Sonje Marinković 4a",
+    "address": "Sonje Marinković 4a, 23272 Novi Bečej",
+    "city": "Novi Bečej",
+    "phones": ["023/772-399", "062/659-025"],
+    "hours": "Ponedeljak – petak: 07:00 – 17:00\nSubota: 07:00 – 12:00\nNedelja: ne radimo"
+  }
+]

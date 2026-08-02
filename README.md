@@ -99,9 +99,24 @@ Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`
 
 ## Mapa (Lokacije)
 
-`lokacije.html` koristi Leaflet + OpenStreetMap (besplatno, bez API ključa). Pošto tačne GPS koordinate za Koste Abraševića 31 nisu bile dostupne prilikom izrade, `assets/js/lokacije-page.js` pri prvoj poseti pokuša da sam geokodira adresu preko besplatnog Nominatim servisa (iz browsera posetioca) i rezultat trajno zapamti (`localStorage`). Dok se to ne desi (ili ako geokodiranje ne uspe), marker stoji na proceni centra Novog Sada — **ako znaš tačne koordinate**, upiši ih direktno u `FALLBACK_COORDS` na vrhu tog fajla da mapa uvek bude precizna bez oslanjanja na spoljni servis.
+`lokacije.html` prikazuje **svih 6 BIOTEST lokacija** (5 u Novom Sadu + 1 u Novom Bečeju) na jednoj Leaflet + OpenStreetMap mapi (besplatno, bez API ključa), sa karticom po lokaciji ispod mape (adresa, radno vreme, telefoni, dugme za poziv). Klik na karticu centrira mapu na tu lokaciju.
 
-Radno vreme na `lokacije.html` je trenutno **placeholder** — zameni ga tačnim podacima čim ih dobiješ (jasno je obeleženo u HTML-u).
+Sve lokacije su u `data/locations.json` — da dodaš, izmeniš ili obrišeš lokaciju, samo izmeni taj fajl:
+
+```json
+{
+  "id": "jedinstven-slug",
+  "name": "BIOTEST — Naziv/adresa",
+  "address": "Ulica broj, poštanski broj Grad",
+  "city": "Novi Sad",
+  "phones": ["021/xxx-xxx"],
+  "hours": "Ponedeljak – petak: 07:00 – 20:00\nSubota: 07:00 – 14:00\nNedelja: ne radimo"
+}
+```
+
+Pošto tačne GPS koordinate nisu bile dostupne prilikom izrade, `assets/js/lokacije-page.js` pri prvoj poseti pokuša da sam geokodira svaku adresu preko besplatnog Nominatim servisa (iz browsera posetioca) i rezultat trajno zapamti po lokaciji (`localStorage`, ključ `biotest_geocode_<id>`). Dok se to ne desi (ili ako geokodiranje ne uspe), marker te lokacije stoji na proceni centra grada (`CITY_FALLBACK_COORDS` na vrhu fajla).
+
+**Podaci o adresama, telefonima i radnom vremenu su prikupljeni sa javno dostupnih izvora (zvanični sajt biotest.rs i poslovni imenici) i nisu direktno potvrđeni od strane laboratorije — obavezno proveri tačnost pre nego što sajt ode u produkciju**, posebno radno vreme (razlikuje se po lokaciji, a neki izvori nisu bili potpuno usaglašeni).
 
 ## PWA
 
