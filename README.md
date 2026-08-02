@@ -101,7 +101,13 @@ Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`
 
 ## Mapa (Lokacije)
 
-`lokacije.html` prikazuje **svih 6 BIOTEST lokacija** (5 u Novom Sadu + 1 u Novom Bečeju) na jednoj Leaflet + OpenStreetMap mapi (besplatno, bez API ključa), sa karticom po lokaciji ispod mape (adresa, radno vreme, telefoni, dugme za poziv). Klik na karticu centrira mapu na tu lokaciju.
+`lokacije.html` prikazuje **svih 6 BIOTEST lokacija** (5 u Novom Sadu + 1 u Novom Bečeju) na jednoj Leaflet mapi sa svetlom CartoDB Positron podlogom (besplatno, bez API ključa — samo atribucija u dnu mape), sa karticom po lokaciji ispod mape (adresa, radno vreme, telefoni, dugme za poziv). Mapa se podrazumevano fokusira na Novi Sad (5/6 lokacija); Novi Bečej ima svoj marker, dostupan klikom na karticu.
+
+Dodatne "moderne" funkcije na ovoj stranici:
+- **Brendirani markeri** — teal pin sa 🧪, koralni i veći pin za "najbližu" lokaciju.
+- **Bedž Otvoreno/Zatvoreno** po lokaciji, izračunat u browseru iz teksta radnog vremena i trenutnog vremena posetioca (`parseHours()`/`isOpenNow()` u `assets/js/lokacije-page.js`) — očekuje da `hours` u JSON-u prati format iz primera ispod (tri linije: radni dani / subota / nedelja); ako format odstupi, bedž jednostavno neće raditi za tu lokaciju, ostatak stranice i dalje radi normalno.
+- **"Pronađi lokaciju najbližu meni"** dugme — traži dozvolu za lokaciju iz browsera (ne automatski pri učitavanju stranice, samo na klik) i istakne najbližu lokaciju na mapi i u listi.
+- **Poziv direktno iz mapnog oblačića** (popup na markeru), ne samo iz kartice.
 
 Sve lokacije su u `data/locations.json` — da dodaš, izmeniš ili obrišeš lokaciju, samo izmeni taj fajl:
 

@@ -698,6 +698,34 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 .location-card { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
 .location-card:hover { border-color: var(--color-border-strong); box-shadow: var(--shadow-md); }
+.location-card--nearest { border-color: var(--color-accent); box-shadow: var(--shadow-md); }
+.location-status { flex-shrink: 0; }
+
+/* Brendirani markeri na mapi (umesto podrazumevanih plavih Leaflet pinova) */
+.biotest-marker-wrap { background: transparent; border: none; }
+.biotest-marker-pin {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, var(--color-primary), #1fb3ad);
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: var(--shadow-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.biotest-marker-pin span { transform: rotate(45deg); font-size: 15px; line-height: 1; }
+.biotest-marker-pin--nearest {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+}
+.biotest-marker-pin--nearest span { font-size: 18px; }
+
+.map-popup { font-size: 0.9rem; line-height: 1.5; }
+.map-popup-call {
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
 .info-row { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--color-bg-alt); }
 .info-row:last-child { border-bottom: none; }
 .info-row .icon-badge { margin-bottom: 0; flex-shrink: 0; }
