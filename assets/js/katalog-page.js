@@ -204,11 +204,14 @@
       calcCountEl.textContent = `Izabrano: ${items.length} ${items.length === 1 ? 'analiza' : 'analize/a'}`;
       calcItemsEl.innerHTML = items.map((t) => `
         <div class="calc-item">
-          <span>${t.name}</span>
-          <span style="display:flex; align-items:center; gap:8px;">
-            ${formatPrice(t.price)}
+          <div class="calc-item-top">
+            <span>${t.name}</span>
             <button type="button" aria-label="Ukloni ${t.name}" data-remove="${t.id}">✕</button>
-          </span>
+          </div>
+          <div class="calc-item-meta">
+            <span class="calc-item-time">⏱ ${t.time || 'po dogovoru'}</span>
+            <span class="calc-item-price">${formatPrice(t.price)}</span>
+          </div>
         </div>`).join('');
       calcItemsEl.querySelectorAll('[data-remove]').forEach((btn) => {
         btn.addEventListener('click', () => removeSelected(btn.getAttribute('data-remove')));
