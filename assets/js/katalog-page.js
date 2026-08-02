@@ -122,15 +122,21 @@
   function openDetailDrawer(test) {
     const desc = descriptions[test.name];
     if (!desc) return;
-    const instrument = test.instrument ? ` · ${test.instrument}` : '';
+    const instrument = test.instrument ? test.instrument : '';
+    const prepHtml = desc.prep
+      ? `<div class="test-prep-box"><strong>Priprema:</strong> ${desc.prep}</div>`
+      : '';
+    const paragraphs = desc.long.map((p) => `<p>${p}</p>`).join('');
     detailDrawerBody.innerHTML = `
       <span class="eyebrow">${test.category}</span>
       <h2>${test.name}</h2>
       <div class="test-meta-row">
         <span>⏱ ${test.time || 'po dogovoru'}</span>
-        <span>${instrument.replace(' · ', '')}</span>
+        ${instrument ? `<span>🔬 ${instrument}</span>` : ''}
       </div>
-      <div class="article-body"><p>${desc.long}</p></div>
+      ${prepHtml}
+      <h3>O ovoj analizi</h3>
+      <div class="article-body">${paragraphs}</div>
     `;
     const isSelected = selected.has(test.id);
     detailDrawerFooter.innerHTML = `
