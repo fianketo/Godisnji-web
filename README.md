@@ -51,12 +51,12 @@ Kalkulator (na `katalog.html`) sabira cene izabranih analiza i prikazuje **najdu
 
 Kalkulator sada, pored cena analiza, dodaje i **jednokratnu** cenu uzorkovanja — "Vađenje krvi" ako je bar jedna izabrana analiza iz krvi, i/ili "Uzimanje brisa" ako je bar jedna izabrana analiza sa brisa. Ako je izabrano više analiza istog tipa uzorka, fiksna cena se naplaćuje samo jednom (jedno vađenje krvi pokriva sve analize iz krvi u toj poseti).
 
-**Trenutne cene (300 RSD za oba) su placeholder — zameni ih stvarnim cenama** u `assets/js/katalog-page.js`, na vrhu fajla:
+Cene su definisane u `assets/js/katalog-page.js`, na vrhu fajla (trenutno 100 RSD vađenje krvi, 200 RSD uzimanje brisa):
 
 ```js
 const SAMPLING_FEES = {
-  krv: { label: 'Vađenje krvi', price: 300 },
-  bris: { label: 'Uzimanje brisa', price: 300 },
+  krv: { label: 'Vađenje krvi', price: 100 },
+  bris: { label: 'Uzimanje brisa', price: 200 },
 };
 ```
 

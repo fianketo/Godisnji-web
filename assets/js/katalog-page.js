@@ -11,10 +11,9 @@
   const listEl = document.getElementById('catalog-list');
   const resultsMeta = document.getElementById('results-meta');
 
-  // Cena uzorkovanja — PLACEHOLDER vrednosti, zameniti stvarnim cenama laboratorije.
   const SAMPLING_FEES = {
-    krv: { label: 'Vađenje krvi', price: 300 },
-    bris: { label: 'Uzimanje brisa', price: 300 },
+    krv: { label: 'Vađenje krvi', price: 100 },
+    bris: { label: 'Uzimanje brisa', price: 200 },
   };
 
   const calcItemsEl = document.getElementById('calc-items');
