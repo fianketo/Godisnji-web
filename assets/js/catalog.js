@@ -22,6 +22,22 @@ function parseTimeToHours(raw) {
   return value; // nepoznata jedinica — tretiraj kao sate
 }
 
+// Prefiks u nazivu analize (deo pre prve crte) govori kakav se uzorak uzima.
+// S/eK/cP/eP/cK/hK/hP/K = uzorak krvi (serum/plazma/puna krv) → vađenje krvi.
+// B/B-U/OT = bris (koža, grlo, nokat...) → uzimanje brisa.
+// Ostalo (U, dU, F, SPR, SPT, Sp, Km...) pacijent sam donosi uzorak (urin, feces...) — nema dodatne usluge uzorkovanja.
+const BLOOD_SAMPLE_PREFIXES = new Set(['S', 'eK', 'cP', 'eP', 'cK', 'hK', 'hP', 'K', 'k']);
+const SWAB_SAMPLE_PREFIXES = new Set(['B', 'B/U', 'OT']);
+
+function parseSampleType(name) {
+  const match = /^([A-Za-zčćžšđČĆŽŠĐ0-9/]+)-/.exec(name);
+  if (!match) return null;
+  const prefix = match[1];
+  if (BLOOD_SAMPLE_PREFIXES.has(prefix)) return 'krv';
+  if (SWAB_SAMPLE_PREFIXES.has(prefix)) return 'bris';
+  return null;
+}
+
 function slugify(str) {
   return str
     .toString()
@@ -51,6 +67,7 @@ async function loadCatalog() {
         time: item.time || '',
         price: item.price,
         hours: parseTimeToHours(item.time),
+        sampleType: parseSampleType(item.name),
       });
     }
   }
@@ -65,3 +82,4 @@ window.Biotest = window.Biotest || {};
 window.Biotest.loadCatalog = loadCatalog;
 window.Biotest.formatPrice = formatPrice;
 window.Biotest.parseTimeToHours = parseTimeToHours;
+window.Biotest.parseSampleType = parseSampleType;

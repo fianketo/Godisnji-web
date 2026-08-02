@@ -11,9 +11,14 @@
   const listEl = document.getElementById('catalog-list');
   const resultsMeta = document.getElementById('results-meta');
 
+  // Cena uzorkovanja — PLACEHOLDER vrednosti, zameniti stvarnim cenama laboratorije.
+  const SAMPLING_FEES = {
+    krv: { label: 'Vađenje krvi', price: 300 },
+    bris: { label: 'Uzimanje brisa', price: 300 },
+  };
+
   const calcItemsEl = document.getElementById('calc-items');
   const calcCountEl = document.getElementById('calc-count');
-  const calcSubtotalEl = document.getElementById('calc-subtotal');
   const calcDiscountRow = document.getElementById('calc-discount-row');
   const calcDiscountPercentEl = document.getElementById('calc-discount-percent');
   const calcDiscountAmountEl = document.getElementById('calc-discount-amount');
@@ -202,7 +207,8 @@
       calcCountEl.textContent = 'Nije izabrana nijedna analiza.';
     } else {
       calcCountEl.textContent = `Izabrano: ${items.length} ${items.length === 1 ? 'analiza' : 'analize/a'}`;
-      calcItemsEl.innerHTML = items.map((t) => `
+
+      const analysisRows = items.map((t) => `
         <div class="calc-item">
           <div class="calc-item-top">
             <span>${t.name}</span>
@@ -213,24 +219,43 @@
             <span class="calc-item-price">${formatPrice(t.price)}</span>
           </div>
         </div>`).join('');
+
+      const neededSamples = new Set(items.map((t) => t.sampleType).filter(Boolean));
+      const feeRows = Array.from(neededSamples).map((type) => {
+        const fee = SAMPLING_FEES[type];
+        if (!fee) return '';
+        return `
+        <div class="calc-item calc-fee-item">
+          <div class="calc-item-top">
+            <span>🩹 ${fee.label} <span class="field-hint">(uzorkovanje)</span></span>
+          </div>
+          <div class="calc-item-meta">
+            <span class="calc-item-time">jednokratno</span>
+            <span class="calc-item-price">${formatPrice(fee.price)}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      calcItemsEl.innerHTML = analysisRows + feeRows;
       calcItemsEl.querySelectorAll('[data-remove]').forEach((btn) => {
         btn.addEventListener('click', () => removeSelected(btn.getAttribute('data-remove')));
       });
     }
 
-    const subtotal = items.reduce((sum, t) => sum + t.price, 0);
-    calcSubtotalEl.textContent = formatPrice(subtotal);
+    const analysesSubtotal = items.reduce((sum, t) => sum + t.price, 0);
+    const neededSamples = new Set(items.map((t) => t.sampleType).filter(Boolean));
+    const samplingFeesTotal = Array.from(neededSamples).reduce((sum, type) => sum + (SAMPLING_FEES[type] ? SAMPLING_FEES[type].price : 0), 0);
 
-    let total = subtotal;
+    let discountAmount = 0;
     if (appliedDiscount && items.length > 0) {
-      const discountAmount = Math.round(subtotal * (DISCOUNT_PERCENT / 100));
+      discountAmount = Math.round(analysesSubtotal * (DISCOUNT_PERCENT / 100));
       calcDiscountRow.style.display = 'flex';
       calcDiscountPercentEl.textContent = DISCOUNT_PERCENT;
       calcDiscountAmountEl.textContent = '-' + formatPrice(discountAmount);
-      total = subtotal - discountAmount;
     } else {
       calcDiscountRow.style.display = 'none';
     }
+    const total = analysesSubtotal - discountAmount + samplingFeesTotal;
     calcTotalEl.textContent = formatPrice(total);
 
     if (items.length === 0) {

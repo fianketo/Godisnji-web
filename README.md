@@ -47,6 +47,26 @@ Da dodaš opis za još neku analizu:
 
 Kalkulator (na `katalog.html`) sabira cene izabranih analiza i prikazuje **najduže** vreme obrade među njima. Pošto se vreme u cenovniku beleži veoma različito ("4h", "2-3 dana", "do 15 dana", "45 min."...), `assets/js/catalog.js` sadrži `parseTimeToHours()` koja sve to pretvara u približan broj sati radi poređenja — u kalkulatoru se onda prikazuje originalan tekst analize sa najdužim vremenom (ne prepravljen broj), da ostane čitljivo i tačno.
 
+## Cena uzorkovanja (vađenje krvi / uzimanje brisa)
+
+Kalkulator sada, pored cena analiza, dodaje i **jednokratnu** cenu uzorkovanja — "Vađenje krvi" ako je bar jedna izabrana analiza iz krvi, i/ili "Uzimanje brisa" ako je bar jedna izabrana analiza sa brisa. Ako je izabrano više analiza istog tipa uzorka, fiksna cena se naplaćuje samo jednom (jedno vađenje krvi pokriva sve analize iz krvi u toj poseti).
+
+**Trenutne cene (300 RSD za oba) su placeholder — zameni ih stvarnim cenama** u `assets/js/katalog-page.js`, na vrhu fajla:
+
+```js
+const SAMPLING_FEES = {
+  krv: { label: 'Vađenje krvi', price: 300 },
+  bris: { label: 'Uzimanje brisa', price: 300 },
+};
+```
+
+Koji tip uzorka odgovara kojoj analizi određuje se automatski na osnovu prefiksa u nazivu (deo pre prve crte), u `assets/js/catalog.js` (`parseSampleType()`):
+- **Krv** (vađenje krvi): nazivi koji počinju sa `S-`, `eK-`, `cP-`, `eP-`, `cK-`, `hK-`, `hP-`, `K-`
+- **Bris** (uzimanje brisa): nazivi koji počinju sa `B-`, `B/U-`, `OT-`
+- **Bez dodatne naplate** (pacijent sam donosi uzorak): urin (`U-`, `dU-`), stolica (`F-`), sperma/sputum (`SPR-`, `SPT-`, `Sp-`) i par ređih kategorija
+
+Ovo je heuristika bazirana na postojećim prefiksima u cenovniku i pokriva veliku većinu analiza — ako primetiš da je neka konkretna analiza pogrešno svrstana, javi, lako se doda ručni izuzetak.
+
 ## Blog — kako dodati novu objavu
 
 Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije ka najstarijoj. Da dodaš novu objavu, dodaj novi objekat na **vrh** niza (bez pravljenja novog HTML fajla):
