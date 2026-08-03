@@ -1,6 +1,6 @@
 # BIOTEST — sajt za Zavod za laboratorijsku dijagnostiku
 
-Prezentacioni, informativni sajt za BIOTEST laboratoriju (Novi Sad, Koste Abraševića 31). Bez online zakazivanja termina i bez portala za preuzimanje rezultata — samo katalog analiza, kalkulator cene/vremena, lokacije, popusti i osnovne informacije.
+Prezentacioni, informativni sajt za BIOTEST laboratoriju (6 lokacija — Novi Sad i Novi Bečej). Bez online zakazivanja termina i bez portala za preuzimanje rezultata — samo katalog analiza, kalkulator cene/vremena, lokacije, usluge na terenu, popusti i osnovne informacije.
 
 Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) — jednostavan za održavanje za jednog developera.
 
@@ -10,7 +10,7 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 
 - `index.html` — Početna (hero, promocija, zašto Biotest, teaser bloga)
 - `katalog.html` — Katalog analiza: pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
-- `lokacije.html` — Mapa (Leaflet + OpenStreetMap) i kontakt kartica
+- `lokacije.html` — Mapa svih 6 lokacija (Leaflet + OpenStreetMap) + kartice po lokaciji
 - `teren.html` — Usluge na terenu (kućne posete za vađenje krvi/brisa) — kako funkcioniše, za koga, kontakt za dogovor termina
 - `popusti.html` — Preuzimanje popust koda (ime + kontakt → jedinstveni kod na ekranu)
 - `blog.html` — Lista blog objava (kartice sa slikom-bannerom, kategorijom i kratkim opisom)
