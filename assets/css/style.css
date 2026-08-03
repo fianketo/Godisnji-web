@@ -780,28 +780,66 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   #calc-close { display: inline-flex; }
 }
 
-/* ---------- Locations ---------- */
+/* ---------- Locations — "store locator" (lista + mapa u jednom uređaju) ---------- */
+.locator-panel {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--color-border);
+  height: 640px;
+}
+.locator-list {
+  background: linear-gradient(180deg, var(--color-primary-darker), var(--color-indigo-dark));
+  overflow-y: auto;
+}
+.locator-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 18px 22px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-left: 3px solid transparent;
+}
+.locator-item:hover { background: rgba(255, 255, 255, 0.06); }
+.locator-item.is-nearest { background: rgba(255, 138, 92, 0.14); border-left-color: var(--color-accent); }
+.locator-item.is-hidden { display: none; }
+.locator-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.locator-item-head h3 { margin: 0; font-size: 1rem; color: #fff; }
+.locator-item address {
+  font-style: normal;
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.68);
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+.locator-item-phone { font-size: 0.86rem; color: rgba(255, 255, 255, 0.85); }
+.locator-item-phone a { color: inherit; }
+.locator-item-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #ffb08c;
+}
+.locator-empty { padding: 40px 22px; color: rgba(255, 255, 255, 0.7); font-size: 0.92rem; }
+
 #map {
   width: 100%;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-.locations-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  height: 100%;
 }
 @media (max-width: 900px) {
-  #map { height: 300px !important; }
+  .locator-panel { grid-template-columns: 1fr; height: auto; }
+  .locator-list { max-height: 380px; }
+  #map { height: 320px; }
 }
-@media (max-width: 720px) {
-  .locations-list { grid-template-columns: 1fr; }
-}
-.location-card { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
-.location-card:hover { border-color: var(--color-border-strong); box-shadow: var(--shadow-md); }
-.location-card--nearest { border-color: var(--color-accent); box-shadow: var(--shadow-md); }
-.location-status { flex-shrink: 0; }
 
 /* Brendirani markeri na mapi (umesto podrazumevanih plavih Leaflet pinova) */
 .biotest-marker-wrap { background: transparent; border: none; }

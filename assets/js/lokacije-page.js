@@ -15,6 +15,8 @@
   const listEl = document.getElementById('locations-list');
   const findNearestBtn = document.getElementById('find-nearest-btn');
   const nearestStatus = document.getElementById('nearest-status');
+  const searchInput = document.getElementById('loc-search-input');
+  const citySelect = document.getElementById('loc-city-select');
 
   const map = L.map('map');
   // Svetla, minimalna podloga (CartoDB Positron) — čistije uz zdravstveni brend
@@ -93,26 +95,16 @@
   function cardHtml(loc) {
     const open = isOpenNow(loc.hours);
     const statusBadge = open
-      ? '<span class="badge badge-success">🟢 Otvoreno sada</span>'
+      ? '<span class="badge badge-success">🟢 Otvoreno</span>'
       : '<span class="badge badge-accent">Zatvoreno</span>';
-    return `<div class="card location-card" id="location-card-${loc.id}" data-loc="${loc.id}">
-      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
-        <h3 class="mt-0" style="margin-bottom:10px;">${loc.name}</h3>
-        <span class="location-status">${statusBadge}</span>
+    return `<div class="locator-item" id="location-card-${loc.id}" data-loc="${loc.id}" data-search="${(loc.name + ' ' + loc.address + ' ' + loc.city).toLowerCase()}" data-city="${loc.city}" role="button" tabindex="0">
+      <div class="locator-item-head">
+        <h3>${loc.name}</h3>
+        ${statusBadge}
       </div>
-      <div class="info-row" style="padding-top:0;">
-        <div class="icon-badge">📍</div>
-        <div><h4>Adresa</h4><p>${loc.address}</p></div>
-      </div>
-      <div class="info-row">
-        <div class="icon-badge">🕒</div>
-        <div><h4>Radno vreme</h4><p>${loc.hours.replace(/\n/g, '<br>')}</p></div>
-      </div>
-      <div class="info-row">
-        <div class="icon-badge">📞</div>
-        <div><h4>Telefoni</h4><p>${phoneHtml(loc.phones)}</p></div>
-      </div>
-      <a href="${telHref(loc.phones[0])}" class="btn btn-primary btn-block" style="margin-top:8px;">📞 Pozovi (${loc.city})</a>
+      <address>${loc.address}</address>
+      <div class="locator-item-phone">📞 ${phoneHtml(loc.phones)}</div>
+      <span class="locator-item-link">Pogledaj na mapi →</span>
     </div>`;
   }
 
@@ -120,7 +112,7 @@
     locations.forEach((loc) => {
       const card = document.getElementById(`location-card-${loc.id}`);
       if (card) {
-        card.classList.remove('location-card--nearest');
+        card.classList.remove('is-nearest');
         const oldBadge = card.querySelector('.nearest-badge');
         if (oldBadge) oldBadge.remove();
       }
@@ -130,12 +122,36 @@
     nearestLoc.marker.setIcon(pinIconNearest);
     const card = document.getElementById(`location-card-${nearestLoc.id}`);
     if (card) {
-      card.classList.add('location-card--nearest');
+      card.classList.add('is-nearest');
       const badge = document.createElement('span');
       badge.className = 'badge badge-accent nearest-badge';
-      badge.style.marginLeft = '8px';
       badge.textContent = '📍 Najbliža vama';
-      card.querySelector('h3').after(badge);
+      card.querySelector('.locator-item-head').appendChild(badge);
+    }
+  }
+
+  function applyFilters() {
+    const query = (searchInput?.value || '').trim().toLowerCase();
+    const city = citySelect?.value || '';
+    const items = listEl.querySelectorAll('.locator-item');
+    let visibleCount = 0;
+    items.forEach((item) => {
+      const matchesQuery = !query || item.getAttribute('data-search').includes(query);
+      const matchesCity = !city || item.getAttribute('data-city') === city;
+      const visible = matchesQuery && matchesCity;
+      item.classList.toggle('is-hidden', !visible);
+      if (visible) visibleCount += 1;
+    });
+    let emptyRow = listEl.querySelector('.locator-empty');
+    if (visibleCount === 0) {
+      if (!emptyRow) {
+        emptyRow = document.createElement('div');
+        emptyRow.className = 'locator-empty';
+        emptyRow.textContent = 'Nema lokacija koje odgovaraju pretrazi.';
+        listEl.appendChild(emptyRow);
+      }
+    } else if (emptyRow) {
+      emptyRow.remove();
     }
   }
 
@@ -143,16 +159,25 @@
     .then((res) => res.json())
     .then((locations) => {
       listEl.innerHTML = locations.map(cardHtml).join('');
-      listEl.querySelectorAll('.location-card').forEach((el) => {
-        el.addEventListener('click', (e) => {
-          if (e.target.closest('a')) return; // ne presretaj klik/dodir na telefon-link
+      listEl.querySelectorAll('.locator-item').forEach((el) => {
+        const openThisLocation = () => {
           const loc = locations.find((l) => l.id === el.getAttribute('data-loc'));
           if (loc && loc.marker) {
             map.setView(loc.marker.getLatLng(), 16);
             loc.marker.openPopup();
           }
+        };
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('a')) return; // ne presretaj klik/dodir na telefon-link
+          openThisLocation();
+        });
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openThisLocation(); }
         });
       });
+
+      if (searchInput) searchInput.addEventListener('input', applyFilters);
+      if (citySelect) citySelect.addEventListener('change', applyFilters);
 
       // Fokus mape je na Novi Sad (5 od 6 lokacija) — Novi Bečej i dalje ima marker
       // i dostupan je klikom na svoju karticu, ali ne razvlači početni zum.
@@ -227,7 +252,7 @@
       }
     })
     .catch(() => {
-      listEl.innerHTML = '<p class="empty-state">⚠️ Greška pri učitavanju lokacija.</p>';
+      listEl.innerHTML = '<div class="locator-empty">⚠️ Greška pri učitavanju lokacija.</div>';
       map.setView(CITY_FALLBACK_COORDS['Novi Sad'], 13);
     });
 })();
