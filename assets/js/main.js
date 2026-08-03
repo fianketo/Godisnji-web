@@ -21,6 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-year]').forEach((el) => {
     el.textContent = String(new Date().getFullYear());
   });
+
+  const header = document.querySelector('.site-header');
+  if (header) {
+    const updateScrolled = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+    updateScrolled();
+    window.addEventListener('scroll', updateScrolled, { passive: true });
+  }
 });
 
 if ('serviceWorker' in navigator) {
