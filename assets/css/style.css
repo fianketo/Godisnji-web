@@ -176,7 +176,7 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1100;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: saturate(180%) blur(14px);
   -webkit-backdrop-filter: saturate(180%) blur(14px);
@@ -606,13 +606,13 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 /* ---------- Test detail drawer (slide-in "Pročitaj više") ---------- */
 .detail-backdrop {
   position: fixed; inset: 0; background: rgba(10, 30, 35, 0.45);
-  z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+  z-index: 1200; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
 }
 .detail-backdrop.open { opacity: 1; pointer-events: auto; }
 
 .detail-drawer {
   position: fixed; top: 0; right: 0; height: 100%; width: 480px; max-width: 92vw;
-  background: #fff; z-index: 201; box-shadow: -16px 0 40px rgba(6, 42, 46, 0.18);
+  background: #fff; z-index: 1201; box-shadow: -16px 0 40px rgba(6, 42, 46, 0.18);
   transform: translateX(100%); transition: transform 0.25s ease;
   display: flex; flex-direction: column;
 }

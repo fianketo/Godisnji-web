@@ -244,9 +244,15 @@
                 if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
             },
-            () => {
-              nearestStatus.textContent = 'Nije moguće odrediti vašu lokaciju — proverite dozvole za lokaciju u browseru.';
-            }
+            (err) => {
+              const messages = {
+                1: 'Odbijena je dozvola za lokaciju — omogućite je u podešavanjima browsera i pokušajte ponovo.',
+                2: 'Vaša lokacija trenutno nije dostupna — proverite da li su usluge lokacije uključene na uređaju.',
+                3: 'Određivanje lokacije je predugo trajalo — pokušajte ponovo.',
+              };
+              nearestStatus.textContent = messages[err.code] || 'Nije moguće odrediti vašu lokaciju — proverite dozvole za lokaciju u browseru.';
+            },
+            { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
           );
         });
       }
