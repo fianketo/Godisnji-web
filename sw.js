@@ -3,12 +3,13 @@
 // Screen" actually offers the install prompt instead of just a bookmark.
 // Network-first: always prefers the live deployed version and only falls
 // back to the cached shell when there's no connection at all.
-const CACHE_NAME = 'biotest-shell-v1';
+const CACHE_NAME = 'biotest-shell-v2';
 const SHELL_ASSETS = [
   './',
   './index.html',
   './katalog.html',
   './lokacije.html',
+  './teren.html',
   './popusti.html',
   './blog.html',
   './clanak.html',

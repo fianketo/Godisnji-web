@@ -11,6 +11,7 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 - `index.html` — Početna (hero, promocija, zašto Biotest, teaser bloga)
 - `katalog.html` — Katalog analiza: pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
 - `lokacije.html` — Mapa (Leaflet + OpenStreetMap) i kontakt kartica
+- `teren.html` — Usluge na terenu (kućne posete za vađenje krvi/brisa) — kako funkcioniše, za koga, kontakt za dogovor termina
 - `popusti.html` — Preuzimanje popust koda (ime + kontakt → jedinstveni kod na ekranu)
 - `blog.html` — Lista blog objava (kartice sa slikom-bannerom, kategorijom i kratkim opisom)
 - `clanak.html` — Pojedinačni blog članak, učitava se preko `?slug=` iz URL-a

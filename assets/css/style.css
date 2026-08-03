@@ -732,6 +732,23 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .info-row h4 { margin: 0 0 2px; font-size: 0.98rem; }
 .info-row p { margin: 0; }
 
+/* ---------- Numbered steps (npr. "Kako funkcioniše") ---------- */
+.steps-list { display: flex; flex-direction: column; gap: 24px; }
+.step-item { display: flex; gap: 18px; align-items: flex-start; }
+.step-num {
+  flex-shrink: 0;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+}
+.step-item h4 { margin: 4px 0 4px; }
+.step-item p { margin: 0; }
+
 /* ---------- Discounts ---------- */
 .discount-hero {
   background: linear-gradient(120deg, var(--color-accent-light), var(--color-primary-soft));
