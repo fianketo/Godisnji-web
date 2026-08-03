@@ -28,6 +28,33 @@ document.addEventListener('DOMContentLoaded', () => {
     updateScrolled();
     window.addEventListener('scroll', updateScrolled, { passive: true });
   }
+
+  // Klizna "pilula" u navigaciji — prati hover, vraća se na aktivnu stranicu
+  if (links) {
+    const indicator = document.createElement('span');
+    indicator.className = 'nav-indicator';
+    links.prepend(indicator);
+
+    const navItems = Array.from(links.querySelectorAll('a'));
+    const activeLink = links.querySelector('a.active');
+
+    const moveIndicatorTo = (link) => {
+      if (!link) { indicator.classList.remove('is-visible'); return; }
+      indicator.style.width = link.offsetWidth + 'px';
+      indicator.style.transform = `translateX(${link.offsetLeft}px)`;
+      indicator.classList.add('is-visible');
+    };
+
+    moveIndicatorTo(activeLink);
+
+    navItems.forEach((link) => {
+      link.addEventListener('mouseenter', () => moveIndicatorTo(link));
+      link.addEventListener('focus', () => moveIndicatorTo(link));
+    });
+    links.addEventListener('mouseleave', () => moveIndicatorTo(activeLink));
+
+    window.addEventListener('resize', () => moveIndicatorTo(activeLink));
+  }
 });
 
 if ('serviceWorker' in navigator) {

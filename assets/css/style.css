@@ -162,6 +162,16 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .btn-block { width: 100%; }
 .btn-sm { padding: 9px 18px; font-size: 0.88rem; }
 
+/* ---------- Glatka tranzicija između stranica (progresivno poboljšanje — radi u Chrome/Edge, ostali browseri jednostavno nemaju animaciju) ---------- */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease;
+}
+
 /* ---------- Header / Nav ---------- */
 .site-header {
   position: sticky;
@@ -173,6 +183,7 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   border-bottom: 1px solid rgba(20, 45, 51, 0.06);
   box-shadow: 0 1px 0 rgba(20, 45, 51, 0.02);
   transition: box-shadow 0.2s ease, background 0.2s ease;
+  view-transition-name: site-header;
 }
 .site-header.is-scrolled {
   background: rgba(255, 255, 255, 0.94);
@@ -218,6 +229,7 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 
 .nav-links {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 2px;
@@ -229,19 +241,41 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 .nav-links a {
   position: relative;
+  z-index: 1;
   display: block;
   padding: 9px 16px;
   border-radius: var(--radius-pill);
   font-weight: 600;
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  transition: background 0.18s ease, color 0.18s ease;
+  transition: color 0.18s ease;
 }
 .nav-links a:hover { color: var(--color-primary-dark); }
-.nav-links a.active {
+.nav-links a.active { color: var(--color-primary-darker); }
+
+/* Klizna "pilula" iza linkova — pomera se glatko na hover, vraća se na aktivnu stranicu (main.js, .nav-indicator) */
+.nav-indicator {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  height: calc(100% - 8px);
+  width: 0;
+  border-radius: var(--radius-pill);
   background: var(--color-bg);
-  color: var(--color-primary-darker);
   box-shadow: 0 2px 8px rgba(14, 60, 66, 0.10);
+  transform: translateX(0);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), width 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+.nav-indicator.is-visible { opacity: 1; }
+
+@media (max-width: 900px) {
+  .nav-indicator { display: none; }
+  .nav-links a.active {
+    background: var(--color-primary-light);
+    color: var(--color-primary-dark);
+  }
 }
 
 .nav-cta { display: flex; align-items: center; gap: 10px; }
@@ -324,12 +358,41 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 .hero-stat span { font-size: 0.85rem; color: var(--color-text-muted); }
 
-.hero-art {
+.hero-visual { position: relative; }
+.hero-visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.hero-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   background: #fff;
-  border-radius: var(--radius-lg);
-  padding: 28px;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
+  max-width: 250px;
+}
+.hero-badge-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.hero-badge strong { display: block; font-size: 0.88rem; color: var(--color-text); }
+.hero-badge span { display: block; font-size: 0.78rem; color: var(--color-text-muted); }
+@media (max-width: 500px) {
+  .hero-badge { display: none; }
 }
 
 /* ---------- Cards ---------- */
