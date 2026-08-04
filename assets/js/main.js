@@ -55,6 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', () => moveIndicatorTo(activeLink));
   }
+
+  // Hero video (Početna) — malo sporije od realnog vremena, radi mirnijeg utiska
+  const heroVideo = document.querySelector('.hero-video-frame video');
+  if (heroVideo) heroVideo.playbackRate = 0.75;
 });
 
 if ('serviceWorker' in navigator) {
