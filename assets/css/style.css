@@ -894,6 +894,35 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   #map { height: 320px; }
 }
 
+/* ---------- "6 lokacija" teaser na početnoj — mini-mapa + tekst ---------- */
+.locations-teaser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0;
+  overflow: hidden;
+  align-items: stretch;
+}
+.locations-teaser-map {
+  position: relative;
+  min-height: 300px;
+  background: var(--color-bg-alt);
+}
+#mini-map { position: absolute; inset: 0; }
+.locations-teaser-body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+.locations-teaser-body h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.locations-teaser-body p { margin: 0 0 16px; }
+.locations-teaser-body .btn { align-self: flex-start; }
+@media (max-width: 900px) {
+  .locations-teaser { grid-template-columns: 1fr; }
+  .locations-teaser-map { min-height: 240px; }
+}
+
 /* Brendirani markeri na mapi (umesto podrazumevanih plavih Leaflet pinova) */
 .biotest-marker-wrap { background: transparent; border: none; }
 .biotest-marker-pin {

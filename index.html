@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0e7c86">
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -150,12 +151,15 @@
 
   <section class="section section-tight">
     <div class="container">
-      <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap: 24px; flex-wrap: wrap;">
-        <div>
-          <h3 class="mt-0"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" /></svg> 6 lokacija — Novi Sad i Novi Bečej</h3>
-          <p style="margin:0;">Pronađite vama najbližu BIOTEST laboratoriju na mapi.</p>
+      <div class="card locations-teaser">
+        <div class="locations-teaser-map">
+          <div id="mini-map" role="img" aria-label="Mapa Novog Sada sa pozicijama BIOTEST laboratorija, povezanih linijama iz centralne lokacije"></div>
         </div>
-        <a href="lokacije.html" class="btn btn-primary">Pogledaj sve lokacije</a>
+        <div class="locations-teaser-body">
+          <h3 class="mt-0"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" /></svg> 6 lokacija — Novi Sad i Novi Bečej</h3>
+          <p>Pet laboratorija u Novom Sadu, povezanih iz naše centralne lokacije na Koste Abraševića, plus laboratorija u Novom Bečeju.</p>
+          <a href="lokacije.html" class="btn btn-primary">Pogledaj sve lokacije</a>
+        </div>
       </div>
     </div>
   </section>
@@ -214,6 +218,8 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/js/catalog.js"></script>
 <script src="assets/js/blog.js"></script>
+<script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/js/index-map.js"></script>
 <script>
   window.Biotest.loadCatalog().then(({ categories, tests }) => {
     document.getElementById('stat-tests').textContent = tests.length + '+';

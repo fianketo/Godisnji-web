@@ -128,6 +128,10 @@ Pošto tačne GPS koordinate nisu bile dostupne prilikom izrade, `assets/js/loka
 
 **Podaci o adresama, telefonima i radnom vremenu su prikupljeni sa javno dostupnih izvora (zvanični sajt biotest.rs i poslovni imenici) i nisu direktno potvrđeni od strane laboratorije — obavezno proveri tačnost pre nego što sajt ode u produkciju**, posebno radno vreme (razlikuje se po lokaciji, a neki izvori nisu bili potpuno usaglašeni).
 
+### Mini-mapa na početnoj ("6 lokacija")
+
+`index.html` ima svoju malu, ne-interaktivnu Leaflet mapu (`assets/js/index-map.js`, `#mini-map`) koja prikazuje samo 5 lokacija u Novom Sadu, sa isprekidanim linijama od centralne lokacije (Koste Abraševića 31, `HUB_ID` u fajlu) do ostale četiri — vizuelno "mreža" laboratorija, kao teaser koji vodi na `lokacije.html`. Deli isti keš geokodiranja (`localStorage`, `biotest_geocode_<id>`) i istu logiku sa `lokacije-page.js`, tako da se pozicije poklapaju sa punom mapom čim se bar jednom uspešno geokodiraju. Dok se to ne desi, svi markeri privremeno stoje na istoj proceni centra grada (linije se i dalje iscrtavaju, samo skupljene u jednu tačku) — to nije greška, samo čeka geokodiranje.
+
 ## PWA
 
 Sajt ima `manifest.json` i osnovni `sw.js` (network-first keš), tako da se može instalirati na telefon ("Add to Home Screen"). Ikonice aplikacije (za instalaciju/favicon) su u `assets/icons/`.
