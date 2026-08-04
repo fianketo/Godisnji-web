@@ -56,9 +56,24 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => moveIndicatorTo(activeLink));
   }
 
-  // Hero video (Početna) — malo sporije od realnog vremena, radi mirnijeg utiska
+  // Hero video (Početna) — malo sporije od realnog vremena, radi mirnijeg utiska.
+  // Neki mobilni browseri odbiju autoplay atribut, pa probamo i ručni play();
+  // ako i to padne (npr. stroža politika browsera), pokrenemo na prvi dodir/klik.
   const heroVideo = document.querySelector('.hero-video-frame video');
-  if (heroVideo) heroVideo.playbackRate = 0.75;
+  if (heroVideo) {
+    heroVideo.muted = true;
+    heroVideo.playbackRate = 0.75;
+    const tryPlay = () => heroVideo.play().catch(() => {});
+    tryPlay();
+    heroVideo.addEventListener('loadedmetadata', () => { heroVideo.playbackRate = 0.75; tryPlay(); });
+    const resumeOnInteraction = () => {
+      tryPlay();
+      window.removeEventListener('touchstart', resumeOnInteraction);
+      window.removeEventListener('click', resumeOnInteraction);
+    };
+    window.addEventListener('touchstart', resumeOnInteraction, { once: true, passive: true });
+    window.addEventListener('click', resumeOnInteraction, { once: true });
+  }
 });
 
 if ('serviceWorker' in navigator) {

@@ -379,14 +379,22 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   position: relative;
   max-width: 340px;
   margin: 0 auto;
-  aspect-ratio: 9 / 16;
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--color-border);
   background: var(--color-bg-alt);
 }
+/* Padding-top trik za 9:16 umesto aspect-ratio — neki mobilni browseri
+   nemaju podršku za aspect-ratio, pa bi se okvir bez ovoga sveo na 0 visine. */
+.hero-video-frame::before {
+  content: '';
+  display: block;
+  padding-top: 177.78%;
+}
 .hero-video-frame video {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
