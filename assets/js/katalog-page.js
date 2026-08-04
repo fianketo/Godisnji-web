@@ -117,7 +117,7 @@
       <input type="checkbox" data-id="${test.id}" ${checked}>
       <span class="test-name"><strong>${test.name}</strong><span>${test.category}${instrument}</span>${descHtml}</span>
       <span class="test-meta">
-        <span class="test-time">⏱ ${time}</span>
+        <span class="test-time">${window.Biotest.icon('clock')} ${time}</span>
         <span class="test-price">${formatPrice(test.price)}</span>
       </span>
     </label>`;
@@ -135,8 +135,8 @@
       <span class="eyebrow">${test.category}</span>
       <h2>${test.name}</h2>
       <div class="test-meta-row">
-        <span>⏱ ${test.time || 'po dogovoru'}</span>
-        ${instrument ? `<span>🔬 ${instrument}</span>` : ''}
+        <span>${window.Biotest.icon('clock')} ${test.time || 'po dogovoru'}</span>
+        ${instrument ? `<span>${window.Biotest.icon('microscope')} ${instrument}</span>` : ''}
       </div>
       ${prepHtml}
       <h3>O ovoj analizi</h3>
@@ -146,7 +146,7 @@
     detailDrawerFooter.innerHTML = `
       <span class="test-price">${formatPrice(test.price)}</span>
       <button type="button" class="btn btn-primary" style="flex:1;" id="drawer-toggle-btn">
-        ${isSelected ? '✓ U kalkulatoru' : '+ Dodaj u kalkulator'}
+        ${isSelected ? `${window.Biotest.icon('check')} U kalkulatoru` : '+ Dodaj u kalkulator'}
       </button>
     `;
     document.getElementById('drawer-toggle-btn').addEventListener('click', () => {
@@ -211,10 +211,10 @@
         <div class="calc-item">
           <div class="calc-item-top">
             <span>${t.name}</span>
-            <button type="button" aria-label="Ukloni ${t.name}" data-remove="${t.id}">✕</button>
+            <button type="button" aria-label="Ukloni ${t.name}" data-remove="${t.id}">${window.Biotest.icon('x')}</button>
           </div>
           <div class="calc-item-meta">
-            <span class="calc-item-time">⏱ ${t.time || 'po dogovoru'}</span>
+            <span class="calc-item-time">${window.Biotest.icon('clock')} ${t.time || 'po dogovoru'}</span>
             <span class="calc-item-price">${formatPrice(t.price)}</span>
           </div>
         </div>`).join('');
@@ -226,7 +226,7 @@
         return `
         <div class="calc-item calc-fee-item">
           <div class="calc-item-top">
-            <span>🩹 ${fee.label} <span class="field-hint">(uzorkovanje)</span></span>
+            <span>${window.Biotest.icon('bandage')} ${fee.label} <span class="field-hint">(uzorkovanje)</span></span>
           </div>
           <div class="calc-item-meta">
             <span class="calc-item-time">jednokratno</span>
@@ -328,6 +328,6 @@
     renderList();
     renderCalc();
   }).catch((err) => {
-    listEl.innerHTML = `<div class="empty-state"><p>⚠️ Greška pri učitavanju kataloga: ${err.message}</p></div>`;
+    listEl.innerHTML = `<div class="empty-state"><p>${window.Biotest.icon('alert-triangle')} Greška pri učitavanju kataloga: ${err.message}</p></div>`;
   });
 })();

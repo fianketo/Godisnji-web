@@ -21,7 +21,7 @@ function blogCardHtml(post, opts) {
   const linkBase = options.linkBase || 'clanak.html';
   return `<article class="tip-card">
     <a href="${linkBase}?slug=${encodeURIComponent(post.slug)}" style="display:block;">
-      <div class="tip-banner tip-banner--${post.banner}">${post.emoji}</div>
+      <div class="tip-banner tip-banner--${post.banner}">${window.Biotest.icon(post.icon)}</div>
     </a>
     <div class="tip-card-body">
       <span class="eyebrow">${post.category}</span>

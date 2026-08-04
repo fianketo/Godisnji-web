@@ -22,7 +22,7 @@
     const bodyHtml = post.body.map((p) => `<p>${p}</p>`).join('');
 
     container.innerHTML = `
-      <div class="tip-banner tip-banner--${post.banner}" style="height:220px; border-radius: var(--radius-lg); font-size: 4.5rem;">${post.emoji}</div>
+      <div class="tip-banner tip-banner--${post.banner} tip-banner--article">${window.Biotest.icon(post.icon)}</div>
       <div style="margin-top: 24px;">
         <span class="eyebrow">${post.category}</span>
         <h1 style="margin-top:10px;">${post.title}</h1>
@@ -54,7 +54,7 @@
     renderArticle(post);
     renderRelated(posts, post);
   }).catch((err) => {
-    container.innerHTML = `<div class="empty-state"><p>⚠️ Greška pri učitavanju: ${err.message}</p></div>`;
+    container.innerHTML = `<div class="empty-state"><p>${window.Biotest.icon('alert-triangle')} Greška pri učitavanju: ${err.message}</p></div>`;
     relatedSection.style.display = 'none';
   });
 })();

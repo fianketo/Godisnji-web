@@ -29,14 +29,14 @@
 
   const pinIcon = L.divIcon({
     className: 'biotest-marker-wrap',
-    html: '<div class="biotest-marker-pin"><span>🧪</span></div>',
+    html: `<div class="biotest-marker-pin">${window.Biotest.icon('flask')}</div>`,
     iconSize: [34, 44],
     iconAnchor: [17, 42],
     popupAnchor: [0, -38],
   });
   const pinIconNearest = L.divIcon({
     className: 'biotest-marker-wrap',
-    html: '<div class="biotest-marker-pin biotest-marker-pin--nearest"><span>📍</span></div>',
+    html: `<div class="biotest-marker-pin biotest-marker-pin--nearest">${window.Biotest.icon('map-pin')}</div>`,
     iconSize: [40, 50],
     iconAnchor: [20, 48],
     popupAnchor: [0, -44],
@@ -95,7 +95,7 @@
   function cardHtml(loc) {
     const open = isOpenNow(loc.hours);
     const statusBadge = open
-      ? '<span class="badge badge-success">🟢 Otvoreno</span>'
+      ? '<span class="badge badge-success"><span class="status-dot"></span> Otvoreno</span>'
       : '<span class="badge badge-accent">Zatvoreno</span>';
     return `<div class="locator-item" id="location-card-${loc.id}" data-loc="${loc.id}" data-search="${(loc.name + ' ' + loc.address + ' ' + loc.city).toLowerCase()}" data-city="${loc.city}" role="button" tabindex="0">
       <div class="locator-item-head">
@@ -103,7 +103,7 @@
         ${statusBadge}
       </div>
       <address>${loc.address}</address>
-      <div class="locator-item-phone">📞 ${phoneHtml(loc.phones)}</div>
+      <div class="locator-item-phone">${window.Biotest.icon('phone')} ${phoneHtml(loc.phones)}</div>
       <span class="locator-item-link">Pogledaj na mapi →</span>
     </div>`;
   }
@@ -125,7 +125,7 @@
       card.classList.add('is-nearest');
       const badge = document.createElement('span');
       badge.className = 'badge badge-accent nearest-badge';
-      badge.textContent = '📍 Najbliža vama';
+      badge.innerHTML = `${window.Biotest.icon('map-pin')} Najbliža vama`;
       card.querySelector('.locator-item-head').appendChild(badge);
     }
   }
@@ -189,7 +189,7 @@
         const cached = localStorage.getItem(cacheKey(loc));
         const startCoords = cached ? JSON.parse(cached) : (CITY_FALLBACK_COORDS[loc.city] || CITY_FALLBACK_COORDS['Novi Sad']);
         const marker = L.marker(startCoords, { icon: pinIcon }).addTo(map)
-          .bindPopup(`<div class="map-popup"><strong>${loc.name}</strong><br>${loc.address}<br><a class="map-popup-call" href="${telHref(loc.phones[0])}">📞 Pozovi</a></div>`);
+          .bindPopup(`<div class="map-popup"><strong>${loc.name}</strong><br>${loc.address}<br><a class="map-popup-call" href="${telHref(loc.phones[0])}">${window.Biotest.icon('phone')} Pozovi</a></div>`);
         loc.marker = marker;
         markers.push(marker);
         if (loc.city === FOCUS_CITY) focusMarkers.push(marker);
@@ -258,7 +258,7 @@
       }
     })
     .catch(() => {
-      listEl.innerHTML = '<div class="locator-empty">⚠️ Greška pri učitavanju lokacija.</div>';
+      listEl.innerHTML = `<div class="locator-empty">${window.Biotest.icon('alert-triangle')} Greška pri učitavanju lokacija.</div>`;
       map.setView(CITY_FALLBACK_COORDS['Novi Sad'], 13);
     });
 })();

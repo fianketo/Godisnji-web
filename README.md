@@ -17,7 +17,7 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 - `clanak.html` — Pojedinačni blog članak, učitava se preko `?slug=` iz URL-a
 - `o-nama.html` — O laboratoriji + kontakt forma (mailto)
 - `assets/css/style.css` — jedan CSS fajl, ceo dizajn sistem (boje, tipografija, komponente)
-- `assets/js/` — `main.js` (navigacija, service worker), `catalog.js` (učitavanje JSON-a), `discount.js` (popust kodovi), i po jedan fajl za logiku svake stranice
+- `assets/js/` — `main.js` (navigacija, service worker), `icons.js` (set ikonica), `catalog.js` (učitavanje JSON-a), `discount.js` (popust kodovi), i po jedan fajl za logiku svake stranice
 - `data/biotest-analize.json` — katalog analiza (26 kategorija, ~940 analiza), učitava se kao statički JSON
 - `data/test-descriptions.json` — kratki i dugi opisi za deo analiza (koristi ih katalog)
 - `data/blog-posts.json` — blog objave, učitava se kao statički JSON
@@ -80,7 +80,7 @@ Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije
   "title": "Naslov objave",
   "category": "Kategorija za značku",
   "banner": "teal",
-  "emoji": "🩸",
+  "icon": "droplet",
   "date": "2026-08-01",
   "excerpt": "Kratak opis za karticu na listi (1-2 rečenice).",
   "catalogQuery": "reč za pretragu u katalogu (dugme 'Pronađi u katalogu')",
@@ -90,7 +90,7 @@ Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije
 }
 ```
 
-`banner` bira boju bannera — dostupne vrednosti: `gold`, `teal`, `rose`, `deep`, `slate`, `coral` (definisane u `assets/css/style.css` pod `.tip-banner--*`). `slug` mora biti jedinstven — koristi se u URL-u `clanak.html?slug=...`.
+`banner` bira boju bannera — dostupne vrednosti: `gold`, `teal`, `rose`, `deep`, `slate`, `coral` (definisane u `assets/css/style.css` pod `.tip-banner--*`). `icon` je naziv ikonice iz `assets/js/icons.js` (vidi sekciju "Ikonice" ispod) — ako dodaš temu za koju postojeće ikonice ne odgovaraju, prvo dodaj novu u `icons.js`. `slug` mora biti jedinstven — koristi se u URL-u `clanak.html?slug=...`.
 
 **Važna napomena o autorskim pravima:** tekst objava treba da bude originalan (napisan svojim rečima), čak i kada se koristi kao inspiracija strani članak — direktno kopiranje/prevod tuđeg teksta krši autorska prava. `sourceLabel`/`sourceUrl` služe da se navede opšti izvor informacija (kao referenca), ne da se citira ili prepiše ceo tekst.
 
@@ -130,7 +130,17 @@ Pošto tačne GPS koordinate nisu bile dostupne prilikom izrade, `assets/js/loka
 
 ## PWA
 
-Sajt ima `manifest.json` i osnovni `sw.js` (network-first keš), tako da se može instalirati na telefon ("Add to Home Screen"). Ikonice su u `assets/icons/`.
+Sajt ima `manifest.json` i osnovni `sw.js` (network-first keš), tako da se može instalirati na telefon ("Add to Home Screen"). Ikonice aplikacije (za instalaciju/favicon) su u `assets/icons/`.
+
+## Ikonice u sadržaju sajta
+
+Umesto emoji znakova, sajt koristi [Tabler Icons](https://tabler.io/icons) (MIT licenca) — samostalno hostovane kao inline SVG, bez spoljnog fonta ili mreže. Set ikonica koje se trenutno koriste (imena i putanje) definisan je u `assets/js/icons.js`, kao običan JS objekat; `window.Biotest.icon('flask')` vraća gotov `<svg>` string.
+
+- **Na statičnim HTML stranicama** ikonica je zalepljena direktno kao `<svg class="icon" ...>` (isti format koji `icon()` generiše) — to je čist HTML/CSS, nema JS zavisnost za prikaz.
+- **U JS-generisanom sadržaju** (kartice, kalkulator, mapa, popup...) koristi se `window.Biotest.icon('ime-ikonice')`, pa `assets/js/icons.js` mora biti učitan pre svih ostalih skripti (već je tako podešeno na svim stranicama, odmah pre `main.js`).
+- Ikonica nasleđuje boju teksta iz okolnog elementa (`stroke="currentColor"`), i podrazumevano je veličine `1em` (prati `font-size` roditelja) — u `style.css` postoje precizniji overrides za specifična mesta (`.icon-badge .icon`, `.brand-mark .icon`, `.tip-banner .icon`, itd.).
+
+Da dodaš novu ikonicu koja trenutno nije u setu: preuzmi `outline` varijantu SVG-a sa [tabler.io/icons](https://tabler.io/icons) (ili iz `@tabler/icons` npm paketa), izvuci sadržaj `<path>` elemenata (bez nevidljivog "frame" path-a koji Tabler dodaje) i dodaj novi red u `ICON_PATHS` objektu u `icons.js`.
 
 ## Pokretanje lokalno
 
