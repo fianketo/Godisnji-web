@@ -43,6 +43,7 @@
   let descriptions = {};
   let selected = new Map(); // id -> test
   let appliedDiscount = false;
+  let expandedCategories = new Set(); // ručno otvorene kategorije (dok nema pretrage/filtera)
 
   function renderCategoryOptions(categories) {
     for (const cat of categories) {
@@ -80,10 +81,20 @@
       byCategory.get(test.category).push(test);
     }
 
+    // Dok korisnik pretražuje ili je izabrao konkretnu kategoriju, rezultati se
+    // odmah pokazuju otvoreni — ručno otvaranje/zatvaranje važi samo za
+    // "prolistavanje" bez filtera (svih ~26 kategorija odjednom).
+    const forceOpen = Boolean(term) || Boolean(category);
+
     const html = [];
-    for (const [category, tests] of byCategory) {
-      html.push(`<div class="category-block">
-        <div class="category-title">${category} <span class="category-count">${tests.length}</span></div>
+    for (const [cat, tests] of byCategory) {
+      const isOpen = forceOpen || expandedCategories.has(cat);
+      html.push(`<div class="category-block${isOpen ? ' is-open' : ''}">
+        <button type="button" class="category-title" data-toggle-category="${cat}" aria-expanded="${isOpen}">
+          <span>${cat}</span>
+          <span class="category-count">${tests.length}</span>
+          ${window.Biotest.icon('chevron-down', { class: 'category-chevron' })}
+        </button>
         <div class="test-list">
           ${tests.map(rowHtml).join('')}
         </div>
@@ -91,6 +102,14 @@
     }
     listEl.innerHTML = html.join('');
 
+    listEl.querySelectorAll('[data-toggle-category]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cat = btn.getAttribute('data-toggle-category');
+        if (expandedCategories.has(cat)) expandedCategories.delete(cat);
+        else expandedCategories.add(cat);
+        renderList();
+      });
+    });
     listEl.querySelectorAll('input[type="checkbox"][data-id]').forEach((cb) => {
       cb.addEventListener('change', onCheckboxChange);
     });
@@ -107,7 +126,6 @@
   function rowHtml(test) {
     const checked = selected.has(test.id) ? 'checked' : '';
     const rowChecked = selected.has(test.id) ? ' checked' : '';
-    const instrument = test.instrument ? `<span> · ${test.instrument}</span>` : '';
     const time = test.time || 'po dogovoru';
     const desc = descriptions[test.name];
     const descHtml = desc
@@ -115,7 +133,7 @@
       : '';
     return `<label class="test-row${rowChecked}" data-row-id="${test.id}">
       <input type="checkbox" data-id="${test.id}" ${checked}>
-      <span class="test-name"><strong>${test.name}</strong><span>${test.category}${instrument}</span>${descHtml}</span>
+      <span class="test-name"><strong>${test.displayName}</strong>${descHtml}</span>
       <span class="test-meta">
         <span class="test-time">${window.Biotest.icon('clock')} ${time}</span>
         <span class="test-price">${formatPrice(test.price)}</span>
@@ -126,17 +144,15 @@
   function openDetailDrawer(test) {
     const desc = descriptions[test.name];
     if (!desc) return;
-    const instrument = test.instrument ? test.instrument : '';
     const prepHtml = desc.prep
       ? `<div class="test-prep-box"><strong>Priprema:</strong> ${desc.prep}</div>`
       : '';
     const paragraphs = desc.long.map((p) => `<p>${p}</p>`).join('');
     detailDrawerBody.innerHTML = `
       <span class="eyebrow">${test.category}</span>
-      <h2>${test.name}</h2>
+      <h2>${test.displayName}</h2>
       <div class="test-meta-row">
         <span>${window.Biotest.icon('clock')} ${test.time || 'po dogovoru'}</span>
-        ${instrument ? `<span>${window.Biotest.icon('microscope')} ${instrument}</span>` : ''}
       </div>
       ${prepHtml}
       <h3>O ovoj analizi</h3>
@@ -210,8 +226,8 @@
       const analysisRows = items.map((t) => `
         <div class="calc-item">
           <div class="calc-item-top">
-            <span>${t.name}</span>
-            <button type="button" aria-label="Ukloni ${t.name}" data-remove="${t.id}">${window.Biotest.icon('x')}</button>
+            <span>${t.displayName}</span>
+            <button type="button" aria-label="Ukloni ${t.displayName}" data-remove="${t.id}">${window.Biotest.icon('x')}</button>
           </div>
           <div class="calc-item-meta">
             <span class="calc-item-time">${window.Biotest.icon('clock')} ${t.time || 'po dogovoru'}</span>

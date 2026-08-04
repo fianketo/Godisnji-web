@@ -38,6 +38,13 @@ function parseSampleType(name) {
   return null;
 }
 
+// Naziv u cenovniku nosi prefiks tipa uzorka (npr. "eK-KKS") — za prikaz
+// posetiocu uklanjamo taj deo, ostaje samo "KKS". Sirovi test.name i dalje
+// koristimo za parseSampleType() i pretragu.
+function stripNamePrefix(name) {
+  return name.replace(/^[A-Za-zčćžšđČĆŽŠĐ0-9/]+-/, '').trim() || name;
+}
+
 function slugify(str) {
   return str
     .toString()
@@ -63,6 +70,7 @@ async function loadCatalog() {
         id: `${slugify(category)}--${slugify(item.name)}`,
         category,
         name: item.name,
+        displayName: stripNamePrefix(item.name),
         instrument: item.instrument || '',
         time: item.time || '',
         price: item.price,

@@ -33,6 +33,10 @@ Sve analize, cene i vremena obrade nalaze se u `data/biotest-analize.json`, grup
 
 Da izmeniš cenu, vreme ili dodaš/obrišeš analizu — samo izmeni ovaj fajl (validan JSON) i osveži stranicu, ništa drugo ne treba menjati. Nekoliko naziva ima mali ostatak teksta na kraju (artefakt automatske obrade PDF cenovnika, npr. zarez ili broj) — po potrebi ih ručno ispravi direktno u ovom fajlu.
 
+Posetiocu se naziv analize prikazuje **bez prefiksa** (npr. `S-TSH` → "TSH") — `stripNamePrefix()` u `assets/js/catalog.js` to radi samo za prikaz; sirovi `name` (sa prefiksom) i dalje se koristi za `parseSampleType()`, pretragu i za ključ u `test-descriptions.json`. Polje `instrument` ostaje u podacima ali se više ne prikazuje na katalogu — klijent je tražio da se ukloni iz interfejsa.
+
+Katalog na `katalog.html` prikazuje kategorije kao "harmoniku" (accordion) — sve su podrazumevano zatvorene, klik na naziv kategorije je otvara/zatvara. Čim je aktivna pretraga ili je izabrana konkretna kategorija u padajućem meniju, pogođene kategorije se automatski otvaraju (logika u `renderList()`, `assets/js/katalog-page.js`).
+
 ## Opisi analiza (Katalog)
 
 `data/test-descriptions.json` sadrži kratke opise (šta analiza meri + duže objašnjenje) za trenutno ~50 najtraženijih analiza, ključ je tačan `name` iz `biotest-analize.json`. Analiza koja ima opis dobija u katalogu kratku rečenicu ispod naziva i dugme **"Pročitaj više"** koje otvara bočni panel (kao na primeru koji je klijent poslao) sa dužim objašnjenjem i dugmetom "Dodaj u kalkulator". Analize bez opisa u ovom fajlu i dalje rade normalno, samo bez tog dodatka — dodavanje opisa je postepeno, nije potrebno pokriti svih ~940 odjednom.
