@@ -19,9 +19,9 @@
   const citySelect = document.getElementById('loc-city-select');
 
   const map = L.map('map');
-  // Svetla, minimalna podloga (CartoDB Positron) — čistije uz zdravstveni brend
-  // nego standardna šarena OSM podloga. I dalje besplatno, bez API ključa.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  // CartoDB Voyager — moderna, u boji, ali i dalje čitljiva podloga
+  // (mekše nego standardni šareni OSM). I dalje besplatno, bez API ključa.
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> saradnici &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,

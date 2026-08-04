@@ -102,7 +102,9 @@ Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`
 
 ## Mapa (Lokacije)
 
-`lokacije.html` prikazuje **svih 6 BIOTEST lokacija** (5 u Novom Sadu + 1 u Novom Bečeju) u "store locator" rasporedu — tamna lista lokacija sa leve strane (skroluje nezavisno) i Leaflet mapa sa svetlom CartoDB Positron podlogom (besplatno, bez API ključa — samo atribucija u dnu mape) sa desne strane, oboje u jednom zaobljenom okviru. Mapa se podrazumevano fokusira na Novi Sad (5/6 lokacija); Novi Bečej ima svoj marker, dostupan klikom na karticu u listi.
+`lokacije.html` prikazuje **svih 6 BIOTEST lokacija** (5 u Novom Sadu + 1 u Novom Bečeju) u "store locator" rasporedu — tamna lista lokacija sa leve strane (skroluje nezavisno) i Leaflet mapa sa desne strane, oboje u jednom zaobljenom okviru. Podloga je CartoDB Voyager (besplatno, bez API ključa — samo atribucija u dnu mape) — u boji, ali i dalje čitljiva, umesto standardne šarene OSM podloge ili prigušene sivkaste Positron varijante koju smo prvo probali. Mapa se podrazumevano fokusira na Novi Sad (5/6 lokacija); Novi Bečej ima svoj marker, dostupan klikom na karticu u listi.
+
+Leaflet po difoltu stavlja flat sivu (`#ddd`) pozadinu direktno na kontejner mape — vidi se dok se tajlovi učitavaju ili ako neki tajl ne uspe (npr. spor internet, ad-blocker). To smo prekrili brendiranim teal→koral gradijentom (`.leaflet-container` u `style.css`), tako da mapa nikad ne "trepne" sivo, ni ovde ni na mini-mapi na početnoj.
 
 Dodatne "moderne" funkcije na ovoj stranici:
 - **Pretraga i filter po gradu** — polje za pretragu (naziv/adresa) i padajući meni za grad iznad liste, filtriraju samo listu (svi markeri ostaju na mapi).

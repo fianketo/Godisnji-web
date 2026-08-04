@@ -923,6 +923,14 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   .locations-teaser-map { min-height: 240px; }
 }
 
+/* Leaflet podrazumevano ima flat sivu (#ddd) pozadinu direktno na mapnom
+   kontejneru — vidi se dok se tajlovi učitavaju ili ako neki ne uspe da se
+   učita. Prekrivamo je brendiranim gradijentom da mapa nikad ne izgleda
+   kao "mrtva" siva kutija. */
+.leaflet-container {
+  background: linear-gradient(135deg, var(--color-primary) 0%, #17a3a0 55%, var(--color-accent) 100%);
+}
+
 /* Brendirani markeri na mapi (umesto podrazumevanih plavih Leaflet pinova) */
 .biotest-marker-wrap { background: transparent; border: none; }
 .biotest-marker-pin {
