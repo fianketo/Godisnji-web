@@ -1028,16 +1028,48 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .tip-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
 
 .tip-banner {
+  position: relative;
   height: 150px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3.2rem;
   color: #fff;
+  overflow: hidden;
 }
-.tip-banner .icon { width: 52px; height: 52px; stroke-width: 1.5; }
+.tip-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.16) 1.5px, transparent 1.5px);
+  background-size: 18px 18px;
+}
+.tip-banner::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  top: -55px;
+  right: -35px;
+}
+.tip-banner-icon {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 26px rgba(6, 30, 34, 0.16);
+}
+.tip-banner .icon { width: 32px; height: 32px; stroke-width: 1.5; }
 .tip-banner--article { height: 220px; border-radius: var(--radius-lg); }
-.tip-banner--article .icon { width: 84px; height: 84px; }
+.tip-banner--article .tip-banner-icon { width: 104px; height: 104px; }
+.tip-banner--article .icon { width: 46px; height: 46px; }
 .tip-banner--gold  { background: linear-gradient(135deg, #d98f2b, #f0b84f); }
 .tip-banner--teal  { background: linear-gradient(135deg, var(--color-primary), #1fb3ad); }
 .tip-banner--rose  { background: linear-gradient(135deg, #e0768f, #f2a4b5); }

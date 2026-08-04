@@ -22,7 +22,7 @@
     const bodyHtml = post.body.map((p) => `<p>${p}</p>`).join('');
 
     container.innerHTML = `
-      <div class="tip-banner tip-banner--${post.banner} tip-banner--article">${window.Biotest.icon(post.icon)}</div>
+      <div class="tip-banner tip-banner--${post.banner} tip-banner--article"><span class="tip-banner-icon">${window.Biotest.icon(post.icon)}</span></div>
       <div style="margin-top: 24px;">
         <span class="eyebrow">${post.category}</span>
         <h1 style="margin-top:10px;">${post.title}</h1>
