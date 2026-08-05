@@ -2,7 +2,7 @@
 // pronalazi post po ?slug= iz URL-a i renderuje ga).
 
 (function () {
-  const { loadBlogPosts, formatBlogDate, blogCardHtml } = window.Biotest;
+  const { loadBlogPosts, formatBlogDate, blogCardHtml, blogBannerHtml } = window.Biotest;
   const container = document.getElementById('article-content');
   const relatedGrid = document.getElementById('related-grid');
   const relatedSection = document.getElementById('related-section');
@@ -19,10 +19,23 @@
   function renderArticle(post) {
     document.title = `${post.title} — BIOTEST blog`;
 
-    const bodyHtml = post.body.map((p) => `<p>${p}</p>`).join('');
+    const inlineByParagraph = {};
+    (post.inlineImages || []).forEach((img) => {
+      inlineByParagraph[img.afterParagraph] = img;
+    });
+
+    const bodyHtml = post.body
+      .map((p, i) => {
+        const img = inlineByParagraph[i];
+        const imgHtml = img
+          ? `<figure class="article-inline-image"><img src="${img.src}" alt="${img.alt || ''}" loading="lazy">${img.caption ? `<figcaption>${img.caption}</figcaption>` : ''}</figure>`
+          : '';
+        return `<p>${p}</p>${imgHtml}`;
+      })
+      .join('');
 
     container.innerHTML = `
-      <div class="tip-banner tip-banner--${post.banner} tip-banner--article"><span class="tip-banner-icon">${window.Biotest.icon(post.icon)}</span></div>
+      ${blogBannerHtml(post, 'tip-banner--article')}
       <div style="margin-top: 24px;">
         <span class="eyebrow">${post.category}</span>
         <h1 style="margin-top:10px;">${post.title}</h1>

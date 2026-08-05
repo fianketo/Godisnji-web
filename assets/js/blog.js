@@ -16,12 +16,20 @@ function formatBlogDate(isoDate) {
   return `${d}. ${MONTHS_SR[m - 1]} ${y}.`;
 }
 
+function blogBannerHtml(post, extraClass) {
+  const cls = ['tip-banner', `tip-banner--${post.banner}`].concat(extraClass ? [extraClass] : []).join(' ');
+  if (post.image) {
+    return `<div class="${cls} has-photo"><img class="tip-banner-photo" src="${post.image}" alt="" loading="lazy"></div>`;
+  }
+  return `<div class="${cls}"><span class="tip-banner-icon">${window.Biotest.icon(post.icon)}</span></div>`;
+}
+
 function blogCardHtml(post, opts) {
   const options = opts || {};
   const linkBase = options.linkBase || 'clanak.html';
   return `<article class="tip-card">
     <a href="${linkBase}?slug=${encodeURIComponent(post.slug)}" style="display:block;">
-      <div class="tip-banner tip-banner--${post.banner}"><span class="tip-banner-icon">${window.Biotest.icon(post.icon)}</span></div>
+      ${blogBannerHtml(post)}
     </a>
     <div class="tip-card-body">
       <span class="eyebrow">${post.category}</span>
@@ -37,3 +45,4 @@ window.Biotest = window.Biotest || {};
 window.Biotest.loadBlogPosts = loadBlogPosts;
 window.Biotest.formatBlogDate = formatBlogDate;
 window.Biotest.blogCardHtml = blogCardHtml;
+window.Biotest.blogBannerHtml = blogBannerHtml;
