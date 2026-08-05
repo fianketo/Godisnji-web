@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — BIOTEST</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3l6 0" /> <path d="M10 9l4 0" /> <path d="M10 3v6l-4 11a.7 .7 0 0 0 .5 1h11a.7 .7 0 0 0 .5 -1l-4 -11v-6" /></svg></span>
+      <span>BIOTEST<span class="brand-sub">Admin</span></span>
+    </a>
+    <div class="nav-cta">
+      <button type="button" id="logout-btn" class="btn btn-outline btn-sm" style="display:none;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" /> <path d="M9 12h12l-3 -3" /> <path d="M18 15l3 -3" /></svg> Odjava</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section">
+    <div class="container">
+
+      <div id="config-warning" class="card" style="display:none; border-color: var(--color-accent);">
+        <p style="margin:0;"><strong>Firebase nije podešen.</strong> Popuni <code>assets/js/firebase-config.js</code> sa podacima svog Firebase projekta da bi admin panel radio. Vidi README, sekcija "Promocije — Firebase podešavanje".</p>
+      </div>
+
+      <div id="login-screen" class="admin-login-wrap">
+        <div class="card admin-login-card">
+          <h1>Prijava</h1>
+          <p class="field-hint">Pristup je ograničen na osoblje BIOTEST laboratorije.</p>
+          <form id="login-form">
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required autocomplete="username">
+            </div>
+            <div class="field">
+              <label for="login-password">Lozinka</label>
+              <input type="password" id="login-password" required autocomplete="current-password">
+            </div>
+            <p id="login-error" class="field-hint" style="display:none; color: var(--color-accent-dark);"></p>
+            <button class="btn btn-accent btn-block" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /> <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /> <path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg> Prijavi se</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="admin-screen" style="display:none;">
+        <div class="admin-tabs">
+          <button type="button" class="admin-tab is-active" data-panel="panel-promotions">Promocije</button>
+          <button type="button" class="admin-tab" data-panel="panel-codes">Provera koda</button>
+        </div>
+
+        <div id="panel-promotions" class="admin-panel is-active">
+          <div class="admin-panel-header">
+            <h2>Promocije</h2>
+            <button type="button" id="promo-add-btn" class="btn btn-accent btn-sm">+ Nova promocija</button>
+          </div>
+
+          <div id="promo-form-card" class="card" style="display:none;">
+            <h3 id="promo-form-title" class="mt-0">Nova promocija</h3>
+            <form id="promo-form">
+              <input type="hidden" id="promo-id">
+              <div class="field">
+                <label for="promo-name">Naziv</label>
+                <input type="text" id="promo-name" required placeholder="npr. Kompletna krvna slika">
+              </div>
+              <div class="admin-form-row">
+                <div class="field">
+                  <label for="promo-old-price">Stara cena (RSD)</label>
+                  <input type="number" id="promo-old-price" required min="0" step="1">
+                </div>
+                <div class="field">
+                  <label for="promo-new-price">Nova cena (RSD)</label>
+                  <input type="number" id="promo-new-price" required min="0" step="1">
+                </div>
+              </div>
+              <div class="admin-form-row">
+                <div class="field">
+                  <label for="promo-icon">Ikonica (ako nema slike)</label>
+                  <select id="promo-icon"></select>
+                </div>
+                <div class="field">
+                  <label for="promo-banner">Boja pozadine</label>
+                  <select id="promo-banner"></select>
+                </div>
+              </div>
+              <div class="field">
+                <label for="promo-image">URL slike (opciono)</label>
+                <input type="url" id="promo-image" placeholder="https://...">
+              </div>
+              <div class="admin-form-actions">
+                <button type="button" id="promo-form-cancel" class="btn btn-ghost">Otkaži</button>
+                <button type="submit" class="btn btn-accent">Sačuvaj</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="promo-admin-list" class="admin-promo-list"></div>
+        </div>
+
+        <div id="panel-codes" class="admin-panel">
+          <h2>Provera i otkazivanje koda</h2>
+          <form id="code-lookup-form" class="admin-code-form">
+            <input type="text" id="code-lookup-input" placeholder="npr. BIO-050826-7F2A9K" required>
+            <button type="submit" class="btn btn-accent"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /> <path d="M21 21l-6 -6" /></svg> Pretraži</button>
+          </form>
+          <div id="code-lookup-result"></div>
+
+          <h3 style="margin-top: 40px;">Poslednje porudžbine</h3>
+          <div id="recent-orders-list" class="admin-recent-list"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script src="assets/js/icons.js"></script>
+<script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

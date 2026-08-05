@@ -102,7 +102,54 @@ Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije
 
 Kod koji posetilac dobija na `popusti.html` je **sam sebi dovoljan za proveru** — sadrži 6 nasumičnih cifara i 2-cifreni kontrolni broj izračunat iz njih (`assets/js/discount.js`). Kalkulator proverava kod istim izračunom, pa nije potrebna nikakva baza ili server da bi se utvrdilo da li je kod validno izdat sa ovog sajta. Trenutno svaki validan kod nosi fiksni popust od 10% (`DISCOUNT_PERCENT` u `discount.js`).
 
-Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`, ključ `biotest_discount_leads`) — to je samo lokalna beleška tog uređaja, laboratorija ih trenutno ne prima centralno. Ako ti zatreba da svi preuzeti kodovi/kontakti stignu na jedno mesto (npr. za praćenje ili marketing), najlakša opcija je **Firebase Firestore na besplatnom Spark planu** (isti pristup kao u `legacy-odmorpro` aplikaciji) — javi ako ti to zatreba, dodaje se bez menjanja postojeće logike provere koda.
+Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`, ključ `biotest_discount_leads`) — to je samo lokalna beleška tog uređaja, laboratorija ih trenutno ne prima centralno.
+
+Napomena: ovaj sistem (fiksnih 10%, samoprovera bez baze) je i dalje aktivan **samo u kalkulatoru na `katalog.html`**. Za pojedinačne promocije po analizi (kartice, korpa, jednokratan kod koji se može otkazati) koristi se odvojen, noviji sistem — vidi sekciju ispod.
+
+## Promocije — katalog kao Temu (`popusti.html`) + admin panel
+
+`popusti.html` je prodavnica promocija u stilu Temu-a: kartice sa slikom/ikonicom, starom precrtanom cenom i novom cenom, dugme "Dodaj u korpu", korpa sa desne strane sa količinama i ukupnim iznosom. Posetilac unese ime (i opciono telefon) i dobija **jednokratan kod sa datumom** (npr. `BIO-050826-7F2A9K`) koji se prikazuje preko celog ekrana — napravi se screenshot i pokaže na šalteru. Nema slanja emaila — sve je dizajnirano da radi kroz sam ekran.
+
+Da bi kod zaista mogao da se iskoristi **samo jednom** (a ne da se isti screenshot pokaže dvaput), status "iskorišćen" se čuva centralno u bazi (ne samo lokalno na telefonu posetioca) — za to je potreban **Firebase** (besplatan Spark plan pokriva ovu potrebu bez ostatka). Isto važi i za same promocije (cene, nazivi) — da bi mogle da se menjaju bez ponovnog postavljanja sajta, moraju biti u bazi, ne u JSON fajlu koji se deploy-uje sa kodom.
+
+### Šta je već napravljeno
+
+- **`popusti.html` + `assets/js/popusti-page.js`** — javna prodavnica (kartice, korpa, kod na ekranu). Kod se generiše u `assets/js/promo-store.js` (`generateOrderCode()`), format `BIO-DDMMGG-XXXXXX` — datum je čitljiv golim okom, a osoblje dodatno vidi tačan datum/vreme izdavanja kad kod pretraži u adminu.
+- **`admin.html` + `assets/js/admin.js`** — zaštićen prijavom (Firebase Auth, email/lozinka):
+  - tab **Promocije** — dodavanje/izmena/brisanje/deaktivacija promocija (naziv, stara/nova cena, ikonica ili URL slike, boja pozadine);
+  - tab **Provera koda** — unese se kod (ili klikne iz liste poslednjih porudžbina), vidi se šta je poručeno i po kojoj ceni, dugme **"Označi kao iskorišćen"** — nakon toga kod trajno prestaje da važi, čak i ako ga posetilac ponovo pokaže.
+- `admin.html` **nije povezan iz javne navigacije** i ima `<meta name="robots" content="noindex, nofollow">` — pristupa mu se direktno preko URL-a (`tvoj-sajt.rs/admin.html`).
+
+### Firebase podešavanje (obavezno da bi ovo proradilo)
+
+1. Idi na [console.firebase.google.com](https://console.firebase.google.com) → **Add project** → prati korake (besplatno, bez kartice na Spark planu).
+2. U projektu: **Build → Firestore Database → Create database** → izaberi region (npr. `eur3`) → **Start in production mode**.
+3. **Build → Authentication → Get started → Sign-in method → Email/Password → Enable.**
+4. **Authentication → Users → Add user** — unesi email/lozinku koju će osoblje koristiti za prijavu na `admin.html`.
+5. **Project settings (zupčanik) → General → Your apps → Add app → Web (`</>`)** — registruj app (nije potreban Hosting, samo se uzima config). Kopiraj `firebaseConfig` objekat.
+6. Zalepi te vrednosti u `assets/js/firebase-config.js` (zameni `'TODO'` placeholdere). Ovi podaci nisu tajni — bezbednost obezbeđuju pravila ispod, ne tajnost config-a.
+7. **Firestore Database → Rules** — zameni sadržaj sa:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /promotions/{promoId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update: if request.auth != null;
+      allow delete: if false;
+    }
+  }
+}
+```
+
+Ovo znači: svako može da vidi promocije i da napravi porudžbinu (kreira svoj kod), ali samo prijavljeno osoblje (iz koraka 4) može da menja promocije, čita/pretražuje porudžbine i označava kod kao iskorišćen. Niko (ni prijavljen) ne može da briše porudžbine iz browsera — to čuva istoriju.
+
+Dok `firebase-config.js` ima `'TODO'` vrednosti, `popusti.html` i `admin.html` prikazuju jasnu poruku da Firebase nije podešen, umesto da nešto tiho ne radi.
 
 ## Mapa (Lokacije)
 

@@ -1194,3 +1194,184 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   padding: 10px 16px; border-radius: 0 0 8px 0; z-index: 1000;
 }
 .skip-link:focus { left: 0; }
+.text-danger { color: var(--color-accent-dark) !important; }
+
+/* ---------- Promocije — katalog kao Temu (kartice + korpa) ---------- */
+.promo-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .promo-layout { grid-template-columns: 1fr; }
+}
+
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 900px) {
+  .promo-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .promo-grid { grid-template-columns: 1fr; }
+}
+
+.promo-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.promo-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+.promo-card-media { position: relative; height: 150px; }
+.promo-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.promo-card-icon {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+}
+.promo-card-icon .icon { width: 42px; height: 42px; }
+.promo-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.promo-card-body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.promo-card-body h3 { margin: 0; font-size: 1rem; }
+.promo-card-prices { display: flex; align-items: baseline; gap: 10px; }
+.price-old { color: var(--color-text-faint); text-decoration: line-through; font-size: 0.88rem; }
+.price-new { color: var(--color-primary-dark); font-weight: 800; font-size: 1.15rem; }
+
+.promo-card-qty, .cart-item-qty {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-pill);
+  padding: 6px 10px;
+}
+.qty-btn {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  background: #fff;
+  color: var(--color-primary-dark);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.qty-btn:hover { background: var(--color-primary-soft); }
+.qty-btn .icon { width: 14px; height: 14px; }
+
+/* Korpa — jedan nivo sticky (ne ugnježdavati position:sticky, videti napomenu u kalkulatoru) */
+.cart-panel {
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.cart-header h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 1.05rem; }
+.cart-count-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  background: var(--color-accent); color: #fff;
+  font-size: 0.72rem; font-weight: 700; border-radius: var(--radius-pill);
+}
+.cart-empty { color: var(--color-text-faint); font-size: 0.9rem; }
+.cart-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+.cart-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+}
+.cart-item-name { min-width: 0; }
+.cart-item-price { font-weight: 700; white-space: nowrap; }
+.cart-item-remove {
+  border: none; background: none; color: var(--color-text-faint); cursor: pointer;
+  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
+}
+.cart-item-remove:hover { color: var(--color-accent-dark); }
+.cart-item-remove .icon { width: 16px; height: 16px; }
+
+.cart-totals { border-top: 1px solid var(--color-border); padding-top: 12px; margin-bottom: 14px; }
+.cart-totals-row { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 3px 0; color: var(--color-text-muted); }
+.cart-totals-save span:last-child { color: var(--color-success); font-weight: 600; }
+.cart-totals-final { font-size: 1rem; font-weight: 800; color: var(--color-text); padding-top: 6px; }
+
+.checkout-card { max-width: 480px; margin: 32px auto 0; }
+.checkout-card .btn-ghost { margin-bottom: 14px; }
+
+.code-screen { max-width: 480px; margin: 0 auto; }
+.code-screen-inner { text-align: center; }
+.code-display-lg { padding: 32px 24px; }
+.code-display-lg .code-value { font-size: 1.8rem; word-break: break-all; }
+.code-qr { margin: 14px auto 0; border-radius: 10px; background: #fff; padding: 8px; }
+.code-items-recap { list-style: none; margin: 20px 0; padding: 0; text-align: left; border-top: 1px solid var(--color-border); }
+.code-items-recap li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border); font-size: 0.92rem; }
+.code-totals-recap { display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; font-size: 0.92rem; }
+.code-totals-recap s { color: var(--color-text-faint); }
+
+/* ---------- Admin panel ---------- */
+.admin-login-wrap { display: flex; justify-content: center; padding: 40px 0; }
+.admin-login-card { max-width: 380px; width: 100%; }
+
+.admin-tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--color-border); }
+.admin-tab {
+  border: none; background: none; cursor: pointer;
+  padding: 10px 16px; font-weight: 600; color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+}
+.admin-tab.is-active { color: var(--color-primary-dark); border-bottom-color: var(--color-primary); }
+.admin-panel { display: none; }
+.admin-panel.is-active { display: block; }
+
+.admin-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.admin-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .admin-form-row { grid-template-columns: 1fr; } }
+.admin-form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.admin-promo-list { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.admin-promo-row {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+  background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 12px 16px;
+}
+.admin-promo-row.is-inactive { opacity: 0.55; }
+.admin-promo-row-info { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+.admin-promo-row-actions { display: flex; gap: 6px; }
+
+.admin-code-form { display: flex; gap: 10px; margin-bottom: 20px; }
+.admin-code-form input { flex: 1; }
+
+.admin-order-card {
+  background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 18px 20px;
+}
+.admin-order-card.is-redeemed { border-color: var(--color-accent); background: var(--color-accent-light); }
+.admin-order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-family: var(--font-heading); }
+.admin-order-flag { color: var(--color-accent-dark); font-weight: 700; margin: 0; }
+
+.admin-recent-list { display: flex; flex-direction: column; gap: 6px; }
+.admin-recent-row {
+  display: grid; grid-template-columns: 1fr auto auto; gap: 12px;
+  background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  padding: 8px 14px; font-size: 0.85rem; text-align: left; cursor: pointer;
+}
+.admin-recent-row:hover { background: var(--color-primary-soft); }
+.admin-recent-row.is-redeemed { color: var(--color-text-faint); }

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Popusti i promocije — BIOTEST</title>
-<meta name="description" content="Preuzmite jedinstveni popust kod za BIOTEST laboratoriju — bez naloga i lozinke. Ostavite ime i kontakt i kod se odmah prikazuje na ekranu.">
+<meta name="description" content="Izaberite analize na akciji, dodajte u korpu i preuzmite jedinstveni kod — bez naloga i lozinke. Kod se odmah prikazuje na ekranu.">
 <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
@@ -45,52 +45,56 @@
     <div class="container">
       <div class="section-header">
         <span class="eyebrow">Popusti i promocije</span>
-        <h1>Preuzmite svoj popust kod</h1>
-        <p>Ostavite ime i telefon ili email i odmah dobijate jedinstveni popust kod od <strong data-discount-percent>10</strong>% na sve laboratorijske analize. Bez naloga i lozinke.</p>
+        <h1>Trenutne akcije</h1>
+        <p>Izaberite analize na akciji, dodajte u korpu i preuzmite jedinstveni kod. Bez naloga i lozinke — kod se odmah prikazuje na ekranu, uslikajte ga i pokažite na šalteru.</p>
       </div>
 
-      <div class="discount-columns">
-        <div class="card">
-          <form id="discount-form">
-            <div class="field">
-              <label for="name">Ime i prezime</label>
-              <input type="text" id="name" required placeholder="npr. Marko Marković">
-            </div>
-            <div class="field">
-              <label for="contact">Telefon ili email</label>
-              <input type="text" id="contact" required placeholder="npr. 06X/XXX-XXXX ili email adresa">
-            </div>
-            <button class="btn btn-accent btn-block" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2" /> <path d="M12 8l0 13" /> <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /> <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></svg> Preuzmi popust kod</button>
-            <p class="field-hint">Kod je namenjen za ličnu upotrebu prilikom sledeće posete laboratoriji.</p>
-          </form>
+      <div class="promo-layout">
+        <div id="promo-catalog-wrap">
+          <div id="promo-grid-error" class="card text-center" style="display:none;">
+            <p style="margin:0;">Promocije trenutno nisu dostupne. Pokušajte kasnije ili nas <a href="o-nama.html">pozovite</a>.</p>
+          </div>
+          <div id="promo-grid-empty" class="card text-center" style="display:none;">
+            <p style="margin:0;">Trenutno nema aktivnih promocija. Vratite se uskoro!</p>
+          </div>
+          <div id="promo-grid" class="promo-grid"></div>
         </div>
 
-        <div>
-          <div id="code-result" style="display:none;">
-            <div class="code-display">
-              <div>Vaš popust kod</div>
-              <div class="code-value" id="code-value">BIO-000000-00</div>
-              <div><span data-discount-percent>10</span>% popusta na sve analize</div>
-            </div>
-            <p class="field-hint text-center" style="margin-top:14px;">Sačuvajte ili napravite screenshot — kod pokažite na šalteru prilikom plaćanja. Kod možete uneti i u <a href="katalog.html">kalkulator</a> da odmah vidite cenu sa popustom.</p>
+        <aside id="cart-panel" class="cart-panel">
+          <div class="cart-header">
+            <h3><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 17h-11v-14h-2" /> <path d="M6 5l14 1l-1 7h-13" /></svg> Vaša korpa <span id="cart-count" class="cart-count-badge" style="display:none;">0</span></h3>
           </div>
-          <div id="code-placeholder" style="height:100%;">
-            <div class="card text-center" style="height:100%; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-              <div class="icon-badge" style="margin: 0 auto 14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2" /> <path d="M12 8l0 13" /> <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /> <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></svg></div>
-              <p style="margin:0;">Vaš kod će se pojaviti ovde.</p>
-            </div>
+          <div id="cart-empty" class="cart-empty">
+            <p>Korpa je prazna. Dodajte analize sa akcije.</p>
           </div>
-        </div>
+          <div id="cart-items" class="cart-items" style="display:none;"></div>
+          <div id="cart-totals" class="cart-totals" style="display:none;">
+            <div class="cart-totals-row"><span>Bez popusta</span><span id="cart-total-old"></span></div>
+            <div class="cart-totals-row cart-totals-save"><span>Ušteda</span><span id="cart-total-save"></span></div>
+            <div class="cart-totals-row cart-totals-final"><span>Za plaćanje</span><span id="cart-total-new"></span></div>
+          </div>
+          <button type="button" id="checkout-btn" class="btn btn-accent btn-block" disabled>Preuzmi kod</button>
+        </aside>
       </div>
 
-      <div class="card" style="margin-top: 32px;">
-        <h3 class="mt-0">Kako se koristi popust kod?</h3>
-        <ol style="color: var(--color-text-muted); padding-left: 20px; margin:0;">
-          <li>Popunite formu iznad i dobijte svoj kod.</li>
-          <li>Otvorite <a href="katalog.html">Katalog analiza</a>, izaberite šta vam treba i unesite kod u kalkulator da vidite cenu sa popustom.</li>
-          <li>Dođite u laboratoriju i pokažite kod na šalteru prilikom plaćanja.</li>
-        </ol>
+      <div id="checkout-section" class="card checkout-card" style="display:none;">
+        <button type="button" id="checkout-back" class="btn btn-ghost btn-sm"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l14 0" /> <path d="M5 12l6 6" /> <path d="M5 12l6 -6" /></svg> Nazad na korpu</button>
+        <h3>Vaši podaci</h3>
+        <form id="checkout-form">
+          <div class="field">
+            <label for="checkout-name">Ime i prezime</label>
+            <input type="text" id="checkout-name" required placeholder="npr. Marko Marković">
+          </div>
+          <div class="field">
+            <label for="checkout-contact">Telefon (opciono)</label>
+            <input type="text" id="checkout-contact" placeholder="npr. 06X/XXX-XXXX">
+          </div>
+          <button class="btn btn-accent btn-block" type="submit">Preuzmi kod</button>
+          <p class="field-hint">Kod je jednokratan — nakon što ga osoblje očita na šalteru, prestaje da važi.</p>
+        </form>
       </div>
+
+      <div id="code-screen" class="code-screen" style="display:none;"></div>
     </div>
   </section>
 </main>
@@ -133,7 +137,6 @@
 
 <script src="assets/js/icons.js"></script>
 <script src="assets/js/main.js"></script>
-<script src="assets/js/discount.js"></script>
-<script src="assets/js/popusti-page.js"></script>
+<script type="module" src="assets/js/popusti-page.js"></script>
 </body>
 </html>
