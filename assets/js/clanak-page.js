@@ -27,15 +27,16 @@
     const bodyHtml = post.body
       .map((p, i) => {
         const img = inlineByParagraph[i];
+        const captionParts = [img && img.caption, img && img.credit ? `<span class="image-credit">${img.credit}</span>` : ''].filter(Boolean);
         const imgHtml = img
-          ? `<figure class="article-inline-image"><img src="${img.src}" alt="${img.alt || ''}" loading="lazy">${img.caption ? `<figcaption>${img.caption}</figcaption>` : ''}</figure>`
+          ? `<figure class="article-inline-image"><img src="${img.src}" alt="${img.alt || ''}" loading="lazy">${captionParts.length ? `<figcaption>${captionParts.join(' — ')}</figcaption>` : ''}</figure>`
           : '';
         return `<p>${p}</p>${imgHtml}`;
       })
       .join('');
 
     container.innerHTML = `
-      ${blogBannerHtml(post, 'tip-banner--article')}
+      ${blogBannerHtml(post, 'tip-banner--article', { showCredit: true })}
       <div style="margin-top: 24px;">
         <span class="eyebrow">${post.category}</span>
         <h1 style="margin-top:10px;">${post.title}</h1>

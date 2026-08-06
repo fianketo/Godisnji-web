@@ -1,5 +1,32 @@
 [
   {
+    "slug": "abdominalna-gojaznost-i-metabolizam",
+    "title": "Mast oko stomaka nije samo estetika: šta govori o vašem metabolizmu",
+    "category": "Ishrana i metabolizam",
+    "banner": "coral",
+    "icon": "bolt",
+    "image": "assets/img/blog/abdominalna-gojaznost.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
+    "date": "2026-08-05",
+    "excerpt": "Obim struka često govori više o zdravstvenom riziku nego broj na vagi — a inzulinska rezistencija zna da se razvija tiho, godinama pre dijabetesa.",
+    "catalogQuery": "HOMA",
+    "inlineImages": [
+      {
+        "src": "assets/img/blog/abdominalna-gojaznost-izbor-hrane.jpg",
+        "afterParagraph": 1,
+        "caption": "Svesniji izbori u ishrani su najdostupniji prvi korak — ali vredi proveriti i šta se dešava \"iznutra\", analizom.",
+        "credit": "Foto: Vecteezy.com"
+      }
+    ],
+    "body": [
+      "Mast koja se nakuplja oko stomaka (visceralna mast) razlikuje se od one ispod kože na drugim delovima tela — okružuje unutrašnje organe i metabolički je znatno aktivnija, što znači da neprestano ispušta hormone i upalne materije direktno u krvotok.",
+      "Zato obim struka često govori više o zdravstvenom riziku nego broj na vagi. Dve osobe slične telesne mase mogu imati vrlo različit raspored masnog tkiva, a samim tim i vrlo različit rizik po zdravlje, čak i kad im se BMI čini sličnim.",
+      "Jedan od ranijih znakova da telo teže reaguje na šećer iz hrane jeste inzulinska rezistencija — stanje u kojem ćelije sporije primaju glukozu iz krvi, pa gušterača mora da luči sve više inzulina da bi nivo šećera ostao u granicama normale.",
+      "Dugotrajno povišen inzulin, u kombinaciji sa abdominalnom gojaznošću, povezuje se sa većim rizikom od dijabetesa tipa 2, povišenog krvnog pritiska i poremećaja masnoća u krvi — kada se ovi faktori jave zajedno, govori se o metaboličkom sindromu.",
+      "Analiza poput HOMA-IR indeksa (odnos glukoze i inzulina našte) daje jasniju sliku o tome da li je otpornost na inzulin već prisutna — često i pre nego što redovna kontrola šećera u krvi pokaže bilo kakvo odstupanje."
+    ]
+  },
+  {
     "slug": "secer-hba1c",
     "title": "Šećer u krvi i HbA1c: kako da otkrijete dijabetes pre nego što vas iznenadi",
     "category": "Metabolizam",
@@ -26,6 +53,7 @@
     "banner": "gold",
     "icon": "droplets",
     "image": "assets/img/blog/dehidracija-leti.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-07-18",
     "excerpt": "Na velikoj vrućini gubite i vodu i minerale — a umor, grčevi u mišićima i glavobolja često su prvi znak da je ravnoteža poremećena.",
     "catalogQuery": "natrijum",

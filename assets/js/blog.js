@@ -16,10 +16,17 @@ function formatBlogDate(isoDate) {
   return `${d}. ${MONTHS_SR[m - 1]} ${y}.`;
 }
 
-function blogBannerHtml(post, extraClass) {
+function blogBannerHtml(post, extraClass, opts) {
+  const options = opts || {};
   const cls = ['tip-banner', `tip-banner--${post.banner}`].concat(extraClass ? [extraClass] : []).join(' ');
   if (post.image) {
-    return `<div class="${cls} has-photo"><img class="tip-banner-photo" src="${post.image}" alt="" loading="lazy"></div>`;
+    // imageCredit se prikazuje samo na stranici članka (options.showCredit), ne na
+    // sitnim karticama liste — potrebno je za slike sa besplatnih stock sajtova
+    // (npr. Vecteezy) čiji free nivo zahteva vidljivu atribuciju.
+    const credit = options.showCredit && post.imageCredit
+      ? `<span class="tip-banner-credit">${post.imageCredit}</span>`
+      : '';
+    return `<div class="${cls} has-photo"><img class="tip-banner-photo" src="${post.image}" alt="" loading="lazy">${credit}</div>`;
   }
   return `<div class="${cls}"><span class="tip-banner-icon">${window.Biotest.icon(post.icon)}</span></div>`;
 }
