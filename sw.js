@@ -3,7 +3,7 @@
 // Screen" actually offers the install prompt instead of just a bookmark.
 // Network-first: always prefers the live deployed version and only falls
 // back to the cached shell when there's no connection at all.
-const CACHE_NAME = 'biotest-shell-v5';
+const CACHE_NAME = 'biotest-shell-v6';
 const SHELL_ASSETS = [
   './',
   './index.html',
@@ -21,6 +21,10 @@ const SHELL_ASSETS = [
   './assets/js/index-map.js',
   './assets/js/catalog.js',
   './assets/js/discount.js',
+  './assets/js/promotions.js',
+  './assets/js/promo-catalog-page.js',
+  './assets/js/firebase-config.js',
+  './assets/js/firebase-init.js',
   './assets/js/blog.js',
   './assets/icons/icon.svg',
   './assets/img/hero-video-poster.jpg',

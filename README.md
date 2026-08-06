@@ -12,12 +12,15 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 - `katalog.html` — Katalog analiza: pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
 - `lokacije.html` — Mapa svih 6 lokacija (Leaflet + OpenStreetMap) + kartice po lokaciji
 - `teren.html` — Usluge na terenu (kućne posete za vađenje krvi/brisa) — kako funkcioniše, za koga, kontakt za dogovor termina
-- `popusti.html` — Preuzimanje popust koda (ime + kontakt → jedinstveni kod na ekranu)
+- `popusti.html` — Katalog akcija (Temu-stil kartice + korpa + kod na email, vidi sekciju "Promocije, korpa i kod na email" ispod) i opšti 10% popust kod (ime + kontakt → jedinstveni kod na ekranu, bez baze)
+- `admin.html` — Admin panel za dodavanje/izmenu/brisanje akcija (iza Firebase login-a, nije u navigaciji)
+- `provera-koda.html` — Provera koda porudžbine za osoblje u laboratoriji (ručni unos ili QR skener, iza Firebase login-a, nije u navigaciji)
 - `blog.html` — Lista blog objava (kartice sa slikom-bannerom, kategorijom i kratkim opisom)
 - `clanak.html` — Pojedinačni blog članak, učitava se preko `?slug=` iz URL-a
 - `o-nama.html` — O laboratoriji + kontakt forma (mailto)
 - `assets/css/style.css` — jedan CSS fajl, ceo dizajn sistem (boje, tipografija, komponente)
-- `assets/js/` — `main.js` (navigacija, service worker), `icons.js` (set ikonica), `catalog.js` (učitavanje JSON-a), `discount.js` (popust kodovi), i po jedan fajl za logiku svake stranice
+- `assets/js/` — `main.js` (navigacija, service worker), `icons.js` (set ikonica), `catalog.js` (učitavanje JSON-a), `discount.js` (opšti popust kod), `promotions.js`/`promo-catalog-page.js` (korpa akcija), `firebase-config.js`/`firebase-init.js` (Firebase podešavanje), `admin-page.js`, `verify-page.js`, i po jedan fajl za logiku svake ostale stranice
+- `assets/vendor/firebase/`, `assets/vendor/qrcode/`, `assets/vendor/jsqr/`, `assets/vendor/emailjs/` — samostalno hostovane biblioteke (bez CDN-a), isti pristup kao `assets/vendor/leaflet/`
 - `data/biotest-analize.json` — katalog analiza (26 kategorija, ~940 analiza), učitava se kao statički JSON
 - `data/test-descriptions.json` — kratki i dugi opisi za deo analiza (koristi ih katalog)
 - `data/blog-posts.json` — blog objave, učitava se kao statički JSON
@@ -103,6 +106,69 @@ Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije
 Kod koji posetilac dobija na `popusti.html` je **sam sebi dovoljan za proveru** — sadrži 6 nasumičnih cifara i 2-cifreni kontrolni broj izračunat iz njih (`assets/js/discount.js`). Kalkulator proverava kod istim izračunom, pa nije potrebna nikakva baza ili server da bi se utvrdilo da li je kod validno izdat sa ovog sajta. Trenutno svaki validan kod nosi fiksni popust od 10% (`DISCOUNT_PERCENT` u `discount.js`).
 
 Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`, ključ `biotest_discount_leads`) — to je samo lokalna beleška tog uređaja, laboratorija ih trenutno ne prima centralno. Ako ti zatreba da svi preuzeti kodovi/kontakti stignu na jedno mesto (npr. za praćenje ili marketing), najlakša opcija je **Firebase Firestore na besplatnom Spark planu** (isti pristup kao u `legacy-odmorpro` aplikaciji) — javi ako ti to zatreba, dodaje se bez menjanja postojeće logike provere koda.
+
+## Promocije, korpa i kod na email (Firebase)
+
+Pored gornjeg opšteg 10% koda (koji ne zahteva bazu), `popusti.html` ima i **katalog akcija u stilu online prodavnice** — kartice sa slikom, starom/novom cenom, dugme "Dodaj u korpu", korpa sa ukupnom uštedom, i na kraju forma (ime + email) koja generiše **jedinstven kod porudžbine** i šalje ga na email. Osoblje u laboratoriji taj kod pronalazi na `provera-koda.html` (ručnim unosom ili skeniranjem QR koda kamerom) i vidi tačno šta je poručeno i koliki je popust. Akcije se dodaju/uređuju na `admin.html`, koji nije u glavnoj navigaciji (link mu ne stoji nigde na sajtu) — otvara se direktno preko URL-a.
+
+Sve troje (`popusti.html` korpa, `admin.html`, `provera-koda.html`) rade preko **Firebase Firestore** (baza) i **Firebase Authentication** (login za admin/osoblje), isti pristup kao stara `legacy-odmorpro` aplikacija. Dok `assets/js/firebase-config.js` ima prazne vrednosti, sve tri stranice to prepoznaju i prikazuju jasnu poruku "nije podešeno" — stari 10% kod iznad i dalje radi nezavisno od ovoga, jer njemu baza ne treba.
+
+### 1. Napravi Firebase projekat
+
+1. Idi na [console.firebase.google.com](https://console.firebase.google.com) → **Add project** → daj mu ime (npr. `biotest-akcije`) → Google Analytics nije potreban, može se isključiti.
+2. **Build → Firestore Database → Create database** → izaberi region (npr. `eur3 (europe-west)`, blizu Srbije) → počni u **production mode** (pravila podešavamo ručno u koraku 3).
+3. **Build → Authentication → Get started → Sign-in method → Email/Password** → uključi (Enable).
+4. **Project settings (zupčanik gore levo) → General → Your apps → Web (`</>`)** → daj nadimak (npr. "BIOTEST sajt") → Firebase ti daje `firebaseConfig` objekat sa `apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`. Prekopiraj te vrednosti u `assets/js/firebase-config.js` (`window.BiotestConfig.firebase`) — **i u Godisnji-web i u biotest-sajt repozitorijum**, isti fajl na oba mesta.
+
+### 2. Napravi nalog za admina/osoblje
+
+U Firebase konzoli → **Authentication → Users → Add user** → unesi email i lozinku koje će se koristiti za prijavu na `admin.html` i `provera-koda.html`. Nema javne registracije na sajtu — nalozi se prave isključivo ovde, ručno. Isti nalog radi za obe stranice; ako želiš da razdvojiš ko sme šta (npr. osoblje samo proverava kodove, ne menja akcije), to bi zahtevalo dodatna Firestore pravila po korisniku — javi ako ti ovo zatreba.
+
+### 3. Firestore pravila (sigurnost)
+
+Bez pravila, baza je ili potpuno zatvorena (ništa ne radi) ili potpuno otvorena (bilo ko sa interneta može da čita/menja sve, uključujući tuđe kodove i email adrese) — nijedno od toga ne želimo. U Firebase konzoli → **Firestore Database → Rules**, zameni sadržaj sa:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Akcije — svako može da vidi (katalog na sajtu), samo prijavljeni admin menja.
+    match /promotions/{promoId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Porudžbine — svako može da NAPRAVI porudžbinu (checkout, bez prijave),
+    // ali samo prijavljeno osoblje sme da ih ČITA i menja status (provera-koda.html).
+    // Ovo je namerno: kod nije javno pretraživ, štiti se time što se otvara samo get()
+    // po tačnom kodu (id dokumenta), ne kroz listu.
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update: if request.auth != null;
+      allow delete: if false;
+    }
+  }
+}
+```
+
+Klikni **Publish**. Ovim: katalog akcija je javno vidljiv (mora biti, da bi se prikazao na sajtu), kupovina/checkout radi bez prijave (posetilac se ne loguje), ali samo prijavljeno osoblje može da otvori bazu porudžbina i vidi tuđe kodove/email adrese/status.
+
+### 4. EmailJS (slanje email-a sa kodom)
+
+Kod se uvek čuva u bazi i prikazuje na ekranu odmah nakon porudžbine (sa QR kodom) — email je dodatna pogodnost, ne jedini način da se kod dobije. Da bi i email stvarno stizao:
+
+1. Napravi besplatan nalog na [emailjs.com](https://www.emailjs.com) (besplatan tier: ~200 email-ova mesečno).
+2. **Email Services → Add New Service** → poveži Gmail (ili drugi provajder) nalog sa kog će se slati email-ovi → zapamti **Service ID**.
+3. **Email Templates → Create New Template** → napravi template koji koristi promenljive: `{{to_name}}`, `{{to_email}}`, `{{code}}`, `{{items}}`, `{{total_old}}`, `{{total_new}}` (šalju se iz `assets/js/promo-catalog-page.js`) → u polju "To Email" template-a unesi `{{to_email}}` → zapamti **Template ID**.
+4. **Account → General → Public Key** → prekopiraj.
+5. Popuni `window.BiotestConfig.emailjs` u `assets/js/firebase-config.js` (`publicKey`, `serviceId`, `templateId`) — na oba repozitorijuma.
+
+Dok su ova polja prazna, porudžbina i dalje radi normalno (upisuje se u bazu, kod se prikazuje na ekranu) — samo se email ne šalje.
+
+### Podaci porudžbine (šta se čuva)
+
+Svaka porudžbina u `orders` kolekciji ima: `items` (lista `{id, name, oldPrice, newPrice}`), `customerName`, `customerEmail`, `totalOld`, `totalNew`, `savings`, `status` (`neiskorišćen` / `iskorišćen`), `createdAt`, i `redeemedAt` nakon što ga osoblje označi kao iskorišćen na `provera-koda.html`. Id dokumenta je sam kod (npr. `BIO-7F2A9K`), pa je pretraga po kodu direktan `get()` po id-u — brzo i bez potrebe za dodatnim indeksom.
 
 ## Mapa (Lokacije)
 

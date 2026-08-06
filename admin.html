@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Akcije — BIOTEST</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3l6 0" /> <path d="M10 9l4 0" /> <path d="M10 3v6l-4 11a.7 .7 0 0 0 .5 1h11a.7 .7 0 0 0 .5 -1l-4 -11v-6" /></svg></span>
+      <span>BIOTEST<span class="brand-sub">Admin — Akcije</span></span>
+    </a>
+    <div class="nav-cta">
+      <div id="admin-user-badge" class="admin-user-badge" style="display:none;">
+        <span id="admin-user-email"></span>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /> <path d="M3 12h13l-3 -3" /> <path d="M13 15l3 -3" /></svg> Odjava</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section section-tight">
+    <div class="container">
+
+      <div id="admin-not-configured" class="auth-not-configured" style="display:none;">
+        <div class="card">
+          <h3 class="mt-0">Firebase nije podešen</h3>
+          <p>Da bi admin panel radio, potrebno je popuniti <code>assets/js/firebase-config.js</code> sa podacima tvog Firebase projekta. Pogledaj README.md, sekcija "Promocije, korpa i kod na email".</p>
+        </div>
+      </div>
+
+      <div id="admin-login" class="auth-gate" style="display:none;">
+        <div class="card">
+          <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /> <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /> <path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg></div>
+          <h1>Admin prijava</h1>
+          <p class="field-hint">Nalog kreira administrator direktno u Firebase konzoli (Authentication → Users).</p>
+          <form id="login-form">
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required>
+            </div>
+            <div class="field">
+              <label for="login-password">Lozinka</label>
+              <input type="password" id="login-password" required>
+            </div>
+            <button class="btn btn-accent btn-block" type="submit">Prijavi se</button>
+            <p id="login-error" class="promo-status-msg err" style="display:none;"></p>
+          </form>
+        </div>
+      </div>
+
+      <div id="admin-app" style="display:none;">
+        <div class="admin-topbar">
+          <h1>Akcije</h1>
+          <button class="btn btn-outline btn-sm" id="refresh-btn" type="button">Osveži listu</button>
+        </div>
+
+        <div class="admin-layout">
+          <div class="card admin-form-card">
+            <h3 class="mt-0" id="form-title">Nova akcija</h3>
+            <form id="promo-form">
+              <input type="hidden" id="promo-id">
+              <div class="field">
+                <label for="promo-name">Naziv</label>
+                <input type="text" id="promo-name" required placeholder="npr. Kompletna krvna slika">
+              </div>
+              <div class="field">
+                <label for="promo-image">URL slike</label>
+                <input type="url" id="promo-image" placeholder="https://...">
+              </div>
+              <div class="field">
+                <label for="promo-old-price">Redovna cena (RSD)</label>
+                <input type="number" id="promo-old-price" min="0" step="1">
+              </div>
+              <div class="field">
+                <label for="promo-new-price">Akcijska cena (RSD)</label>
+                <input type="number" id="promo-new-price" min="0" step="1" required>
+              </div>
+              <div class="admin-toggle-row">
+                <input type="checkbox" id="promo-active" checked>
+                <label for="promo-active">Aktivna (vidljiva na sajtu)</label>
+              </div>
+              <button class="btn btn-accent btn-block" type="submit" id="promo-submit">Sačuvaj akciju</button>
+              <button class="btn btn-ghost btn-block" type="button" id="promo-cancel" style="display:none;">Otkaži izmenu</button>
+              <p id="promo-form-msg" class="promo-status-msg" style="display:none;"></p>
+            </form>
+          </div>
+
+          <div>
+            <div id="admin-empty" class="empty-state" style="display:none;">
+              <p>Nema unetih akcija. Dodajte prvu koristeći formu sa strane.</p>
+            </div>
+            <div id="admin-list" class="admin-list"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script src="assets/vendor/firebase/firebase-app-compat.js"></script>
+<script src="assets/vendor/firebase/firebase-auth-compat.js"></script>
+<script src="assets/vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-init.js"></script>
+<script src="assets/js/admin-page.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Popusti i promocije — BIOTEST</title>
-<meta name="description" content="Preuzmite jedinstveni popust kod za BIOTEST laboratoriju — bez naloga i lozinke. Ostavite ime i kontakt i kod se odmah prikazuje na ekranu.">
+<meta name="description" content="Trenutne akcije na laboratorijske analize — dodajte u korpu i dobijte jedinstven kod na email koji pokazujete u laboratoriji.">
 <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
@@ -45,8 +45,78 @@
     <div class="container">
       <div class="section-header">
         <span class="eyebrow">Popusti i promocije</span>
-        <h1>Preuzmite svoj popust kod</h1>
-        <p>Ostavite ime i telefon ili email i odmah dobijate jedinstveni popust kod od <strong data-discount-percent>10</strong>% na sve laboratorijske analize. Bez naloga i lozinke.</p>
+        <h1>Trenutne akcije</h1>
+        <p>Dodajte akcije koje vas zanimaju u korpu. Na kraju unesite ime i email — jedinstveni kod stiže odmah na email, pokažite ga u laboratoriji da ostvarite popust.</p>
+      </div>
+
+      <div id="promo-loading" class="empty-state"><p>Učitavanje akcija...</p></div>
+
+      <div id="promo-not-configured" class="auth-not-configured" style="display:none;">
+        <div class="card">
+          <div class="icon-badge" style="margin: 0 auto 14px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a1 1 0 0 1 1 -1h16a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1l0 -2" /> <path d="M12 8l0 13" /> <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" /> <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" /></svg></div>
+          <h3 class="mt-0">Online akcije uskoro</h3>
+          <p>Ova sekcija još uvek nije povezana sa bazom akcija. Za trenutni popust kod, pogledajte ponudu ispod.</p>
+        </div>
+      </div>
+
+      <div id="promo-empty" class="empty-state" style="display:none;">
+        <p>Trenutno nema aktivnih akcija. Vratite se uskoro!</p>
+      </div>
+
+      <div id="promo-app" class="promo-layout" style="display:none;">
+        <div id="promo-grid" class="promo-grid"></div>
+
+        <aside class="calc-panel" id="calc-panel">
+          <div class="calc-header">
+            <h3><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /> <path d="M17 17h-11v-14h-2" /> <path d="M6 5l14 1l-1 7h-13" /></svg> Vaša korpa</h3>
+            <button class="btn btn-ghost btn-sm" id="calc-close" aria-label="Zatvori korpu"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></svg></button>
+          </div>
+          <p id="calc-count" style="font-size:0.85rem; color: var(--color-text-faint); margin: 4px 0 0;">Korpa je prazna.</p>
+          <div class="calc-items" id="calc-items"></div>
+
+          <div class="calc-summary" id="calc-summary" style="display:none;">
+            <div class="calc-summary-row"><span>Bez popusta</span><span id="cart-total-old">0 RSD</span></div>
+            <div class="calc-summary-row"><span>Ušteda</span><span class="discount-value" id="cart-savings">0 RSD</span></div>
+            <div class="calc-summary-row total"><span>Za platiti</span><span id="cart-total-new">0 RSD</span></div>
+
+            <form id="checkout-form" class="promo-checkout">
+              <div class="field">
+                <label for="checkout-name">Ime i prezime</label>
+                <input type="text" id="checkout-name" required placeholder="npr. Marko Marković">
+              </div>
+              <div class="field">
+                <label for="checkout-email">Email</label>
+                <input type="email" id="checkout-email" required placeholder="vasa@email.com">
+              </div>
+              <button class="btn btn-accent btn-block" type="submit" id="checkout-submit">Pošalji porudžbinu i preuzmi kod</button>
+            </form>
+            <div id="checkout-msg" class="promo-status-msg" style="display:none;"></div>
+          </div>
+
+          <div id="checkout-success" class="promo-success" style="display:none;">
+            <div class="icon-badge" style="margin:0 auto 12px;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10" /></svg></div>
+            <h3 class="mt-0">Uspešno poslato!</h3>
+            <p>Kod je poslat na vaš email. Sačuvajte i ovaj prikaz — pokažite ga (ili email) u laboratoriji.</p>
+            <div class="promo-code-value" id="success-code">BIO-XXXXXX</div>
+            <div class="promo-qr-box" id="success-qr"></div>
+            <button type="button" class="btn btn-outline btn-block" id="new-order-btn">Nova porudžbina</button>
+          </div>
+        </aside>
+      </div>
+
+      <div class="mobile-calc-bar" id="mobile-calc-bar">
+        <span id="mobile-calc-summary">0 stavki u korpi</span>
+        <button class="btn btn-primary btn-sm" id="mobile-calc-open" type="button">Otvori korpu</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" style="background: var(--color-bg-soft);">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Opšti popust</span>
+        <h2>Ili preuzmite kod od <span data-discount-percent>10</span>% na sve analize</h2>
+        <p>Ostavite ime i telefon ili email i odmah dobijate jedinstveni popust kod. Bez naloga i lozinke.</p>
       </div>
 
       <div class="discount-columns">
@@ -81,15 +151,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="card" style="margin-top: 32px;">
-        <h3 class="mt-0">Kako se koristi popust kod?</h3>
-        <ol style="color: var(--color-text-muted); padding-left: 20px; margin:0;">
-          <li>Popunite formu iznad i dobijte svoj kod.</li>
-          <li>Otvorite <a href="katalog.html">Katalog analiza</a>, izaberite šta vam treba i unesite kod u kalkulator da vidite cenu sa popustom.</li>
-          <li>Dođite u laboratoriju i pokažite kod na šalteru prilikom plaćanja.</li>
-        </ol>
       </div>
     </div>
   </section>
@@ -131,8 +192,16 @@
   </div>
 </footer>
 
+<script src="assets/vendor/firebase/firebase-app-compat.js"></script>
+<script src="assets/vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="assets/vendor/qrcode/qrcode.js"></script>
+<script src="assets/vendor/emailjs/email.min.js"></script>
 <script src="assets/js/icons.js"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-init.js"></script>
+<script src="assets/js/promotions.js"></script>
+<script src="assets/js/promo-catalog-page.js"></script>
 <script src="assets/js/discount.js"></script>
 <script src="assets/js/popusti-page.js"></script>
 </body>
