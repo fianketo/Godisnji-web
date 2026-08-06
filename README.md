@@ -105,7 +105,9 @@ Sve objave su u `data/blog-posts.json`, kao niz objekata poređanih od najnovije
 
 Kod koji posetilac dobija na `popusti.html` je **sam sebi dovoljan za proveru** — sadrži 6 nasumičnih cifara i 2-cifreni kontrolni broj izračunat iz njih (`assets/js/discount.js`). Kalkulator proverava kod istim izračunom, pa nije potrebna nikakva baza ili server da bi se utvrdilo da li je kod validno izdat sa ovog sajta. Trenutno svaki validan kod nosi fiksni popust od 10% (`DISCOUNT_PERCENT` u `discount.js`).
 
-Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`, ključ `biotest_discount_leads`) — to je samo lokalna beleška tog uređaja, laboratorija ih trenutno ne prima centralno. Ako ti zatreba da svi preuzeti kodovi/kontakti stignu na jedno mesto (npr. za praćenje ili marketing), najlakša opcija je **Firebase Firestore na besplatnom Spark planu** (isti pristup kao u `legacy-odmorpro` aplikaciji) — javi ako ti to zatreba, dodaje se bez menjanja postojeće logike provere koda.
+Ime i kontakt koje posetilac unese čuvaju se lokalno u browseru (`localStorage`, ključ `biotest_discount_leads`) — to je samo lokalna beleška tog uređaja, laboratorija ih trenutno ne prima centralno.
+
+Napomena: ovaj sistem (fiksnih 10%, samoprovera bez baze) je nezavisan od novijeg sistema pojedinačnih promocija po analizi (kartice, korpa, kod na email) — vidi sekciju ispod. Oba rade paralelno na `popusti.html`.
 
 ## Promocije, korpa i kod na email (Firebase)
 

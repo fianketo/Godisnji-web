@@ -39,6 +39,7 @@ const ICON_PATHS = {
   'send': `<path d="M10 14l11 -11" /> <path d="M21 3l-6.5 18a.55 .55 0 0 1 -1 0l-3.5 -7l-7 -3.5a.55 .55 0 0 1 0 -1l18 -6.5" />`,
   'edit': `<path d="M4 20h4l10.5 -10.5a1.5 1.5 0 0 0 -4 -4l-10.5 10.5v4" /> <path d="M13.5 6.5l4 4" />`,
   'logout': `<path d="M9 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /> <path d="M3 12h13l-3 -3" /> <path d="M13 15l3 -3" />`,
+  'arrow-left': `<path d="M5 12l14 0" /> <path d="M5 12l6 6" /> <path d="M5 12l6 -6" />`,
 };
 
 function icon(name, opts) {
