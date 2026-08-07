@@ -67,6 +67,7 @@
     "banner": "deep",
     "icon": "sun",
     "image": "assets/img/blog/vitamin-d.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-07-10",
     "excerpt": "I leti, uz svo sunce, veliki broj ljudi ima nedostatak vitamina D — a to utiče na kosti, mišiće i imunitet mnogo pre nego što postane vidljivo.",
     "catalogQuery": "vitamin D",
@@ -86,6 +87,8 @@
     "category": "Krvna slika",
     "banner": "teal",
     "icon": "droplet",
+    "image": "assets/img/blog/kompletna-krvna-slika.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-07-02",
     "excerpt": "KKS je verovatno najčešće rađena laboratorijska analiza na svetu — i nije slučajno, jer u jednom vađenju krvi otkriva tragove desetina različitih stanja.",
     "catalogQuery": "KKS",
@@ -105,6 +108,8 @@
     "category": "Srce",
     "banner": "rose",
     "icon": "heart",
+    "image": "assets/img/blog/holesterol-i-srce.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-06-20",
     "excerpt": "Povišen holesterol godinama ne boli — a upravo je to najveći rizik. Lipidni status jednom godišnje pokazuje gde stojite pre nego što postane problem.",
     "catalogQuery": "holesterol",
@@ -125,18 +130,7 @@
     "banner": "slate",
     "icon": "flower",
     "image": "assets/img/blog/alergije-na-polen.jpg",
-    "inlineImages": [
-      {
-        "src": "assets/img/blog/alergije-na-polen-krv.jpg",
-        "afterParagraph": 1,
-        "caption": "Kada imuni sistem prepozna polen kao pretnju, u krvi raste nivo IgE antitela usmerenih baš protiv tog alergena."
-      },
-      {
-        "src": "assets/img/blog/alergije-na-polen-hrana.jpg",
-        "afterParagraph": 3,
-        "caption": "Kod nekih osoba alergičnih na polen javlja se i unakrsna reakcija na određenu hranu (npr. voće) — još jedan razlog da se zna tačan uzročnik."
-      }
-    ],
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-06-05",
     "excerpt": "Curenje nosa, kijanje i suzne oči svakog proleća i leta nisu \"obična prehlada\" — analiza IgE antitela može tačno da pokaže koji polen je krivac.",
     "catalogQuery": "alergen",
