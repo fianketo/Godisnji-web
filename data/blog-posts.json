@@ -10,14 +10,6 @@
     "date": "2026-08-05",
     "excerpt": "Obim struka često govori više o zdravstvenom riziku nego broj na vagi — a inzulinska rezistencija zna da se razvija tiho, godinama pre dijabetesa.",
     "catalogQuery": "HOMA",
-    "inlineImages": [
-      {
-        "src": "assets/img/blog/abdominalna-gojaznost-izbor-hrane.jpg",
-        "afterParagraph": 1,
-        "caption": "Svesniji izbori u ishrani su najdostupniji prvi korak — ali vredi proveriti i šta se dešava \"iznutra\", analizom.",
-        "credit": "Foto: Vecteezy.com"
-      }
-    ],
     "body": [
       "Mast koja se nakuplja oko stomaka (visceralna mast) razlikuje se od one ispod kože na drugim delovima tela — okružuje unutrašnje organe i metabolički je znatno aktivnija, što znači da neprestano ispušta hormone i upalne materije direktno u krvotok.",
       "Zato obim struka često govori više o zdravstvenom riziku nego broj na vagi. Dve osobe slične telesne mase mogu imati vrlo različit raspored masnog tkiva, a samim tim i vrlo različit rizik po zdravlje, čak i kad im se BMI čini sličnim.",
@@ -33,6 +25,7 @@
     "banner": "coral",
     "icon": "candy",
     "image": "assets/img/blog/secer-hba1c.jpg",
+    "imageCredit": "Foto: Vecteezy.com",
     "date": "2026-07-25",
     "excerpt": "Dijabetes tipa 2 godinama nema simptoma. Dve jednostavne analize — glukoza i HbA1c — mogu da ga otkriju dok se lako drži pod kontrolom.",
     "catalogQuery": "HbA1c",
