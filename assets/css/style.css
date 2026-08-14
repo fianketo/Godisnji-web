@@ -1277,6 +1277,15 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm);
 }
+.promo-card-credit {
+  position: absolute;
+  right: 8px; bottom: 8px;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(6, 30, 34, 0.45);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
 .promo-card-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .promo-card-name { font-weight: 700; font-size: 0.98rem; color: var(--color-text); margin: 0; flex: 1; }
 .promo-card-prices { display: flex; align-items: baseline; gap: 8px; }

@@ -75,6 +75,7 @@
         <div class="promo-card-media">
           ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy">` : ''}
           ${pct > 0 ? `<span class="promo-card-discount">-${pct}%</span>` : ''}
+          ${p.imageCredit ? `<span class="promo-card-credit">${p.imageCredit}</span>` : ''}
         </div>
         <div class="promo-card-body">
           <p class="promo-card-name">${p.name}</p>

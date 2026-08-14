@@ -29,6 +29,7 @@
   const promoName = document.getElementById('promo-name');
   const promoNameSuggestions = document.getElementById('promo-name-suggestions');
   const promoImage = document.getElementById('promo-image');
+  const promoImageCredit = document.getElementById('promo-image-credit');
   const promoImageFile = document.getElementById('promo-image-file');
   const promoImagePreviewWrap = document.getElementById('promo-image-preview-wrap');
   const promoImagePreview = document.getElementById('promo-image-preview');
@@ -163,6 +164,7 @@
     promoActive.checked = true;
     pendingImageDataUrl = null;
     promoImageFile.value = '';
+    promoImageCredit.value = '';
     clearImagePreview();
     promoImage.style.display = 'none';
     promoImageUrlToggle.textContent = 'nalepi URL umesto toga';
@@ -184,6 +186,7 @@
       clearImagePreview();
       promoImage.value = '';
     }
+    promoImageCredit.value = promo.imageCredit || '';
     promoOldPrice.value = promo.oldPrice || '';
     promoNewPrice.value = promo.newPrice || '';
     promoActive.checked = Boolean(promo.active);
@@ -209,6 +212,7 @@
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if (imageUrl !== undefined) data.imageUrl = imageUrl;
+    data.imageCredit = promoImageCredit.value.trim() || null;
     if (!data.name || !data.newPrice) return;
 
     promoSubmit.disabled = true;
