@@ -17,5 +17,9 @@
 
   firebase.initializeApp(cfg);
   window.Biotest.db = firebase.firestore();
-  window.Biotest.auth = firebase.auth();
+  // Auth SDK se ne učitava na popusti.html (kupci se ne prijavljuju tamo) —
+  // samo na admin.html i provera-koda.html, gde je firebase.auth zaista dostupan.
+  if (typeof firebase.auth === 'function') {
+    window.Biotest.auth = firebase.auth();
+  }
 })();

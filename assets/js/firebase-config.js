@@ -8,12 +8,12 @@
 
 window.BiotestConfig = {
   firebase: {
-    apiKey: '',
-    authDomain: '',
-    projectId: '',
-    storageBucket: '',
-    messagingSenderId: '',
-    appId: '',
+    apiKey: 'AIzaSyBbthuZy2m5VWliIK6_bDkZJriE9NgMqe8',
+    authDomain: 'biotest-akcije.firebaseapp.com',
+    projectId: 'biotest-akcije',
+    storageBucket: 'biotest-akcije.firebasestorage.app',
+    messagingSenderId: '705718953940',
+    appId: '1:705718953940:web:13183fbf01287df7c05841',
   },
   emailjs: {
     publicKey: '',
