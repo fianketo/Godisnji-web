@@ -27,7 +27,13 @@
   const promoForm = document.getElementById('promo-form');
   const promoIdInput = document.getElementById('promo-id');
   const promoName = document.getElementById('promo-name');
+  const promoNameSuggestions = document.getElementById('promo-name-suggestions');
   const promoImage = document.getElementById('promo-image');
+  const promoImageFile = document.getElementById('promo-image-file');
+  const promoImagePreviewWrap = document.getElementById('promo-image-preview-wrap');
+  const promoImagePreview = document.getElementById('promo-image-preview');
+  const promoImageRemove = document.getElementById('promo-image-remove');
+  const promoImageUrlToggle = document.getElementById('promo-image-url-toggle');
   const promoOldPrice = document.getElementById('promo-old-price');
   const promoNewPrice = document.getElementById('promo-new-price');
   const promoActive = document.getElementById('promo-active');
@@ -39,6 +45,91 @@
   const listEl = document.getElementById('admin-list');
   const emptyEl = document.getElementById('admin-empty');
   const refreshBtn = document.getElementById('refresh-btn');
+
+  // ---------- Predlozi naziva iz kataloga analiza (slobodan unos i dalje radi) ----------
+  if (window.Biotest.loadCatalog) {
+    window.Biotest.loadCatalog().then(({ tests }) => {
+      const seen = new Set();
+      const frag = document.createDocumentFragment();
+      tests.forEach((t) => {
+        if (seen.has(t.displayName)) return;
+        seen.add(t.displayName);
+        const opt = document.createElement('option');
+        opt.value = t.displayName;
+        frag.appendChild(opt);
+      });
+      promoNameSuggestions.appendChild(frag);
+    }).catch(() => { /* predlozi su samo pogodnost, nisu neophodni */ });
+  }
+
+  // ---------- Slika: biranje fajla sa računara umesto ručnog otpremanja na GitHub ----------
+  // Slika se smanji i sabije u browseru, pa se sačuva direktno kao deo akcije u bazi
+  // (data URL) — nema potrebe za GitHub upload ili poseban hosting servis.
+  let pendingImageDataUrl = null; // null = nema izabranog fajla u ovoj sesiji izmene
+
+  function resizeImageFile(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        img.onerror = reject;
+        img.onload = () => {
+          const MAX_DIM = 900;
+          let { width, height } = img;
+          if (Math.max(width, height) > MAX_DIM) {
+            const scale = MAX_DIM / Math.max(width, height);
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.72));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function showImagePreview(src) {
+    promoImagePreview.src = src;
+    promoImagePreviewWrap.style.display = 'block';
+  }
+
+  function clearImagePreview() {
+    promoImagePreview.src = '';
+    promoImagePreviewWrap.style.display = 'none';
+  }
+
+  promoImageFile.addEventListener('change', () => {
+    const file = promoImageFile.files[0];
+    if (!file) return;
+    resizeImageFile(file).then((dataUrl) => {
+      pendingImageDataUrl = dataUrl;
+      showImagePreview(dataUrl);
+      promoImage.value = '';
+    }).catch(() => {
+      promoFormMsg.textContent = 'Nije uspelo učitavanje slike — probaj drugi fajl.';
+      promoFormMsg.className = 'promo-status-msg err';
+      promoFormMsg.style.display = 'block';
+    });
+  });
+
+  promoImageRemove.addEventListener('click', () => {
+    pendingImageDataUrl = null;
+    promoImageFile.value = '';
+    clearImagePreview();
+  });
+
+  promoImageUrlToggle.addEventListener('click', () => {
+    const showing = promoImage.style.display !== 'none';
+    promoImage.style.display = showing ? 'none' : 'block';
+    promoImageUrlToggle.textContent = showing ? 'nalepi URL umesto toga' : 'sakrij polje za URL';
+    if (!showing) promoImage.focus();
+  });
 
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -70,6 +161,11 @@
     promoForm.reset();
     promoIdInput.value = '';
     promoActive.checked = true;
+    pendingImageDataUrl = null;
+    promoImageFile.value = '';
+    clearImagePreview();
+    promoImage.style.display = 'none';
+    promoImageUrlToggle.textContent = 'nalepi URL umesto toga';
     formTitle.textContent = 'Nova akcija';
     promoSubmit.textContent = 'Sačuvaj akciju';
     promoCancel.style.display = 'none';
@@ -79,7 +175,15 @@
   function fillFormForEdit(promo) {
     promoIdInput.value = promo.id;
     promoName.value = promo.name || '';
-    promoImage.value = promo.imageUrl || '';
+    pendingImageDataUrl = null;
+    promoImageFile.value = '';
+    if (promo.imageUrl) {
+      showImagePreview(promo.imageUrl);
+      promoImage.value = promo.imageUrl;
+    } else {
+      clearImagePreview();
+      promoImage.value = '';
+    }
     promoOldPrice.value = promo.oldPrice || '';
     promoNewPrice.value = promo.newPrice || '';
     promoActive.checked = Boolean(promo.active);
@@ -95,14 +199,16 @@
   promoForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = promoIdInput.value;
+    // Redosled prvenstva za sliku: novo izabran fajl > ručno upisan URL > (kod izmene) postojeća slika.
+    const imageUrl = pendingImageDataUrl || promoImage.value.trim() || (id ? undefined : null);
     const data = {
       name: promoName.value.trim(),
-      imageUrl: promoImage.value.trim() || null,
       oldPrice: promoOldPrice.value ? Number(promoOldPrice.value) : null,
       newPrice: Number(promoNewPrice.value),
       active: promoActive.checked,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
+    if (imageUrl !== undefined) data.imageUrl = imageUrl;
     if (!data.name || !data.newPrice) return;
 
     promoSubmit.disabled = true;

@@ -69,12 +69,19 @@
               <input type="hidden" id="promo-id">
               <div class="field">
                 <label for="promo-name">Naziv</label>
-                <input type="text" id="promo-name" required placeholder="npr. Kompletna krvna slika">
+                <input type="text" id="promo-name" required placeholder="npr. Kompletna krvna slika" list="promo-name-suggestions" autocomplete="off">
+                <datalist id="promo-name-suggestions"></datalist>
+                <p class="field-hint">Slobodno upiši bilo šta, ili počni da kucaš da vidiš predloge iz kataloga analiza.</p>
               </div>
               <div class="field">
-                <label for="promo-image">URL slike</label>
-                <input type="text" id="promo-image" placeholder="https://... ili assets/img/promocije/naziv.jpg">
-                <p class="field-hint">Puna adresa (https://...) ili putanja do fajla u samom sajtu (assets/img/promocije/naziv.jpg)</p>
+                <label for="promo-image-file">Slika</label>
+                <input type="file" id="promo-image-file" accept="image/*">
+                <div id="promo-image-preview-wrap" style="display:none; margin-top:10px;">
+                  <img id="promo-image-preview" alt="" style="max-width:100%; border-radius:var(--radius-sm); display:block;">
+                  <button type="button" class="btn btn-ghost btn-sm" id="promo-image-remove" style="margin-top:6px;">Ukloni sliku</button>
+                </div>
+                <p class="field-hint">Izaberi sliku sa računara — automatski se smanjuje i čuva, bez otpremanja na GitHub. Ili, ako već imaš link ka slici, <button type="button" id="promo-image-url-toggle" class="btn-link-inline">nalepi URL umesto toga</button>.</p>
+                <input type="text" id="promo-image" placeholder="https://... ili assets/img/promocije/naziv.jpg" style="display:none; margin-top:8px;">
               </div>
               <div class="field">
                 <label for="promo-old-price">Redovna cena (RSD)</label>
@@ -112,6 +119,7 @@
 <script src="assets/vendor/firebase/firebase-firestore-compat.js"></script>
 <script src="assets/js/icons.js"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/catalog.js"></script>
 <script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/firebase-init.js"></script>
 <script src="assets/js/admin-page.js"></script>

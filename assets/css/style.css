@@ -588,6 +588,11 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 .field textarea { resize: vertical; min-height: 110px; }
 .field-hint { font-size: 0.82rem; color: var(--color-text-faint); margin-top: 4px; }
+.btn-link-inline {
+  background: none; border: none; padding: 0; margin: 0;
+  color: var(--color-primary); font-size: inherit; text-decoration: underline;
+  cursor: pointer; font-family: inherit;
+}
 
 /* ---------- Search / filter bar ---------- */
 .search-bar {
