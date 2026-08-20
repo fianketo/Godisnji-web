@@ -145,7 +145,6 @@
       <div class="locator-item-hours">
         ${window.Biotest.icon('clock')}
         <strong>${todayStatusText(loc.hours)}</strong>
-        <span class="locator-item-hours-full">${formatHoursCompact(loc.hours)}</span>
       </div>
       <div class="locator-item-phone">${window.Biotest.icon('phone')} ${phoneHtml(loc.phones)}</div>
       <div class="locator-item-actions">
@@ -236,7 +235,13 @@
         const cached = localStorage.getItem(cacheKey(loc));
         const startCoords = cached ? JSON.parse(cached) : (CITY_FALLBACK_COORDS[loc.city] || CITY_FALLBACK_COORDS['Novi Sad']);
         const marker = L.marker(startCoords, { icon: pinIcon }).addTo(map)
-          .bindPopup(`<div class="map-popup"><strong>${loc.name}</strong><br>${loc.address}<br><a class="map-popup-call" href="${telHref(loc.phones[0])}">${window.Biotest.icon('phone')} Pozovi</a></div>`);
+          .bindPopup(`<div class="map-popup">
+            <strong>${loc.name}</strong><br>
+            ${loc.address}<br>
+            <span class="map-popup-hours">${window.Biotest.icon('clock')} ${todayStatusText(loc.hours)}</span><br>
+            <span class="map-popup-hours-full">${formatHoursCompact(loc.hours)}</span><br>
+            <a class="map-popup-call" href="${telHref(loc.phones[0])}">${window.Biotest.icon('phone')} Pozovi</a>
+          </div>`);
         loc.marker = marker;
         markers.push(marker);
         if (loc.city === FOCUS_CITY) focusMarkers.push(marker);

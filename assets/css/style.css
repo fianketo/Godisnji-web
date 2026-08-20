@@ -938,12 +938,11 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   line-height: 1.5;
 }
 .locator-item-hours {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  display: flex; align-items: center; gap: 6px;
   font-size: 0.85rem; color: rgba(255, 255, 255, 0.85); margin: 0 0 8px;
 }
 .locator-item-hours .icon { width: 14px; height: 14px; flex-shrink: 0; color: rgba(255, 255, 255, 0.5); }
 .locator-item-hours strong { color: #fff; }
-.locator-item-hours-full { flex-basis: 100%; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
 .locator-item-phone { font-size: 0.86rem; color: rgba(255, 255, 255, 0.85); }
 .locator-item-phone a { color: inherit; }
 .locator-item-actions {
@@ -1035,6 +1034,9 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .biotest-marker-pin--nearest .icon { width: 19px; height: 19px; }
 
 .map-popup { font-size: 0.9rem; line-height: 1.5; }
+.map-popup-hours { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-weight: 600; }
+.map-popup-hours .icon { width: 13px; height: 13px; vertical-align: -2px; color: var(--color-text-muted); }
+.map-popup-hours-full { font-size: 0.8rem; color: var(--color-text-muted); }
 .map-popup-call {
   display: inline-block;
   margin-top: 6px;
