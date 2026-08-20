@@ -75,13 +75,49 @@
     return result;
   }
 
-  function isOpenNow(hoursText) {
+  function getTodayRange(hoursText) {
     const parsed = parseHours(hoursText);
+    const day = new Date().getDay(); // 0 = nedelja ... 6 = subota
+    return day === 0 ? parsed.sun : day === 6 ? parsed.sat : parsed.monFri;
+  }
+
+  function isOpenNow(hoursText) {
+    const range = getTodayRange(hoursText);
     const now = new Date();
-    const day = now.getDay(); // 0 = nedelja ... 6 = subota
     const minutes = now.getHours() * 60 + now.getMinutes();
-    const range = day === 0 ? parsed.sun : day === 6 ? parsed.sat : parsed.monFri;
     return !!range && minutes >= range[0] && minutes < range[1];
+  }
+
+  function formatClock(totalMinutes) {
+    const h = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+    const m = String(totalMinutes % 60).padStart(2, '0');
+    return `${h}:${m}`;
+  }
+
+  // Kratak status za danas ("Otvoreno do 20:00" / "Otvara se u 07:00" / "Zatvoreno danas").
+  function todayStatusText(hoursText) {
+    const range = getTodayRange(hoursText);
+    if (!range) return 'Zatvoreno danas';
+    const now = new Date();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    if (minutes < range[0]) return `Otvara se u ${formatClock(range[0])}`;
+    if (minutes < range[1]) return `Otvoreno do ${formatClock(range[1])}`;
+    return 'Zatvoreno danas';
+  }
+
+  // Puno radno vreme u jednom kompaktnom redu za prikaz na kartici.
+  function formatHoursCompact(hoursText) {
+    return hoursText
+      .split('\n')
+      .map((line) => line
+        .replace(/^Ponedeljak\s*[–-]\s*petak/i, 'Pon–pet')
+        .replace(/^Subota/i, 'Sub')
+        .replace(/^Nedelja/i, 'Ned'))
+      .join(' · ');
+  }
+
+  function directionsHref(loc) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${loc.address}, Srbija`)}`;
   }
 
   function distanceKm(lat1, lon1, lat2, lon2) {
@@ -99,12 +135,23 @@
       : '<span class="badge badge-accent">Zatvoreno</span>';
     return `<div class="locator-item" id="location-card-${loc.id}" data-loc="${loc.id}" data-search="${(loc.name + ' ' + loc.address + ' ' + loc.city).toLowerCase()}" data-city="${loc.city}" role="button" tabindex="0">
       <div class="locator-item-head">
-        <h3>${loc.name}</h3>
+        <div class="locator-item-title">
+          <span class="locator-item-icon">${window.Biotest.icon('flask')}</span>
+          <h3>${loc.name}</h3>
+        </div>
         ${statusBadge}
       </div>
       <address>${loc.address}</address>
+      <div class="locator-item-hours">
+        ${window.Biotest.icon('clock')}
+        <strong>${todayStatusText(loc.hours)}</strong>
+        <span class="locator-item-hours-full">${formatHoursCompact(loc.hours)}</span>
+      </div>
       <div class="locator-item-phone">${window.Biotest.icon('phone')} ${phoneHtml(loc.phones)}</div>
-      <span class="locator-item-link">Pogledaj na mapi →</span>
+      <div class="locator-item-actions">
+        <a class="locator-action-btn" href="${directionsHref(loc)}" target="_blank" rel="noopener">${window.Biotest.icon('navigation')} Uputi me</a>
+        <span class="locator-item-link">Pogledaj na mapi →</span>
+      </div>
     </div>`;
   }
 

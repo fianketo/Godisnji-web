@@ -6,6 +6,7 @@ const ICON_PATHS = {
   'flask': `<path d="M9 3l6 0" /> <path d="M10 9l4 0" /> <path d="M10 3v6l-4 11a.7 .7 0 0 0 .5 1h11a.7 .7 0 0 0 .5 -1l-4 -11v-6" />`,
   'phone': `<path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />`,
   'map-pin': `<path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /> <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0" />`,
+  'navigation': `<path d="M12 3l9 18l-9 -5l-9 5z" />`,
   'mail': `<path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10" /> <path d="M3 7l9 6l9 -6" />`,
   'bolt': `<path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" />`,
   'microscope': `<path d="M5 21h14" /> <path d="M6 18h2" /> <path d="M7 18v3" /> <path d="M9 11l3 3l6 -6l-3 -3l-6 6" /> <path d="M10.5 12.5l-1.5 1.5" /> <path d="M17 3l3 3" /> <path d="M12 21a6 6 0 0 0 3.715 -10.712" />`,

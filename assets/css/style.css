@@ -920,23 +920,50 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .locator-item:hover { background: rgba(255, 255, 255, 0.06); }
 .locator-item.is-nearest { background: rgba(255, 138, 92, 0.14); border-left-color: var(--color-accent); }
 .locator-item.is-hidden { display: none; }
-.locator-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.locator-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.locator-item-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.locator-item-icon {
+  width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--color-primary), #1fb3ad);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(14, 124, 134, 0.35);
+}
+.locator-item-icon .icon { width: 17px; height: 17px; }
 .locator-item-head h3 { margin: 0; font-size: 1rem; color: #fff; }
 .locator-item address {
   font-style: normal;
   font-size: 0.86rem;
   color: rgba(255, 255, 255, 0.68);
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   line-height: 1.5;
 }
+.locator-item-hours {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  font-size: 0.85rem; color: rgba(255, 255, 255, 0.85); margin: 0 0 8px;
+}
+.locator-item-hours .icon { width: 14px; height: 14px; flex-shrink: 0; color: rgba(255, 255, 255, 0.5); }
+.locator-item-hours strong { color: #fff; }
+.locator-item-hours-full { flex-basis: 100%; font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); }
 .locator-item-phone { font-size: 0.86rem; color: rgba(255, 255, 255, 0.85); }
 .locator-item-phone a { color: inherit; }
+.locator-item-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 12px;
+}
+.locator-action-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; font-weight: 700; color: #fff;
+  background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px; border-radius: var(--radius-pill);
+  transition: background 0.15s ease;
+}
+.locator-action-btn:hover { background: rgba(255, 255, 255, 0.24); }
+.locator-action-btn .icon { width: 13px; height: 13px; }
 .locator-item-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-top: 10px;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #ffb08c;
 }
