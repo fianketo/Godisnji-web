@@ -749,12 +749,14 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 }
 .test-interpretation-item.is-high { background: var(--color-accent-light); border-color: #ffd9c2; }
 .test-interpretation-item.is-low { background: #eef1fb; border-color: #c7d3f0; }
+.test-interpretation-item.is-neutral { background: var(--color-bg-soft); }
 .test-interpretation-label {
   display: flex; align-items: center; gap: 6px;
   font-weight: 700; font-size: 0.85rem; margin: 0 0 4px;
 }
 .test-interpretation-item.is-high .test-interpretation-label { color: var(--color-accent-dark); }
 .test-interpretation-item.is-low .test-interpretation-label { color: var(--color-indigo); }
+.test-interpretation-item.is-neutral .test-interpretation-label { color: var(--color-primary-dark); }
 .test-interpretation-item p { font-size: 0.88rem; line-height: 1.55; margin: 0; color: var(--color-text); }
 
 .detail-drawer-footer {

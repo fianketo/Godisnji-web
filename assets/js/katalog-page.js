@@ -149,15 +149,26 @@
       : '';
     const paragraphs = desc.long.map((p) => `<p>${p}</p>`).join('');
     const interpretation = Array.isArray(desc.interpretation) ? desc.interpretation : [];
+    const HIGH_LABELS = new Set(['Povišeno', 'Pozitivno']);
     const LOW_LABELS = new Set(['Sniženo', 'Negativno']);
+    // Neki nalazi nisu jednostavno povišeno/sniženo (npr. rizik, antibiogram,
+    // opisni citološki nalaz) — takve parove razlikujemo po redosledu, a
+    // usamljenu stavku (bez suprotnog para) prikazujemo neutralno.
     const interpretationHtml = interpretation.length
       ? `<h3>Tumačenje nalaza</h3>
          <div class="test-interpretation">
-           ${interpretation.map((item) => `
-             <div class="test-interpretation-item ${LOW_LABELS.has(item.label) ? 'is-low' : 'is-high'}">
-               <p class="test-interpretation-label">${LOW_LABELS.has(item.label) ? '▼' : '▲'} ${item.label}</p>
+           ${interpretation.map((item, idx) => {
+             let variant;
+             if (HIGH_LABELS.has(item.label)) variant = 'is-high';
+             else if (LOW_LABELS.has(item.label)) variant = 'is-low';
+             else if (interpretation.length > 1) variant = idx === 0 ? 'is-high' : 'is-low';
+             else variant = 'is-neutral';
+             const bullet = variant === 'is-low' ? '▼' : variant === 'is-high' ? '▲' : '●';
+             return `<div class="test-interpretation-item ${variant}">
+               <p class="test-interpretation-label">${bullet} ${item.label}</p>
                <p>${item.text}</p>
-             </div>`).join('')}
+             </div>`;
+           }).join('')}
          </div>`
       : '';
     detailDrawerBody.innerHTML = `
