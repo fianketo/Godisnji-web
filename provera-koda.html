@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provera koda — BIOTEST</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3l6 0" /> <path d="M10 9l4 0" /> <path d="M10 3v6l-4 11a.7 .7 0 0 0 .5 1h11a.7 .7 0 0 0 .5 -1l-4 -11v-6" /></svg></span>
+      <span>BIOTEST<span class="brand-sub">Provera koda</span></span>
+    </a>
+    <div class="nav-cta">
+      <div id="verify-user-badge" class="admin-user-badge" style="display:none;">
+        <span id="verify-user-email"></span>
+        <button class="btn btn-ghost btn-sm" id="logout-btn" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 8v-2a2 2 0 0 1 2 -2h7a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-7a2 2 0 0 1 -2 -2v-2" /> <path d="M3 12h13l-3 -3" /> <path d="M13 15l3 -3" /></svg> Odjava</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section section-tight">
+    <div class="container">
+
+      <div id="verify-not-configured" class="auth-not-configured" style="display:none;">
+        <div class="card">
+          <h3 class="mt-0">Firebase nije podešen</h3>
+          <p>Da bi provera koda radila, potrebno je popuniti <code>assets/js/firebase-config.js</code>. Pogledaj README.md.</p>
+        </div>
+      </div>
+
+      <div id="verify-login" class="auth-gate" style="display:none;">
+        <div class="card">
+          <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" /> <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /> <path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg></div>
+          <h1>Prijava osoblja</h1>
+          <p class="field-hint">Isti nalog kao za admin panel akcija.</p>
+          <form id="login-form">
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required>
+            </div>
+            <div class="field">
+              <label for="login-password">Lozinka</label>
+              <input type="password" id="login-password" required>
+            </div>
+            <button class="btn btn-accent btn-block" type="submit">Prijavi se</button>
+            <p id="login-error" class="promo-status-msg err" style="display:none;"></p>
+          </form>
+        </div>
+      </div>
+
+      <div id="verify-app" class="verify-layout" style="display:none;">
+        <div class="section-header" style="margin-bottom:24px;">
+          <span class="eyebrow">Osoblje</span>
+          <h1>Provera koda porudžbine</h1>
+          <p>Unesite kod koji je pacijent pokazao, ili skenirajte QR kod sa njegovog telefona.</p>
+        </div>
+
+        <div class="card">
+          <div class="verify-scan-row">
+            <input type="text" id="code-input" placeholder="npr. BIO-7F2A9K" autocomplete="off">
+            <button class="btn btn-outline" id="scan-btn" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7v-1a2 2 0 0 1 2 -2h2" /> <path d="M4 17v1a2 2 0 0 0 2 2h2" /> <path d="M16 4h2a2 2 0 0 1 2 2v1" /> <path d="M16 20h2a2 2 0 0 0 2 -2v-1" /> <path d="M5 12l14 0" /></svg> Skeniraj</button>
+            <button class="btn btn-primary" id="lookup-btn" type="button">Proveri</button>
+          </div>
+
+          <div class="verify-camera" id="verify-camera">
+            <video id="scan-video" playsinline muted></video>
+            <button type="button" class="verify-camera-close" id="scan-close" aria-label="Zatvori kameru"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></svg></button>
+          </div>
+
+          <p id="lookup-msg" class="promo-status-msg" style="display:none;"></p>
+
+          <div id="verify-result" class="verify-result" style="display:none;">
+            <div class="verify-result-header">
+              <h3 id="result-code"></h3>
+              <span id="result-status" class="verify-status-badge"></span>
+            </div>
+            <p class="field-hint" id="result-customer"></p>
+            <div id="result-items"></div>
+            <div class="verify-total-row">
+              <span>Ukupno</span>
+              <span id="result-total"></span>
+            </div>
+            <button class="btn btn-accent btn-block" id="redeem-btn" type="button" style="margin-top:16px;">Označi kao iskorišćen</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<script src="assets/vendor/firebase/firebase-app-compat.js"></script>
+<script src="assets/vendor/firebase/firebase-auth-compat.js"></script>
+<script src="assets/vendor/firebase/firebase-firestore-compat.js"></script>
+<script src="assets/vendor/jsqr/jsQR.js"></script>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/firebase-init.js"></script>
+<script src="assets/js/promotions.js"></script>
+<script src="assets/js/verify-page.js"></script>
+</body>
+</html>

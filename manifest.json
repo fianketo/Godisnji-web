@@ -1,16 +1,16 @@
 {
-  "name": "OdmorPro",
-  "short_name": "OdmorPro",
-  "description": "Sistem za upravljanje odsustvima",
+  "name": "BIOTEST — Zavod za laboratorijsku dijagnostiku",
+  "short_name": "BIOTEST",
+  "description": "Katalog laboratorijskih analiza, kalkulator cene i vremena, lokacije i popusti — BIOTEST Novi Sad.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#060a14",
-  "theme_color": "#06b6d4",
+  "background_color": "#ffffff",
+  "theme_color": "#0e7c86",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "assets/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
