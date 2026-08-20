@@ -148,6 +148,18 @@
       ? `<div class="test-prep-box"><strong>Priprema:</strong> ${desc.prep}</div>`
       : '';
     const paragraphs = desc.long.map((p) => `<p>${p}</p>`).join('');
+    const interpretation = Array.isArray(desc.interpretation) ? desc.interpretation : [];
+    const LOW_LABELS = new Set(['Sniženo', 'Negativno']);
+    const interpretationHtml = interpretation.length
+      ? `<h3>Tumačenje nalaza</h3>
+         <div class="test-interpretation">
+           ${interpretation.map((item) => `
+             <div class="test-interpretation-item ${LOW_LABELS.has(item.label) ? 'is-low' : 'is-high'}">
+               <p class="test-interpretation-label">${LOW_LABELS.has(item.label) ? '▼' : '▲'} ${item.label}</p>
+               <p>${item.text}</p>
+             </div>`).join('')}
+         </div>`
+      : '';
     detailDrawerBody.innerHTML = `
       <span class="eyebrow">${test.category}</span>
       <h2>${test.displayName}</h2>
@@ -157,6 +169,7 @@
       ${prepHtml}
       <h3>O ovoj analizi</h3>
       <div class="article-body">${paragraphs}</div>
+      ${interpretationHtml}
     `;
     const isSelected = selected.has(test.id);
     detailDrawerFooter.innerHTML = `
