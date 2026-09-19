@@ -22,6 +22,24 @@ document.addEventListener('DOMContentLoaded', () => {
     el.textContent = String(new Date().getFullYear());
   });
 
+  // Scroll reveal — svaki element sa klasom .reveal se pojavljuje kad uđe u prikaz.
+  const revealEls = document.querySelectorAll('.reveal');
+  if (revealEls.length) {
+    if ('IntersectionObserver' in window) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+      revealEls.forEach((el) => revealObserver.observe(el));
+    } else {
+      revealEls.forEach((el) => el.classList.add('is-visible'));
+    }
+  }
+
   const header = document.querySelector('.site-header');
   if (header) {
     const updateScrolled = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
