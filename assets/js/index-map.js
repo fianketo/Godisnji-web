@@ -13,6 +13,18 @@
 
   function cacheKey(id) { return `biotest_geocode_${id}`; }
 
+  // Isti sanity-check kao u lokacije-page.js — odbacuje koordinate koje su
+  // nerealno daleko od Novog Sada (pogrešan Nominatim rezultat ili stara
+  // loša keširana vrednost), da mala mapa ne "puca" na ceo region.
+  function isReasonableCoords(coords) {
+    if (!Array.isArray(coords) || coords.length !== 2) return false;
+    const dLat = (coords[0] - NOVI_SAD_FALLBACK[0]) * Math.PI / 180;
+    const dLon = (coords[1] - NOVI_SAD_FALLBACK[1]) * Math.PI / 180;
+    const R = 6371;
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(NOVI_SAD_FALLBACK[0] * Math.PI / 180) * Math.cos(coords[0] * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) < 30;
+  }
+
   function geocode(loc) {
     const query = `${loc.address}, Srbija`;
     return fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`)
@@ -30,10 +42,13 @@
     keyboard: false,
     touchZoom: false,
     tap: false,
-    attributionControl: false,
+    attributionControl: true,
   });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
+  // OpenStreetMap standardne pločice — besplatno, bez API ključa (CartoDB je
+  // 2026. ukinuo anonimni pristup svojim rastertiles-ovima).
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    subdomains: 'abc',
     maxZoom: 19,
   }).addTo(map);
   map.setView(NOVI_SAD_FALLBACK, 12);
@@ -62,14 +77,22 @@
       const lines = [];
 
       function placeMarker(loc, icon) {
-        const cached = localStorage.getItem(cacheKey(loc.id));
-        const startCoords = cached ? JSON.parse(cached) : NOVI_SAD_FALLBACK;
+        let cached = null;
+        const cachedRaw = localStorage.getItem(cacheKey(loc.id));
+        if (cachedRaw) {
+          try {
+            const parsed = JSON.parse(cachedRaw);
+            if (isReasonableCoords(parsed)) cached = parsed;
+            else localStorage.removeItem(cacheKey(loc.id));
+          } catch (e) { /* ignoriši oštećen keš */ }
+        }
+        const startCoords = cached || NOVI_SAD_FALLBACK;
         const marker = L.marker(startCoords, { icon, interactive: false }).addTo(map);
         markers.push(marker);
         loc.marker = marker;
         if (!cached) {
           geocode(loc).then((coords) => {
-            if (coords) {
+            if (coords && isReasonableCoords(coords)) {
               localStorage.setItem(cacheKey(loc.id), JSON.stringify(coords));
               marker.setLatLng(coords);
               redrawLines();

@@ -992,6 +992,7 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   background: var(--color-bg-alt);
 }
 #mini-map { position: absolute; inset: 0; }
+#mini-map .leaflet-control-attribution { font-size: 0.62rem; padding: 0 4px; }
 .locations-teaser-body {
   padding: 32px;
   display: flex;

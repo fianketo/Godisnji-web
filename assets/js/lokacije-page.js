@@ -19,11 +19,13 @@
   const citySelect = document.getElementById('loc-city-select');
 
   const map = L.map('map');
-  // CartoDB Voyager — moderna, u boji, ali i dalje čitljiva podloga
-  // (mekše nego standardni šareni OSM). I dalje besplatno, bez API ključa.
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> saradnici &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
+  // OpenStreetMap standardne pločice — besplatno, bez API ključa.
+  // (CartoDB je 2026. ukinuo anonimni pristup svojim rastertiles-ovima —
+  // Voyager/Positron sada zahtevaju plaćen nalog i API ključ, pa se mapa
+  // bez njega prikazivala sa vodenim žigom "API key required".)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> saradnici',
+    subdomains: 'abc',
     maxZoom: 19,
   }).addTo(map);
 
@@ -43,6 +45,16 @@
   });
 
   function cacheKey(loc) { return `biotest_geocode_${loc.id}`; }
+
+  // Sanity-check: odbacuje geokodirane (ili keširane) koordinate koje su
+  // nerealno daleko od grada lokacije — štiti od jednog pogrešnog Nominatim
+  // rezultata (ili stare loše keširane vrednosti) koji bi razvukao mapu na
+  // ceo region umesto da ostane fokusirana na grad.
+  function isReasonableCoords(coords, city) {
+    if (!Array.isArray(coords) || coords.length !== 2) return false;
+    const fallback = CITY_FALLBACK_COORDS[city] || CITY_FALLBACK_COORDS['Novi Sad'];
+    return distanceKm(coords[0], coords[1], fallback[0], fallback[1]) < 30;
+  }
 
   function geocode(loc) {
     const query = `${loc.address}, Srbija`;
@@ -232,8 +244,16 @@
       const markers = [];
 
       for (const loc of locations) {
-        const cached = localStorage.getItem(cacheKey(loc));
-        const startCoords = cached ? JSON.parse(cached) : (CITY_FALLBACK_COORDS[loc.city] || CITY_FALLBACK_COORDS['Novi Sad']);
+        let cached = null;
+        const cachedRaw = localStorage.getItem(cacheKey(loc));
+        if (cachedRaw) {
+          try {
+            const parsed = JSON.parse(cachedRaw);
+            if (isReasonableCoords(parsed, loc.city)) cached = parsed;
+            else localStorage.removeItem(cacheKey(loc)); // odbačen loš keš — geokodira se ponovo ispod
+          } catch (e) { /* ignoriši oštećen keš */ }
+        }
+        const startCoords = cached || (CITY_FALLBACK_COORDS[loc.city] || CITY_FALLBACK_COORDS['Novi Sad']);
         const marker = L.marker(startCoords, { icon: pinIcon }).addTo(map)
           .bindPopup(`<div class="map-popup">
             <strong>${loc.name}</strong><br>
@@ -248,7 +268,7 @@
 
         if (!cached) {
           geocode(loc).then((coords) => {
-            if (coords) {
+            if (coords && isReasonableCoords(coords, loc.city)) {
               localStorage.setItem(cacheKey(loc), JSON.stringify(coords));
               marker.setLatLng(coords);
               fitToFocusCity();
