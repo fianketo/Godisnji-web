@@ -375,6 +375,15 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   height: auto;
   display: block;
 }
+.hero-car-cutout {
+  max-width: 480px;
+  margin: 0 auto;
+}
+.hero--wide-visual .hero-grid { grid-template-columns: 1fr 1.15fr; align-items: center; }
+.hero--wide-visual .hero-car-cutout { max-width: 640px; }
+@media (max-width: 900px) {
+  .hero--wide-visual .hero-grid { grid-template-columns: 1fr; }
+}
 .hero-video-frame {
   position: relative;
   max-width: 340px;
