@@ -9,7 +9,7 @@ Statičan sajt (obične HTML/CSS/JS stranice, bez build koraka, bez servera) —
 ## Struktura sajta
 
 - `index.html` — Početna (hero, promocija, zašto Biotest, teaser bloga)
-- `katalog.html` — Katalog analiza: pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
+- `katalog.html` — Cenovnik (naziv stranice u navigaciji): pretraga + filter po kategoriji + ugrađeni kalkulator cene i vremena
 - `lokacije.html` — Mapa svih 6 lokacija (Leaflet + OpenStreetMap) + kartice po lokaciji
 - `teren.html` — Usluge na terenu (kućne posete za vađenje krvi/brisa) — kako funkcioniše, za koga, kontakt za dogovor termina
 - `popusti.html` — Katalog akcija (Temu-stil kartice + korpa + kod na email, vidi sekciju "Promocije, korpa i kod na email" ispod) i opšti 10% popust kod (ime + kontakt → jedinstveni kod na ekranu, bez baze)

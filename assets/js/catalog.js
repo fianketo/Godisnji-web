@@ -59,7 +59,7 @@ function slugify(str) {
  *  gde je Test = { id, category, name, instrument, time, price, hours } */
 async function loadCatalog() {
   const res = await fetch(CATALOG_URL);
-  if (!res.ok) throw new Error('Ne mogu da učitam katalog analiza.');
+  if (!res.ok) throw new Error('Ne mogu da učitam cenovnik analiza.');
   const data = await res.json();
 
   const categories = Object.keys(data);

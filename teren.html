@@ -8,7 +8,7 @@
 <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0e7c86">
+<meta name="theme-color" content="#0b6fb0">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -23,7 +23,7 @@
     <nav aria-label="Glavna navigacija">
       <ul class="nav-links">
         <li><a href="index.html">Početna</a></li>
-        <li><a href="katalog.html">Katalog analiza</a></li>
+        <li><a href="katalog.html">Cenovnik</a></li>
         <li><a href="lokacije.html">Lokacije</a></li>
         <li><a href="teren.html" class="active">Na terenu</a></li>
         <li><a href="popusti.html">Popusti</a></li>
@@ -41,14 +41,37 @@
 </header>
 
 <main id="main">
+
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">Kućne posete</span>
+        <h1>Dolazimo kod vas.</h1>
+        <p class="hero-lead">Ne morate uvek da dolazite u laboratoriju — naše osoblje izlazi na teren i uzima uzorke tamo gde vama odgovara: kod kuće, na poslu ili u ustanovi. Prepoznatljivo, higijenski opremljeno vozilo dolazi na dogovorenu adresu.</p>
+        <div class="hero-actions">
+          <a href="tel:+38121505913" class="btn btn-primary"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" /></svg> Dogovorite termin</a>
+          <a href="#kako-funkcionise" class="btn btn-outline">Kako funkcioniše?</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>Novi Sad</strong><span>i bliža okolina</span></div>
+          <div class="hero-stat"><strong>Isti protokoli</strong><span>kao u laboratoriji</span></div>
+          <div class="hero-stat"><strong>Bez čekanja</strong><span>u redu za vađenje krvi</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-photo-frame">
+          <img src="assets/img/teren/vozilo-hero.jpg" alt="Vozilo BIOTEST-a za terenske posete, parkirano ispred laboratorije" loading="eager">
+        </div>
+        <div class="hero-badge">
+          <span class="hero-badge-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg></span>
+          <div><strong>Naše vozilo</strong><span>Lako uočljivo na vašoj adresi</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container">
-      <div class="section-header">
-        <span class="eyebrow">Kućne posete</span>
-        <h1>Usluge na terenu</h1>
-        <p>Ne morate uvek da dolazite u laboratoriju — naše osoblje izlazi na teren i uzima uzorke tamo gde vama odgovara: kod kuće, na poslu ili u ustanovi.</p>
-      </div>
-
       <div class="grid grid-3">
         <div class="card card-hover">
           <div class="icon-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" /></svg></div>
@@ -70,6 +93,21 @@
   </section>
 
   <section class="section section-tight">
+    <div class="container">
+      <div class="section-header">
+        <span class="eyebrow">Naše vozilo</span>
+        <h2>Prepoznatljivo na svakoj adresi</h2>
+        <p>Isti brendirani automobil koji dolazi na sve terenske posete — lako ga je uočiti kada stigne pred vašu zgradu ili kuću.</p>
+      </div>
+      <div class="photo-gallery">
+        <div class="photo-gallery-item"><img src="assets/img/teren/vozilo-strana-1.jpg" alt="Vozilo BIOTEST-a, bočni pogled, parkirano na ulici" loading="lazy"></div>
+        <div class="photo-gallery-item"><img src="assets/img/teren/vozilo-strana-2.jpg" alt="Vozilo BIOTEST-a, bočni pogled iz drugog ugla" loading="lazy"></div>
+        <div class="photo-gallery-item"><img src="assets/img/teren/vozilo-strana-3.jpg" alt="Vozilo BIOTEST-a parkirano ispred stambene zgrade" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight" id="kako-funkcionise">
     <div class="container">
       <div class="section-header">
         <span class="eyebrow">Kako funkcioniše</span>
@@ -150,7 +188,7 @@
       <div>
         <h4>Navigacija</h4>
         <ul class="footer-links">
-          <li><a href="katalog.html">Katalog analiza</a></li>
+          <li><a href="katalog.html">Cenovnik</a></li>
           <li><a href="lokacije.html">Lokacije</a></li>
           <li><a href="teren.html">Usluge na terenu</a></li>
           <li><a href="popusti.html">Popusti i promocije</a></li>
