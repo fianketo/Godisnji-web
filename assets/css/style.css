@@ -378,6 +378,22 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
 .hero-car-cutout {
   max-width: 480px;
   margin: 0 auto;
+  animation: drive-in 1.3s both;
+}
+/* Auto se "doveze" s desne strane pri učitavanju stranice — .hero ima
+   overflow:hidden, pa polazna pozicija van kadra ne pravi horizontalni skrol.
+   Timing-function je namerno po pojedinačnim keyframe-ovima (ne na celoj
+   animaciji), da vožnja ne "stigne" na mesto već u prvih 30-40% trajanja
+   i ostatak samo mirno stoji — glavni deo puta traje do 82%, tek onda
+   kratko "sleganje amortizera" (blagi preskok unazad i vraćanje). */
+@keyframes drive-in {
+  0% { transform: translateX(150%); animation-timing-function: cubic-bezier(0.32, 0.02, 0.25, 1); }
+  82% { transform: translateX(0%); animation-timing-function: ease-out; }
+  91% { transform: translateX(-1.2%); animation-timing-function: ease-in-out; }
+  100% { transform: translateX(0%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-car-cutout { animation: none; }
 }
 .hero--wide-visual .hero-grid { grid-template-columns: 1fr 1.15fr; align-items: center; }
 .hero--wide-visual .hero-car-cutout { max-width: 640px; }
