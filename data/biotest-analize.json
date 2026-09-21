@@ -1,0 +1,5700 @@
+{
+  "HEMATOLOGIJA": [
+    {
+      "name": "cK-Sedimentacija",
+      "instrument": "",
+      "time": "4h",
+      "price": 150
+    },
+    {
+      "name": "eK-KKS",
+      "instrument": "Mythic 22 AL",
+      "time": "4h",
+      "price": 470
+    },
+    {
+      "name": "eK-KS",
+      "instrument": "",
+      "time": "4h",
+      "price": 390
+    },
+    {
+      "name": "eK-Leukociti",
+      "instrument": "",
+      "time": "4h",
+      "price": 250
+    },
+    {
+      "name": "eK-Trombociti",
+      "instrument": "",
+      "time": "4h",
+      "price": 250
+    },
+    {
+      "name": "eK-Retikulociti",
+      "instrument": "",
+      "time": "6h",
+      "price": 400
+    },
+    {
+      "name": "eK-Leukocitarna formula",
+      "instrument": "",
+      "time": "4h",
+      "price": 140
+    },
+    {
+      "name": "K-Razmaz periferne krvi",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "hK-Methemoglobin",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1630
+    },
+    {
+      "name": "eK-Anemija srpastih ćelija",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4200
+    },
+    {
+      "name": "cK-Redukovani glutation",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4600
+    },
+    {
+      "name": "34 mutacije cistična fibroza",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 3800
+    }
+  ],
+  "HEMOSTAZA": [
+    {
+      "name": "cP-Koagulacioni faktor XI",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3300
+    },
+    {
+      "name": "K-Vreme krvarenja",
+      "instrument": "",
+      "time": "4h",
+      "price": 140
+    },
+    {
+      "name": "K-Vreme koagulacije",
+      "instrument": "",
+      "time": "4h",
+      "price": 140
+    },
+    {
+      "name": "cP-Vreme koagulacije (Howell)",
+      "instrument": "",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "cP-Protrombinsko vreme",
+      "instrument": "Sysmex CA660",
+      "time": "4h",
+      "price": 390
+    },
+    {
+      "name": "cP-aPTT",
+      "instrument": "Sysmex CA660",
+      "time": "4h",
+      "price": 390
+    },
+    {
+      "name": "cP-Fibrinogen KGM,",
+      "instrument": "Sysmex CA660",
+      "time": "4h",
+      "price": 450
+    },
+    {
+      "name": "cP-Trombinsko vreme",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 500
+    },
+    {
+      "name": "cP-D-Dimer",
+      "instrument": "Cobas C501",
+      "time": "1 dan",
+      "price": 2100
+    },
+    {
+      "name": "cP-Lupus antikoagulans",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1850
+    },
+    {
+      "name": "cP-Protein C",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3500
+    },
+    {
+      "name": "cP-Protein S",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3500
+    },
+    {
+      "name": "cP-Antitrombin III",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2800
+    },
+    {
+      "name": "cP-APCR (rezistencija na aktivisani protein C)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2800
+    },
+    {
+      "name": "cP-Koagulacioni faktor IX",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3000
+    },
+    {
+      "name": "cP-Koagulacioni faktor VIII",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3400
+    },
+    {
+      "name": "cP-Koagulacioni faktor XII",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3400
+    },
+    {
+      "name": "cP-Heparin (anti Xa aktivnost)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2400
+    },
+    {
+      "name": "cP-von Willebrand-ov faktor (aktivnost)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3200
+    },
+    {
+      "name": "cP-von Willebrand-ov faktor (antigen)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3400
+    },
+    {
+      "name": "cP-Euglobulinska fibrinoliza",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1000
+    },
+    {
+      "name": "cP-Koagulacioni faktor XIII",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3950
+    },
+    {
+      "name": "cP-Koagulacioni faktor V",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 3300
+    },
+    {
+      "name": "cP-Koagulacioni faktor VII",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 3300
+    },
+    {
+      "name": "cP-Koagulacioni faktor X",
+      "instrument": "Biomedika",
+      "time": "6 dana",
+      "price": 3300
+    }
+  ],
+  "BIOHEMIJA": [
+    {
+      "name": "S-Glukoza",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 140
+    },
+    {
+      "name": "S-OGTT sa 75g glukoze",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 750
+    },
+    {
+      "name": "S-OGTT sa 100g glukoze",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 750
+    },
+    {
+      "name": "eK-HbA1c",
+      "instrument": "Cobas Integra 400_2",
+      "time": "4h",
+      "price": 950
+    },
+    {
+      "name": "S-Holesterol",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 240
+    },
+    {
+      "name": "S-HDL holesterol",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 240
+    },
+    {
+      "name": "S-Trigliceridi",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 240
+    },
+    {
+      "name": "S-LDL holesterol",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 50
+    },
+    {
+      "name": "S-Apo - A1",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 800
+    },
+    {
+      "name": "S-Apo - B",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 800
+    },
+    {
+      "name": "S-Lipoprotein A",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Natrijum",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Kalijum",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Hlor",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Bikarbonati",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 300
+    },
+    {
+      "name": "S-Kalcijum - ukupni",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Kalcijum - jonski",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "S-Fosfor",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Magnezijum",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Cink",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1000
+    },
+    {
+      "name": "S-Bakar",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 800
+    },
+    {
+      "name": "S-ALT",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-AST",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-ALP",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-GGT",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-LDH",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 220
+    },
+    {
+      "name": "S-Holinesteraza",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 500
+    },
+    {
+      "name": "S-CK (CPK)",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 390
+    },
+    {
+      "name": "S-CK-MB",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "S-Amilaza",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "S-Lipaza",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "S-Kisela fosfataza",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 350
+    },
+    {
+      "name": "S-Kisela fosfataza - prostatična",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 350
+    },
+    {
+      "name": "S-Alkalna fosfataza (koštana)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4800
+    },
+    {
+      "name": "S-Gvožđe",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 240
+    },
+    {
+      "name": "S-TIBC",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "S-UIBC",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "S-Saturacija transferina",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "S-Test oralnog opt. gvožđem",
+      "instrument": "Cobas C501",
+      "time": "8h",
+      "price": 500
+    },
+    {
+      "name": "S-Feritin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "S-Transferin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 990
+    },
+    {
+      "name": "S-Haptoglobin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1300
+    },
+    {
+      "name": "S-Proteini ukupni",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Albumini",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Ceruloplazmin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1400
+    },
+    {
+      "name": "S-Bilirubin - ukupan",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Bilirubin - direktan",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-Urea",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Urea - klirens",
+      "instrument": "",
+      "time": "4h",
+      "price": 400
+    },
+    {
+      "name": "S-Kreatinin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Kreatinin-klirens",
+      "instrument": "",
+      "time": "4h",
+      "price": 400
+    },
+    {
+      "name": "S-eGFR (Procenjena brzina glomerularne fitracije)",
+      "instrument": "",
+      "time": "4h",
+      "price": 300
+    },
+    {
+      "name": "S-Acidum uricum",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "S-RF (reumatoidni faktor)",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 700
+    },
+    {
+      "name": "S-Waaler Rose",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 660
+    },
+    {
+      "name": "S-ASTO",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 700
+    },
+    {
+      "name": "S-CRP",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "S-Troponin I",
+      "instrument": "",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "S-Troponin T",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1850
+    },
+    {
+      "name": "S-Mioglobin",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 1900
+    },
+    {
+      "name": "eP-BNP (B. NATRIURETIČKI PEPTID)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 3700
+    },
+    {
+      "name": "S-NT-proBNP",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 4100
+    },
+    {
+      "name": "hP-Olovo",
+      "instrument": "Biomedika",
+      "time": "12 dana",
+      "price": 4100
+    },
+    {
+      "name": "hK-Živa",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4100
+    },
+    {
+      "name": "S-Selen",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3800
+    },
+    {
+      "name": "S-Aluminijum",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "S-Arsen",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "S-Kobalt",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "hK-Hrom",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "hK-Mangan",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "Km-Analiza kamena hemijski3",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "F-Pankreasna elastaza",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Fruktozamin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1350
+    },
+    {
+      "name": "eK-Glukoza-6-fosfat-dehidrogenaza",
+      "instrument": "Biomedika",
+      "time": "6 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-Ukupne žučne kiseline",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "S-Pankreasna amilaza",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 800
+    },
+    {
+      "name": "S-Jod nivo",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4300
+    },
+    {
+      "name": "S-Triptaza",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4700
+    },
+    {
+      "name": "eK-Holinesteraza eritrocitna",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Troponin I (kvantitativno)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1800
+    },
+    {
+      "name": "eP-Omega 6/Omega 3 masne kiseline",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 8200
+    },
+    {
+      "name": "S-Bilirubin indirektni",
+      "instrument": "",
+      "time": "4 sata",
+      "price": 140
+    },
+    {
+      "name": "S-Hitotriozidaza",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2700
+    },
+    {
+      "name": "eP-Koenzim Q10",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4700
+    },
+    {
+      "name": "S-Superoksid dizmutaza (SOD)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-sTfR (Solubilni transferinski receptor)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3700
+    },
+    {
+      "name": "S-Osmolalitet seruma",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1200
+    },
+    {
+      "name": "S-Oksidativni stres",
+      "instrument": "Biomedika",
+      "time": "12 dana",
+      "price": 6000
+    },
+    {
+      "name": "eK-CRP/MxA",
+      "instrument": "Afias 1",
+      "time": "4h",
+      "price": 900
+    },
+    {
+      "name": "Hemosiderin",
+      "instrument": "Biomedika",
+      "time": "15 rd",
+      "price": 1850
+    },
+    {
+      "name": "S-Aldolaza",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 1700
+    },
+    {
+      "name": "P-Pregled seroznih tečnosti mikroskopski,",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1200
+    }
+  ],
+  "ELEKTROFOREZA": [
+    {
+      "name": "dU-Elektroforeza proteina urina",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Imunoelektroforeza seruma",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 5000
+    },
+    {
+      "name": "U-Imunoelektroforeza urina",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 5000
+    },
+    {
+      "name": "eK-Elektroforeza hemoglobina",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2600
+    },
+    {
+      "name": "S-Elektroforeza ser. proteina",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2100
+    }
+  ],
+  "ANALIZA URINA": [
+    {
+      "name": "U-Kompletan pregled urina",
+      "instrument": "",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "U-PH - urin",
+      "instrument": "",
+      "time": "2h",
+      "price": 200
+    },
+    {
+      "name": "U-Specifična težina - urin",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Proteini - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Glukoza - urin",
+      "instrument": "Cobas Integra 400",
+      "time": "4h",
+      "price": 100
+    },
+    {
+      "name": "U-Glukoza - urin (kvantitativno)",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Ketoni - urin",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Bilirubin - urin",
+      "instrument": "",
+      "time": "4h",
+      "price": 100
+    },
+    {
+      "name": "U-Krv - urin",
+      "instrument": "",
+      "time": "",
+      "price": 200
+    },
+    {
+      "name": "U-Leukociti - urin",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Nitriti - urin",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Kalcijum - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Kreatinin - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Acidum uricum - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Amilaza - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Test na trudnoću",
+      "instrument": "",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "U-Urea - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Bence Jones proteini",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 850
+    },
+    {
+      "name": "U-Proteini - urin (kvantitativno)",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 300
+    },
+    {
+      "name": "U-Mikroalbumini - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "U-Kalijum - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Natrijum - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Hlor - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Fosfat - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "U-Trichomonas vaginalis",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "U-Magnezijum - urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 220
+    },
+    {
+      "name": "U-Fenol - urin",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1900
+    },
+    {
+      "name": "U-Beta 2 mikroglobulin (urin)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1500
+    },
+    {
+      "name": "U-Alkohol u urinu",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1900
+    },
+    {
+      "name": "U-Osmolalitet urina",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1200
+    },
+    {
+      "name": "U-Bakar - urin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "U-Odnos mikroalbumini/kreatinin (ACR)",
+      "instrument": "",
+      "time": "4h",
+      "price": 1560
+    }
+  ],
+  "24H URIN": [
+    {
+      "name": "dU-Olovo - 24 urin",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 4000
+    },
+    {
+      "name": "dU-Natrijum - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Kalijum - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Hlor - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Fosfat - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Kalcijum - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Magnezijum - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Bakar - 24h urin",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 4000
+    },
+    {
+      "name": "dU-Urea - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Kreatinin - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Acidum uricum - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Proteini - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 350
+    },
+    {
+      "name": "dU-Glukoza - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 160
+    },
+    {
+      "name": "dU-Mikroalbumini - 24h urin",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "dU-Kateholamini - 24h urin (Adrenalin, Noradrenalin, Dopamin)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 5000
+    },
+    {
+      "name": "dU-VMA",
+      "instrument": "Biomedika",
+      "time": "6 dana",
+      "price": 2100
+    },
+    {
+      "name": "dU-5-HIAA",
+      "instrument": "Biomedika",
+      "time": "6 dana",
+      "price": 2100
+    },
+    {
+      "name": "dU-17-ketosteroidi",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2600
+    },
+    {
+      "name": "dU-17-OH kortikosteriodi",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3100
+    },
+    {
+      "name": "dU-Metanefrin free - 24h urin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "dU-Porfobilinogen",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1900
+    },
+    {
+      "name": "dU-Koproporfirini",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1700
+    },
+    {
+      "name": "dU-Uroporfirini",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1700
+    },
+    {
+      "name": "dU-Aldosteron - 24h urin",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "dU-d-Aminolevulinska kiselina",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1500
+    },
+    {
+      "name": "dU-Normetanefrin - 24h urin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4600
+    },
+    {
+      "name": "dU-Serotonin - 24h urin",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 4000
+    },
+    {
+      "name": "dU-Cistin - 24h urin",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3300
+    },
+    {
+      "name": "dU-Oksalati - 24h urin",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 1900
+    },
+    {
+      "name": "dU-Citrati - 24h urin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 1800
+    },
+    {
+      "name": "dU-Cortisol - 24h urin",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "dU-Homovanilna kis. (HVA) 24h urin",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 2100
+    },
+    {
+      "name": "dU-Slobodni Kappa lanci (24h urin)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4100
+    },
+    {
+      "name": "dU-Slobodni Lambda lanci (24h urin)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4100
+    },
+    {
+      "name": "dU-Živa - 24h urin",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 4100
+    },
+    {
+      "name": "dU-Jod - 24h urin",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 4500
+    }
+  ],
+  "FECES": [
+    {
+      "name": "F-Helicobacter pylori Ag",
+      "instrument": "",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "F-Okultno krvarenje",
+      "instrument": "",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "F-Svarljivost hrane",
+      "instrument": "",
+      "time": "5h",
+      "price": 500
+    },
+    {
+      "name": "F-Kalprotektin",
+      "instrument": "Alegria",
+      "time": "4 dana",
+      "price": 3900
+    },
+    {
+      "name": "F-Adeno/Rota/Noro/Astro virusi",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 5300
+    },
+    {
+      "name": "F-Adeno/Rota virus",
+      "instrument": "",
+      "time": "",
+      "price": 900
+    },
+    {
+      "name": "F-Okultno krvarenje I",
+      "instrument": "",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "F-Okultno krvarenje II",
+      "instrument": "",
+      "time": "4h",
+      "price": 600
+    },
+    {
+      "name": "F-Okultno krvarenje III",
+      "instrument": "",
+      "time": "4h",
+      "price": 600
+    }
+  ],
+  "TRANSFUZIOLOGIJA": [
+    {
+      "name": "S-Krvna grupa",
+      "instrument": "",
+      "time": "",
+      "price": 1800
+    },
+    {
+      "name": "S-Trudnička antitela",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Coombs-ov test",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 1800
+    }
+  ],
+  "HORMONI": [
+    {
+      "name": "S-TSH",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 650
+    },
+    {
+      "name": "S-T3",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 650
+    },
+    {
+      "name": "S-T4",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 650
+    },
+    {
+      "name": "S-FT3",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 650
+    },
+    {
+      "name": "S-FT4",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 650
+    },
+    {
+      "name": "S-Tireoglobulin - hTg",
+      "instrument": "Cobas e411",
+      "time": "4h",
+      "price": 1250
+    },
+    {
+      "name": "S-Tg At",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1150
+    },
+    {
+      "name": "S-Anti TPO",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "S-TSH receptorska At (TRAb)",
+      "instrument": "Maglumi X3",
+      "time": "1 dana",
+      "price": 2500
+    },
+    {
+      "name": "S-rT3(reverzni T3)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 6700
+    },
+    {
+      "name": "S-Kalcitonin",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1450
+    },
+    {
+      "name": "S-FSH",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-LH",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-Estradiol",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-Progesteron",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-17-OH progesteron",
+      "instrument": "Maglumi X3",
+      "time": "7 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Prolaktin",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-Makroprolaktin",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Testosteron",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 850
+    },
+    {
+      "name": "S-Free Testosteron",
+      "instrument": "Maglumi X3",
+      "time": "4 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Dihidrotestosteron",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2400
+    },
+    {
+      "name": "S-Androstendion",
+      "instrument": "Maglumi X3",
+      "time": "2 dan",
+      "price": 1800
+    },
+    {
+      "name": "S-DHEA-S",
+      "instrument": "Maglumi X3",
+      "time": "2 dan",
+      "price": 1400
+    },
+    {
+      "name": "S-Inhibin A",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3600
+    },
+    {
+      "name": "S-Inhibin B",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2850
+    },
+    {
+      "name": "S-SHBG",
+      "instrument": "Maglumi X3",
+      "time": "2 dan",
+      "price": 1150
+    },
+    {
+      "name": "S-Insulin",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1250
+    },
+    {
+      "name": "S-Insulin 60 min",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1250
+    },
+    {
+      "name": "S-Insulinska rezistencija - HOMA",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    },
+    {
+      "name": "S-C-peptid",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1150
+    },
+    {
+      "name": "S-Adiponektin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3900
+    },
+    {
+      "name": "S-Glukagon",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4900
+    },
+    {
+      "name": "S-Cortisol",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1000
+    },
+    {
+      "name": "eP-ACTH",
+      "instrument": "Cobas e601",
+      "time": "4h",
+      "price": 1300
+    },
+    {
+      "name": "S-Aldosteron",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "eP-Renin",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2350
+    },
+    {
+      "name": "S-hGH (hormon rasta)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1550
+    },
+    {
+      "name": "S-IGF I (somatomedin C)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2300
+    },
+    {
+      "name": "eP-Vazopresin ADH",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4400
+    },
+    {
+      "name": "S-Oksitocin",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3800
+    },
+    {
+      "name": "eP-Adrenalin (Epinefrin)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 1500
+    },
+    {
+      "name": "eP-Noradrenalin (Norepinefrin)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Serotonin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Vitamin B12",
+      "instrument": "Cobas e601",
+      "time": "4h",
+      "price": 1300
+    },
+    {
+      "name": "S-Folna kiselina",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "S-Eritropoetin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2800
+    },
+    {
+      "name": "S-Cross Laps",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1650
+    },
+    {
+      "name": "S-Osteokalcin",
+      "instrument": "Maglumi X3",
+      "time": "1 dan",
+      "price": 2000
+    },
+    {
+      "name": "S-PTH",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "S-Vitamin D total",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 2200
+    },
+    {
+      "name": "S-P1NP",
+      "instrument": "Maglumi X3",
+      "time": "2 dana",
+      "price": 4950
+    },
+    {
+      "name": "S-Leptin",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Grelin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-Homocystein",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 2600
+    },
+    {
+      "name": "S-Procalcitonin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 3000
+    },
+    {
+      "name": "S-Melatonin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3600
+    },
+    {
+      "name": "eP-Free Metanefrin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3400
+    },
+    {
+      "name": "eP-Free Normetanefrin",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3400
+    },
+    {
+      "name": "S-Humani placent. laktogen",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2500
+    },
+    {
+      "name": "S-Cystatin C",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2400
+    },
+    {
+      "name": "S-IGFBP3",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2300
+    },
+    {
+      "name": "S-Vitamin C",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2600
+    },
+    {
+      "name": "S-Vitamin E",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2800
+    },
+    {
+      "name": "S-Vitamin A",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2800
+    },
+    {
+      "name": "eK-Vitamin B1",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2800
+    },
+    {
+      "name": "S-Vitamin B2",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2800
+    },
+    {
+      "name": "eK-Vitamin B6",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Vitamin H (B7,biotin)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3200
+    },
+    {
+      "name": "S-Vitamin K",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 5100
+    },
+    {
+      "name": "S-Beta Karoten",
+      "instrument": "Biomedika",
+      "time": "17 dana",
+      "price": 5400
+    },
+    {
+      "name": "S-Beta HCG",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 990
+    },
+    {
+      "name": "S-Estriol free E3",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 1600
+    },
+    {
+      "name": "S-Melanin",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 5400
+    },
+    {
+      "name": "S-Gastrin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2500
+    },
+    {
+      "name": "S-DHEA",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2100
+    },
+    {
+      "name": "S-Estron E1",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2100
+    },
+    {
+      "name": "S-Karnitin i profil acil-karnitina",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 10000
+    },
+    {
+      "name": "S-Pregnenolon",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4500
+    },
+    {
+      "name": "S-PTH intact",
+      "instrument": "Biomedika",
+      "time": "4 dan",
+      "price": 1500
+    },
+    {
+      "name": "S-Tau protein ukupni",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4200
+    },
+    {
+      "name": "eP-Metilmalonska kiselina",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 6000
+    },
+    {
+      "name": "eP-Kateholamini u plazmi (Adrenalin, Noradrenalin, Dopamin)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 5000
+    },
+    {
+      "name": "S-Anti Milerov Hormon",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 3200
+    }
+  ],
+  "TUMOR MARKERI": [
+    {
+      "name": "S-TATI (Tu. asoc. tripsin inhibitor)",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-CEA",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "S-CA 19-9",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1400
+    },
+    {
+      "name": "S-CA 15-3",
+      "instrument": "MiniVidas",
+      "time": "4h",
+      "price": 1350
+    },
+    {
+      "name": "S-CA 125",
+      "instrument": "Cobas e601",
+      "time": "4h",
+      "price": 1400
+    },
+    {
+      "name": "S-HE4",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 2600
+    },
+    {
+      "name": "S-PSA",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1100
+    },
+    {
+      "name": "S-Free PSA",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "S-CA 72-4",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1800
+    },
+    {
+      "name": "S-CYFRA 21-1",
+      "instrument": "Cobas e601",
+      "time": "1 dan",
+      "price": 1600
+    },
+    {
+      "name": "S-NSE",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1800
+    },
+    {
+      "name": "S-S 100 protein",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 4000
+    },
+    {
+      "name": "S-Beta 2 mikroglobulin",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Hromogranin A (CgA)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3000
+    },
+    {
+      "name": "S-ACE (angiotenzin konvertujući enzim)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1900
+    },
+    {
+      "name": "U-UBC",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3900
+    },
+    {
+      "name": "S-CA 50",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2500
+    },
+    {
+      "name": "S-SCC (squamous cell carcinoma At)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-AFP",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1000
+    },
+    {
+      "name": "S-TNF-A (Tumor necrosis factor alpha)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4600
+    },
+    {
+      "name": "eK-EGF (epidermalni faktor rasta)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-TPA (Tkivni polipeptidni antigen)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Roma index (CA125 + HE4)",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 3800
+    }
+  ],
+  "PRENATALNI SKRINING": [
+    {
+      "name": "S-Free beta HCG",
+      "instrument": "Cobas e411_2",
+      "time": "8h",
+      "price": 1000
+    },
+    {
+      "name": "S-PAPP-A",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 1000
+    },
+    {
+      "name": "S-Double test (12-14 NG)",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 3100
+    },
+    {
+      "name": "Triple test (16-18 NG)",
+      "instrument": "",
+      "time": "5 dana",
+      "price": 3700
+    }
+  ],
+  "IMUNOLOGIJA": [
+    {
+      "name": "S-ZnT8 (Cink Transporter 8) antitela",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 5800
+    },
+    {
+      "name": "S-IgE - ukupni",
+      "instrument": "Cobas e411_2",
+      "time": "4h",
+      "price": 950
+    },
+    {
+      "name": "S-Imunoglobulin A (IgA)",
+      "instrument": "Cobas C501",
+      "time": "8h",
+      "price": 750
+    },
+    {
+      "name": "S-Imunoglobulin M (IgM)",
+      "instrument": "Cobas C501",
+      "time": "8h",
+      "price": 750
+    },
+    {
+      "name": "S-Imunoglobulin G (IgG)",
+      "instrument": "Cobas C501",
+      "time": "8h",
+      "price": 750
+    },
+    {
+      "name": "S-C3 komplement",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 750
+    },
+    {
+      "name": "S-C4 komplement",
+      "instrument": "Cobas C501",
+      "time": "4h",
+      "price": 750
+    },
+    {
+      "name": "S-C1 inhibitor",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1700
+    },
+    {
+      "name": "cP-C1 inaktivator",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2600
+    },
+    {
+      "name": "S-ANA screen",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1550
+    },
+    {
+      "name": "S-ANA (HEP-2)",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Anti Ro/SSA",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Anti La/SSB",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Anti JO-1 At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-RNP/Sm At (U1-RNP/Sm)",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-c-ANCA (anti PR3)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-p-ANCA (anti MPO)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Antimitohondrijalna M2 At (AMA)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Kardiolipinska IgM At (ACA)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1850
+    },
+    {
+      "name": "S-Kardiolipinska IgG At (ACA)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1850
+    },
+    {
+      "name": "S-Antifosfolipidna At IgM",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1850
+    },
+    {
+      "name": "S-Antifosfolipidna At IgG",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1850
+    },
+    {
+      "name": "S-Antiglatkomišićna At (ASMA)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1850
+    },
+    {
+      "name": "S-Glijadinska IgA At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Glijadinska IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Transglutaminska At IgA",
+      "instrument": "Alegria",
+      "time": "3 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Transglutaminska At IgG",
+      "instrument": "Alegria",
+      "time": "3 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-GAD At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2900
+    },
+    {
+      "name": "S-Anti MUSK At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4700
+    },
+    {
+      "name": "S-Acetilholinski receptori At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Krioglobulini",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 900
+    },
+    {
+      "name": "S-Anti LKM1 At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-ASCA IgA",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-ASCA IgG",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Ovarijalna At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2100
+    },
+    {
+      "name": "S-Spermatozoidna At (serum)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1700
+    },
+    {
+      "name": "SPR-Spermatozoidna At (sperma)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-ANA (ENA) Profil 15 At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 5700
+    },
+    {
+      "name": "hK-Quantiferon TB GOLD",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 7400
+    },
+    {
+      "name": "S-C1q antitela",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Beta 2 glikoprotein IgM",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Beta 2 glikoprotein IgG",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Ukupni komplement CH50",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Anti SCL 70 At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Anti neuronalna At (Hu, Yu, Ri...)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 6200
+    },
+    {
+      "name": "S-Endomizijalna IgA At",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Endomizijalna IgG At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Aquaporine 4 At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3600
+    },
+    {
+      "name": "S-Anti IA2 At (Tyrozin phosphatase At)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2900
+    },
+    {
+      "name": "S-Anti ICA At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4500
+    },
+    {
+      "name": "S-Insulinska At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Antiparijetalna At (APA)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "eK-T limfociti (CD4+)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 5500
+    },
+    {
+      "name": "S-Centromerni protein B At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "eK-Subpopulacije limfocita",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 8000
+    },
+    {
+      "name": "S-Anti GBM At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Intrinsic faktor At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Trombocitna At IgA/IgG/IgM",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3000
+    },
+    {
+      "name": "S-Alfa 1 antitripsin",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1500
+    },
+    {
+      "name": "S-Interleukin 6 ( IL6 )",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 4300
+    },
+    {
+      "name": "S-Adrenalna At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "S-Imunokompleksi (PEG)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1000
+    },
+    {
+      "name": "S-Anti MOG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2600
+    },
+    {
+      "name": "S-Sm At (lupusna At)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Diaminooksidaza (DAO)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3700
+    },
+    {
+      "name": "S-Anti CCP hs (high sensitive)",
+      "instrument": "Alegria",
+      "time": "1 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Antisrčana At (ASA)",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-Retikulinska At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4300
+    },
+    {
+      "name": "S-Infliximab At",
+      "instrument": "Biomedika",
+      "time": "do 15 dana",
+      "price": 4700
+    },
+    {
+      "name": "S-IgG subklase (IgG 1,2,3,4)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 5900
+    },
+    {
+      "name": "S-Slobodni Kappa/Lambda Lanci",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 5200
+    },
+    {
+      "name": "S-ds-DNA At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-C1q Komplement",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-ANA (ENA) Profil 25 At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 7100
+    },
+    {
+      "name": "S-Miozitis profil",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 6000
+    },
+    {
+      "name": "S-RNP 70 At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Streptokokna DNaza B At",
+      "instrument": "Biomedika",
+      "time": "20 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Treponema pallidum IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Treponema pallidum IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-BP 180 IgG Pemfigus",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-BP 230 IgG Pemfigus",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-SLA (Solubil liver Ag) IgG At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2300
+    }
+  ],
+  "VIRUSOLOGIJA": [
+    {
+      "name": "eK-JC virus PCR",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 10500
+    },
+    {
+      "name": "S-Herpes simplex tip I IgM At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Herpes simplex tip I IgG At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Herpes simplex tip II IgM At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Herpes simplex tip II IgG At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Respiratorni sincicijalni virus IgM",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Respiratorni sincicijalni virus IgG",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Mumps virus IgM At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Mumps virus IgG At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-TORCH IgM At ELISA,",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 7000
+    },
+    {
+      "name": "S-TORCH IgG At ELISA,",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 6500
+    },
+    {
+      "name": "S-Borrelia burgdorferi IgM At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Borrelia burgdorferi IgG At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Echinococcus IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Trichinela spiralis IgG At",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Helicobacter pylori IgA At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Helicobacter pylori IgG At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Candida IgM At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Candida IgG At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Coxsackie virus IgM At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Coxsackie virus IgG At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-CMV IgM At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-CMV IgG At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Epstein Barr IgM At",
+      "instrument": "Alegria",
+      "time": "1 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Epstein Barr IgG At",
+      "instrument": "Alegria",
+      "time": "1 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Parvovirus B19 IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Parvovirus B19 IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Rubella IgM At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Rubella IgG At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Varicella zoster IgA At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Varicella zoster IgM At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Varicella zoster IgG At",
+      "instrument": "Alegria",
+      "time": "2 dana",
+      "price": 1400
+    },
+    {
+      "name": "S-Toxoplasma gondii IgM At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Toxoplasma gondii IgG At",
+      "instrument": "MiniVidas",
+      "time": "2 dana",
+      "price": 1450
+    },
+    {
+      "name": "S-Morbili (Measles) IgM At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Morbili (Measles) IgG At",
+      "instrument": "Alegria",
+      "time": "3 dana",
+      "price": 1500
+    },
+    {
+      "name": "S-Toxocariosis At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 3600
+    },
+    {
+      "name": "S-Cysticercosis IgG At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Listeria monocytogenes IgM At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Aviditet Toxoplasma IgG",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet CMV IgG",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet VZV IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet Rubella IgG",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet EBV IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet HSV 1 IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet HSV 2 IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet Parvovirus B19 IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aviditet Morbilli IgG",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-HAV ukupna At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-HAV IgM",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-HBs Ag",
+      "instrument": "",
+      "time": "4h",
+      "price": 1500
+    },
+    {
+      "name": "S-HBs ukupna At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-HBc ukupna At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-HBc IgM At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-HBe Ag",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-HBe ukupna At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Anti HCV",
+      "instrument": "",
+      "time": "4h",
+      "price": 1500
+    },
+    {
+      "name": "S-HIV 1/2",
+      "instrument": "",
+      "time": "4h",
+      "price": 1500
+    },
+    {
+      "name": "S-VDRL",
+      "instrument": "",
+      "time": "6h",
+      "price": 1000
+    },
+    {
+      "name": "S-TPHA",
+      "instrument": "",
+      "time": "6h",
+      "price": 1000
+    },
+    {
+      "name": "S-Treponema pallidum",
+      "instrument": "",
+      "time": "6h",
+      "price": 1000
+    },
+    {
+      "name": "S-Borrelia Burgdorferi WB IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 5100
+    },
+    {
+      "name": "S-Borrelia Burgdorferi WB IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 5100
+    },
+    {
+      "name": "S-Galaktomanan test",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3600
+    },
+    {
+      "name": "S-Brucella IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Brucella IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3100
+    },
+    {
+      "name": "S-West Nile virus IgM At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2400
+    },
+    {
+      "name": "S-West Nile virus IgG At",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2400
+    },
+    {
+      "name": "S-HIV Western Blot",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 7200
+    },
+    {
+      "name": "S-Epstein-Barr EBNA-1 IgG At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 3000
+    },
+    {
+      "name": "S-Humani herpes virus 6 IgM At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 4400
+    },
+    {
+      "name": "S-Humani herpes virus 6 IgG At",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 3200
+    },
+    {
+      "name": "S-Echinococcus IgG At WB",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 7500
+    },
+    {
+      "name": "S-Yersinia IgA At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Yersinia IgG At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Leptospira IgM At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3200
+    },
+    {
+      "name": "S-Leptospira IgG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3200
+    },
+    {
+      "name": "S-HDV ukupna At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-HEV-Hepatitis E ukupna AT",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Tularemija At ( Francisella tularensis",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2600
+    },
+    {
+      "name": "S-Adenovirus IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Adenovirus IgA At",
+      "instrument": "Biomedika",
+      "time": "4 radna dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Adenovirus IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Influenza A IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Influenza A IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Influenza B IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Influenza B IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Parainfluenza 1 IgM At",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Parainfluenza 1 IgG At",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2000
+    },
+    {
+      "name": "S-Mycoplasma pneum. IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Mycoplasma pneum. IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Chlamydia trachomatis IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-Chlamydia trachomatis IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1700
+    },
+    {
+      "name": "B/U-Chlamydia Rapid test",
+      "instrument": "",
+      "time": "",
+      "price": 1000
+    },
+    {
+      "name": "S-Chlamydia pneumoniae IgM At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Chlamydia pneumoniae IgG At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Echinococcus ukupna At",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-HCV ukupna At",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 1700
+    },
+    {
+      "name": "S-Coxiella Burnetii IgM At (Q GROZNICA)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Coxiella Burnetii IgG At (Q GROZNICA)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Ureaplasma urealyticum IgM At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Ureaplasma urealyticum IgG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Paul-Bunnell",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Toxocara canis IgG At",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 3500
+    },
+    {
+      "name": "S-Listeria monocytogenes IgG At (1/2a,4b)",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 1800
+    },
+    {
+      "name": "S-Bordetella pertussis toksin IgA At",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Bordetella pertussis toksin IgG At",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 1900
+    },
+    {
+      "name": "S-Treponema pallidum At",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2050
+    },
+    {
+      "name": "S-Aspergillus Fumigatus IgM At",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2050
+    },
+    {
+      "name": "S-Aspergillus Fumigatus IgG At",
+      "instrument": "Biomedika",
+      "time": "9 dana",
+      "price": 2050
+    },
+    {
+      "name": "S-Treponema pallidum WB IgM At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4700
+    },
+    {
+      "name": "S-Treponema pallidum WB IgG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 4700
+    },
+    {
+      "name": "S-Tetanus toxoid IgG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2900
+    },
+    {
+      "name": "S-Bordetella pertussis IgM At",
+      "instrument": "Biomedika",
+      "time": "7 dana",
+      "price": 1600
+    },
+    {
+      "name": "S-Mycoplasma hominis IgM At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Mycoplasma hominis IgG At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2700
+    },
+    {
+      "name": "S-Echinococcus IgG At IIF",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 4000
+    },
+    {
+      "name": "S-MONO Rapid test (Infectious Mononucleosis)",
+      "instrument": "",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "S-SARS-COV-2 IgM At",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2700
+    },
+    {
+      "name": "S-SARS-COV-2 IgG At - Spike protein",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 2700
+    },
+    {
+      "name": "S-Bartonella henselae IgM At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3400
+    },
+    {
+      "name": "S-Bartonella henselae IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3400
+    }
+  ],
+  "TOKSIKOLOGIJA": [
+    {
+      "name": "U-Opijati (5)",
+      "instrument": "",
+      "time": "8h",
+      "price": 2700
+    },
+    {
+      "name": "U-Opijati (10)",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 3500
+    },
+    {
+      "name": "U-Methaqualone",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 900
+    }
+  ],
+  "NIVO LEKA": [
+    {
+      "name": "S-Litijum",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 600
+    },
+    {
+      "name": "S-Valproat (Eftil)",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1600
+    },
+    {
+      "name": "S-Carbamazepine",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 1600
+    },
+    {
+      "name": "S-Phenobarbital",
+      "instrument": "Biomedika",
+      "time": "1 dan",
+      "price": 1600
+    },
+    {
+      "name": "S-Digoksin nivo leka",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 2200
+    },
+    {
+      "name": "S-Lidocaine (nivo leka)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-1-OH-Midazolam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Alprazolam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Bromazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Chlordiazepoxide",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Clobazam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Clonazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Demoxepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Desalkylflurazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Diazepam (Valium)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Flunitrazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Flurazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Lorazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Lormetazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Madazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Midazolam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Nitrazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Norclobazam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Nordiazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Oxazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Prazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Temazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Tetrazepam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Truazolam",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 6200
+    },
+    {
+      "name": "S-Lamictal",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 3400
+    },
+    {
+      "name": "S-Levetiracetam (Keppra)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 3400
+    },
+    {
+      "name": "S-Infliximab nivo leka",
+      "instrument": "Biomedika",
+      "time": "do 15 dana",
+      "price": 6200
+    }
+  ],
+  "DERMATOLOGIJA": [
+    {
+      "name": "B-Dermatofiti",
+      "instrument": "",
+      "time": "15 dana",
+      "price": 1500
+    },
+    {
+      "name": "B-Sarcoptes skabiei",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 1000
+    },
+    {
+      "name": "B-Wood-ova lampa",
+      "instrument": "",
+      "time": "",
+      "price": 1000
+    },
+    {
+      "name": "B-Nativan mikološki preparat",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 1000
+    },
+    {
+      "name": "B-Demodex folliculorum",
+      "instrument": "",
+      "time": "",
+      "price": 1000
+    },
+    {
+      "name": "Pediculosis pubis",
+      "instrument": "",
+      "time": "",
+      "price": 1000
+    }
+  ],
+  "MIKROBIOLOGIJA": [
+    {
+      "name": "B-Bris nokta + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris kože oko nokta",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris guše + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris guše bakteriološki",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 480
+    },
+    {
+      "name": "B-Bris nosa + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris nosa bakteriološki",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 480
+    },
+    {
+      "name": "B-Streptotest",
+      "instrument": "",
+      "time": "45 min.",
+      "price": 950
+    },
+    {
+      "name": "F-Brzi test za campilobakter",
+      "instrument": "",
+      "time": "",
+      "price": 1450
+    },
+    {
+      "name": "B-Bris epifaringsa + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris oka + gljivice (levo)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris oka (levo)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 480
+    },
+    {
+      "name": "B-Bris oka + gljivice (desno)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris oka (desno)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 480
+    },
+    {
+      "name": "B-Bris uha + gljivice (levo)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris uha + gljivice (desno)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris kože + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 730
+    },
+    {
+      "name": "B-Bris rane + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 930
+    },
+    {
+      "name": "B-Bris uretre + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris cerviksa + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris vagine + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris vulve + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris prepucijuma + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris glansa + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris pustule + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris akne + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris usne duplje + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris jezika + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris desni + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris bukalne sluznice + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "B-Bris proteze + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "Iscedak dojke + gljivice",
+      "instrument": "",
+      "time": "",
+      "price": 780
+    },
+    {
+      "name": "B-Chlamydia Trach. DIF (bris cerviksa)",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 1200
+    },
+    {
+      "name": "B-Chlamydia Trach. DIF (bris uretre)",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 1200
+    },
+    {
+      "name": "B/U-Chlamydia antigen test",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "B-Urea Myc. (bris cerviksa)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "B-Urea Myc. (bris uretre)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "U-Urea Myc. (urin)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "SPR-Urea Myc. (ejakulat)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 2100
+    },
+    {
+      "name": "B-Gonokok",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 550
+    },
+    {
+      "name": "U-Urin gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 400
+    },
+    {
+      "name": "U-Urinokultura",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "Urinokultura-brzi test",
+      "instrument": "",
+      "time": "24h",
+      "price": 1300
+    },
+    {
+      "name": "SPR-Spermokultura",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "Antibiogram",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 300
+    },
+    {
+      "name": "Prošireni antibiogram",
+      "instrument": "",
+      "time": "",
+      "price": 400
+    },
+    {
+      "name": "Antimikogram",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 1800
+    },
+    {
+      "name": "SPT-Sputum bakt + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 630
+    },
+    {
+      "name": "OT-Perianalni otisak",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 350
+    },
+    {
+      "name": "F-Koprokultura",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 850
+    },
+    {
+      "name": "Koprokultura (+Y.Enterocolitica,Camp.spp.)",
+      "instrument": "Biomedika",
+      "time": "3-4 dana",
+      "price": 1900
+    },
+    {
+      "name": "F-Stolica na gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 400
+    },
+    {
+      "name": "F-Ciste crevnih protozoa",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 550
+    },
+    {
+      "name": "F-Stolica na jaja crevnih parazita",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 550
+    },
+    {
+      "name": "F-Clostridium dif. toxin A/B",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 2400
+    },
+    {
+      "name": "B-HSV (tip 1)",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 2000
+    },
+    {
+      "name": "B-HSV (tip 2)",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 2000
+    },
+    {
+      "name": "B-Adeno virus",
+      "instrument": "",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "B-Coxsackie B virus (bris)",
+      "instrument": "",
+      "time": "5 dana",
+      "price": 2000
+    },
+    {
+      "name": "Mleko bakt. + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 780
+    },
+    {
+      "name": "eK-Malarija",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 1900
+    },
+    {
+      "name": "Punktat bakt. + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 800
+    },
+    {
+      "name": "Gnojni sadržaj",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 800
+    },
+    {
+      "name": "Eksprimat prostate",
+      "instrument": "",
+      "time": "",
+      "price": 600
+    },
+    {
+      "name": "B-Vaginalni sekret",
+      "instrument": "",
+      "time": "1-2 dana",
+      "price": 550
+    },
+    {
+      "name": "Vaginalni bris - bakterijska vaginoza",
+      "instrument": "",
+      "time": "1-2 dana",
+      "price": 600
+    },
+    {
+      "name": "B-Lepra u brisu nosa - DMP",
+      "instrument": "Biomedika",
+      "time": "2-3 dana",
+      "price": 1500
+    },
+    {
+      "name": "Bioptat endometrijuma",
+      "instrument": "",
+      "time": "",
+      "price": 900
+    },
+    {
+      "name": "Ispirak",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "Tkivo",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "B-Bris abdomena + gljivice",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 930
+    },
+    {
+      "name": "B-Bris operacionog stola",
+      "instrument": "",
+      "time": "",
+      "price": 420
+    },
+    {
+      "name": "B-Chlamydia Trach. DIF (bris oka)",
+      "instrument": "",
+      "time": "",
+      "price": 1200
+    },
+    {
+      "name": "B-Influenza A+B virus (bris)",
+      "instrument": "",
+      "time": "2 h",
+      "price": 2000
+    },
+    {
+      "name": "B-RSV Rapid test",
+      "instrument": "",
+      "time": "2 h",
+      "price": 2000
+    },
+    {
+      "name": "S-Legionella Pneumophila IgM At",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 1900
+    },
+    {
+      "name": "Legionella Pneumophila IgG At",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 1900
+    },
+    {
+      "name": "B-Screening test na Streptococcus agalactiae",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 950
+    },
+    {
+      "name": "B-SARS-CoV-2 Antigen",
+      "instrument": "",
+      "time": "1h",
+      "price": 1500
+    },
+    {
+      "name": "B-Bris kavuma (endometrijuma)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 500
+    },
+    {
+      "name": "B-SARS-CoV Antigen",
+      "instrument": "",
+      "time": "1h",
+      "price": 1500
+    },
+    {
+      "name": "Trichomonas vaginalis - vaginalni bris",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 450
+    },
+    {
+      "name": "B-Panel respiratornih virusa",
+      "instrument": "",
+      "time": "4h",
+      "price": 2900
+    },
+    {
+      "name": "B-Epstein Barr virus brzi test",
+      "instrument": "",
+      "time": "4h",
+      "price": 1200
+    },
+    {
+      "name": "F-Koprokultura - proširena",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 2500
+    },
+    {
+      "name": "Chlamydia Trach. DIF (bris grla)",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 1200
+    },
+    {
+      "name": "B-Urea Myc. (bris vagine)",
+      "instrument": "",
+      "time": "",
+      "price": 2100
+    },
+    {
+      "name": "B-Cervikalni bris - bakterijska vaginoza",
+      "instrument": "",
+      "time": "",
+      "price": 550
+    }
+  ],
+  "ALERGENI": [
+    {
+      "name": "B-Eozinofili u nosu (bris)",
+      "instrument": "",
+      "time": "8h",
+      "price": 400
+    },
+    {
+      "name": "S-Inhalatorni panel",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 5800
+    },
+    {
+      "name": "S-Nutritivni panel",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 5800
+    },
+    {
+      "name": "S-Phadiatop - alatop",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2400
+    },
+    {
+      "name": "S-Phadiatop - infant",
+      "instrument": "Biomedika",
+      "time": "8-10 dana",
+      "price": 3200
+    },
+    {
+      "name": "S-ECP (eozinofilni katjonski protein)",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2350
+    },
+    {
+      "name": "eP-Histamin",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2100
+    },
+    {
+      "name": "S-Pčela I1",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Osa I3",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Bubašvaba I6",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Komarac I71",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Stršljen I75",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Paprika F218",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "U-Histamin u urinu",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2200
+    },
+    {
+      "name": "Inhalatorni i nutritivni panel 54",
+      "instrument": "",
+      "time": "4 dana",
+      "price": 10000
+    },
+    {
+      "name": "S-Articaine C68",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    }
+  ],
+  "ALERGENI - INHALATORNI": [
+    {
+      "name": "S-Polen trava mix GX1 (G3,G4,G5,G6,G8)",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen drveća mix TX9 (T2,T3,T4,T7,T12)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen korova mix WX1 (W1,W6,W9,W10,W11)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen korova mix WX2 (W2, W6, W9, W10)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Buđ mix MX1 (M1, M2, M3, M6)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Buđ mix MX2 (M1, M2, M3,M5, M6, M8)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Perje mix EX73",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Dlaka mix EX1",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Pas (dlaka) E5",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Pirevina G2",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Ambrosia elatior W1",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Ljulj, engleska trava G5",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Niski korov W1",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Topola T4",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Maslačak W8",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Divlji pelin W6",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Platan T11",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Konj E3 (dlaka)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Mačka E1",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Helminthosporum halodes M8",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Kućna prašina H1",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Duvan O201",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Grinje D2, Dermatofago. farine",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Grinje D1, Dermatofago. pteronis.",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Posteljna prašina H3",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Latex K82",
+      "instrument": "Biomedika",
+      "time": "2 dan",
+      "price": 2200
+    },
+    {
+      "name": "S-Popino prase G6",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Kućna prašina H2",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Kućna prašina mix HP1 (H1, D1, D2, I6)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen trava mix GP4 (G1,G5,G7,G12,G13)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen trava mix GX3 (G1,G5,G6,G12,G13)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen trava mix GX2 (G2,G5,G6,G8,G10,G17)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen korova i cveća mix WX5 (W1,W6,W7,W8,W12)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen niskih korova mix WX7 (W7,W8,W9,W10,W12)",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2300
+    },
+    {
+      "name": "S-Polen drveća mix TP1 (T1,T3,T7,T8,T10)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Buđ mix MP1 (M1, M2, M3, M5, M6)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Buđ mix MX8 (M1,M25,M28,M30)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Pas (epitel) E2",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Zova",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Zec E82",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Vrba T12",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Zamorac E6",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Visoki korov W3",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Svinja E83",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Papagaj E196",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Ovca E81",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Maslina T9",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Lipa",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Leska T4",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kućni ljubimci EX2 (E1, E2, E6, E84)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Kravlja dlaka E4",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kopriva W20",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Kanarinac E9",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Javor platan T1",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Jova T2",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Hrčak E84",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Hrast T16",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Golub E11",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Glycyphagus domesticus D73",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Glycyphagus destructor D71",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Čempres T23",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Breza T3",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Brest T8",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Bor T16",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Bokvica W9",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Acarus siro D70 (grinja brašna)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Alergoharma H4",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Jasen T15",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Loboda W15",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Tyrophagus putrescental",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-ASPERGILLUS FUMIGATUS M3",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    }
+  ],
+  "ALERGENI - NUTRITIVNI": [
+    {
+      "name": "S-Paradajz F25",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Laktoza B312",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Gluten F79",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Belance F1",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Žumance F75",
+      "instrument": "Biomedika",
+      "time": "2 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Jaje mix RF 245",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Mleko F2",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Mleko u prahu F228",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Kazein F78",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Alfa laktalbumin F76",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Pšenično brašno F4",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Ražano brašno F4",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Pirinač F9",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Soja F14",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Piletina F83",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kikiriki F13",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Jagode F44",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kivi F84",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kakao F93",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Čokolada F52",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Šargarepa F31",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Celer F85",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Krompir F35",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kvasac F45",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Tuna F40",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Svinjetina F26",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Spanać F214",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Skuša F174",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Ribizla F171",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Morska riba mix FP2",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Raž G12",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Oslić F307",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Orah F16",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Meso mix FP73 (F26, F27, F83, F88)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Med F247",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Malina F156",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Lešnik F17",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kupina F211",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kukuruzno brašno F8",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kruška F271",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 2200
+    },
+    {
+      "name": "S-Ječam G18",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Indijski orah F158",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Grašak F287",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Ćureće meso F284",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Goveđe meso F27",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Borovnica F229",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Boranija F132",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Badem F20",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Kafa F221",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Grožđe F50",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Pšenica G15",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Želatin",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2700
+    },
+    {
+      "name": "Kupus F 216",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Mleko + Gluten panel",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 4000
+    },
+    {
+      "name": "S-Limun F208",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 2600
+    }
+  ],
+  "ALERGENI - LEKOVI": [
+    {
+      "name": "S-Penicilloyl G C1",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Penicilloyl V C2",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 2200
+    },
+    {
+      "name": "S-Cephalosporini C6",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Ampicillin C203",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Amoxicillin C204",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Ciprofloxacin C108",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Baktrim trimethoprim",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 3300
+    },
+    {
+      "name": "S-Aspirin (acetilsalicilna kiselina) C217",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Erythromycin C212",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Ibuprofen C286",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Tetracycline C211",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Doxycyclin C216",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Paracetamol/Acetaminophen C209",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Streptomycin C206",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 3700
+    },
+    {
+      "name": "S-Lidocaine/Xilocaine C232",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Mepivacaine C88",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Gentamycin C213",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Diclofenac C281",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Clindamycin",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    },
+    {
+      "name": "S-Azitromycin (hemomycin)",
+      "instrument": "Biomedika",
+      "time": "10-15 dana",
+      "price": 2300
+    }
+  ],
+  "INTOLERANCIJA": [
+    {
+      "name": "S-Intolerancija na hranu 54",
+      "instrument": "",
+      "time": "4 dana",
+      "price": 11000
+    }
+  ],
+  "SPERMA": [
+    {
+      "name": "SPR-Spermogram",
+      "instrument": "",
+      "time": "1 dan",
+      "price": 2700
+    },
+    {
+      "name": "SPR-Trichomonas vaginalis sp.",
+      "instrument": "",
+      "time": "4h",
+      "price": 200
+    }
+  ],
+  "PCR": [
+    {
+      "name": "28 HPV HUMANI PAPILOMA VIRUS",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 9200
+    },
+    {
+      "name": "41 HPV HUMANI PAPILOMA VIRUS",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 10500
+    },
+    {
+      "name": "cK-JAK2 GEN detekcija mutacije V617F",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 10000
+    },
+    {
+      "name": "eK-M.Tuberculosis u krvi (PCR)",
+      "instrument": "Biomedika",
+      "time": "12 dana",
+      "price": 8000
+    },
+    {
+      "name": "SPT-M.Tuberculosis u sputumu (PCR)",
+      "instrument": "Biomedika",
+      "time": "12 dana",
+      "price": 7000
+    },
+    {
+      "name": "U-Chlamydia Trachomatis PCR (urin)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 3400
+    },
+    {
+      "name": "B-Chlamydia Trachomatis PCR (bris)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 3400
+    },
+    {
+      "name": "Sp-Chlamydia Trachomatis PCR (sperma)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 3400
+    },
+    {
+      "name": "SpHumani papiloma virus sa tipizacijom - HPV (sperma)",
+      "instrument": "",
+      "time": "15 dana",
+      "price": 8800
+    },
+    {
+      "name": "B-Humani papiloma virus sa tipizacijom - HPV (bris)",
+      "instrument": "",
+      "time": "15 dana",
+      "price": 8800
+    },
+    {
+      "name": "B-Trombofilija faktor II (protrombin G20210A)",
+      "instrument": "DNK Centar",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "B-Trombofilija faktor V (Leiden)",
+      "instrument": "DNK Centar",
+      "time": "15 dana",
+      "price": 4000
+    },
+    {
+      "name": "B-Trombofilija MTHFR (C677Tmut)",
+      "instrument": "DNK Centar",
+      "time": "15 dana",
+      "price": 4300
+    },
+    {
+      "name": "Trombofilija MTHFR (lokus 1298)",
+      "instrument": "DNK Centar",
+      "time": "5 dana",
+      "price": 4100
+    },
+    {
+      "name": "cK-PAI-1",
+      "instrument": "DNK Centar",
+      "time": "5 dana",
+      "price": 4500
+    },
+    {
+      "name": "k-EGFR",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 13000
+    },
+    {
+      "name": "B/U-Ureaplasma urealyticum PCR",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3900
+    },
+    {
+      "name": "eK-HLA B27 antigen",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 9300
+    },
+    {
+      "name": "eK-HLA tipizacija (aleli DQ2 i DQ8 haplotipovi)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 10000
+    },
+    {
+      "name": "B-STD 4 (Mycoplasma hominis, Ureaplasma spp, Chlamydia trachomatis, HPV)",
+      "instrument": "Biomedika",
+      "time": "10-12 dana",
+      "price": 10000
+    },
+    {
+      "name": "B-STD 3 (Chlamydia trachomatis, Mycoplasma hominis, Ureaplasma spp)",
+      "instrument": "Biomedika",
+      "time": "10-12 dana",
+      "price": 7000
+    },
+    {
+      "name": "B/U-Mycoplasma homynis PCR",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3900
+    },
+    {
+      "name": "eK-HIV RNK PCR kvantitativni",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 12500
+    },
+    {
+      "name": "ePHIV RNK PCR kvalitativni",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 12500
+    },
+    {
+      "name": "eP-HCV RNK PCR kvantitativni",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 12500
+    },
+    {
+      "name": "eP-HCV RNK PCR kvalitativni",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 12500
+    },
+    {
+      "name": "eP-HCV RNK PCR genotip",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 14500
+    },
+    {
+      "name": "eP-HBV DNK PCR kvantitativni",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 12500
+    },
+    {
+      "name": "HBV DNK PCR kvalitativni",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 12500
+    },
+    {
+      "name": "B-Gonokok PCR (bris)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 3500
+    },
+    {
+      "name": "eK-CMV PCR kvantitativni",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 7000
+    },
+    {
+      "name": "cK-CMV PCR kvalitativni",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 7000
+    },
+    {
+      "name": "hK-Kariotip",
+      "instrument": "Biomedika",
+      "time": "8 dana",
+      "price": 10500
+    },
+    {
+      "name": "B-Očinstvo,utvrđivanje",
+      "instrument": "DNK Centar",
+      "time": "",
+      "price": 29000
+    },
+    {
+      "name": "B-Srodstvo, utvrđivanje",
+      "instrument": "",
+      "time": "",
+      "price": 25000
+    },
+    {
+      "name": "B-HSV PCR (bris)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "U-HSV PCR (urin)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "Sp-HSV PCR (sperma)",
+      "instrument": "",
+      "time": "10 dana",
+      "price": 4000
+    },
+    {
+      "name": "eP-Borrelia Burgdorferi PCR",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 6000
+    },
+    {
+      "name": "eP-Borrelia Burgdorferi PCR (krpelj)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 6000
+    },
+    {
+      "name": "eK-Alfa 1 Antitripsin genotipizacija",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 12500
+    },
+    {
+      "name": "eK-Laktozna intolerancija PCR",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 7000
+    },
+    {
+      "name": "cK-Mikrodelecije Y hromozoma (15 lokusa)",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 13500
+    },
+    {
+      "name": "cK-Cistična fibroza PCR",
+      "instrument": "DNK Centar",
+      "time": "4 dana",
+      "price": 15000
+    },
+    {
+      "name": "eK-BRCA1/BRCA2",
+      "instrument": "Biomedika",
+      "time": "30 dana",
+      "price": 80000
+    },
+    {
+      "name": "cK-Beta talasemija PCR",
+      "instrument": "Biomedika",
+      "time": "16 dana",
+      "price": 14000
+    },
+    {
+      "name": "cK-Herpes simplex virus tip 1/tip 2 PCR (HSV)",
+      "instrument": "Biomedika",
+      "time": "11 dana",
+      "price": 9000
+    },
+    {
+      "name": "cK-Epstein-Barr virus PCR (EBV)",
+      "instrument": "Biomedika",
+      "time": "11 dana",
+      "price": 10800
+    },
+    {
+      "name": "Očinstvo,utvrđivanje,drugo dete",
+      "instrument": "DNK Centar",
+      "time": "",
+      "price": 8000
+    },
+    {
+      "name": "cK-BCR/ABL MOLEKULARNA DETEKCIJA AML i CML i praćenje minimalne rezidualne bolesti",
+      "instrument": "",
+      "time": "15 dana",
+      "price": 30000
+    },
+    {
+      "name": "cKHemohromatoza PCR",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 10500
+    },
+    {
+      "name": "hK-Hromozomske aberacije",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 6500
+    },
+    {
+      "name": "cK-FRAGILNI X SINDROM genetska analiza",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 22000
+    },
+    {
+      "name": "B-Panel respiratornih virusa PCR",
+      "instrument": "Biomedika",
+      "time": "3 dana",
+      "price": 7000
+    },
+    {
+      "name": "U-Gonokok PCR (urin)",
+      "instrument": "",
+      "time": "2 dana",
+      "price": 3000
+    },
+    {
+      "name": "cK-UGT1A1 (Žilberov sindrom)",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 13500
+    },
+    {
+      "name": "B-Praporeklo (Y haplotip)",
+      "instrument": "DNK Centar",
+      "time": "7 dana",
+      "price": 13000
+    },
+    {
+      "name": "B-Humani papiloma virus sa tipizacijom 14",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 5500
+    },
+    {
+      "name": "B-Humani papiloma virus sa tipizacijom 28",
+      "instrument": "Biomedika",
+      "time": "4 dana",
+      "price": 8800
+    },
+    {
+      "name": "U-STD 7",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 10000
+    },
+    {
+      "name": "cK-VZV PCR",
+      "instrument": "Biomedika",
+      "time": "10 dana",
+      "price": 9000
+    },
+    {
+      "name": "eK-DIHIDROPIRIMIDIN DEHIDROGENAZA genotipizacija (DPYD)",
+      "instrument": "Biomedika",
+      "time": "5 dana",
+      "price": 14400
+    },
+    {
+      "name": "CFTR gen sekvenciranje(99% mutacija)",
+      "instrument": "",
+      "time": "",
+      "price": 32000
+    },
+    {
+      "name": "B-DNK profil",
+      "instrument": "DNK Centar",
+      "time": "7 dana",
+      "price": 14000
+    }
+  ],
+  "PATOHISTOLOGIJA": [
+    {
+      "name": "Papanikolau - citoskriner - akreditovani supervizor",
+      "instrument": "",
+      "time": "3 dana",
+      "price": 900
+    },
+    {
+      "name": "Papanikolau",
+      "instrument": "",
+      "time": "5 dana",
+      "price": 1300
+    },
+    {
+      "name": "Vaginalni sekret - patolog",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "Patohistološka analiza",
+      "instrument": "",
+      "time": "",
+      "price": 4000
+    },
+    {
+      "name": "Patohistološka analiza -2",
+      "instrument": "",
+      "time": "",
+      "price": 2500
+    },
+    {
+      "name": "Patohistološka analiza - konizat grlića materice",
+      "instrument": "",
+      "time": "",
+      "price": 4500
+    },
+    {
+      "name": "Patohistološka analiza - biopsija kože i mekih tkiva",
+      "instrument": "",
+      "time": "",
+      "price": 3000
+    },
+    {
+      "name": "Patohistološka analiza - hirurški materijal",
+      "instrument": "",
+      "time": "",
+      "price": 4500
+    },
+    {
+      "name": "Patohistološka analiza - hirurški materijal",
+      "instrument": "",
+      "time": "",
+      "price": 2250
+    },
+    {
+      "name": "Punkciona citologija",
+      "instrument": "",
+      "time": "",
+      "price": 2000
+    },
+    {
+      "name": "Patohistološka analiza - punkciona citologija",
+      "instrument": "",
+      "time": "",
+      "price": 2000
+    },
+    {
+      "name": "Patohistološka analiza - gastro.",
+      "instrument": "",
+      "time": "",
+      "price": 2500
+    },
+    {
+      "name": "Patohistološka analiza - gastro. 2. uzorak",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "Patohistološka analiza - gastro. 3. uzorak",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "Sekstant biopsije prostate",
+      "instrument": "",
+      "time": "",
+      "price": 4400
+    },
+    {
+      "name": "Sekstant biopsije prostate + 1 isečak",
+      "instrument": "",
+      "time": "",
+      "price": 4900
+    },
+    {
+      "name": "Sekstant biopsije prostata + 2 isečka",
+      "instrument": "",
+      "time": "",
+      "price": 5400
+    },
+    {
+      "name": "Sekstant biopsije prostata + 3 isečka",
+      "instrument": "",
+      "time": "",
+      "price": 5900
+    },
+    {
+      "name": "Sekstant biopsije prostata + 4 isečka",
+      "instrument": "",
+      "time": "",
+      "price": 6400
+    },
+    {
+      "name": "Sekstant biopsije prostata + 5 isečaka",
+      "instrument": "",
+      "time": "",
+      "price": 6500
+    },
+    {
+      "name": "Ex tempore sa definitivnom PH dijagnostikom",
+      "instrument": "",
+      "time": "",
+      "price": 8000
+    },
+    {
+      "name": "Imunohistohemija - obrada materijala",
+      "instrument": "",
+      "time": "",
+      "price": 2500
+    },
+    {
+      "name": "Imunohistohemija - sa 1 antitelom",
+      "instrument": "",
+      "time": "",
+      "price": 3000
+    },
+    {
+      "name": "Obrada dela tkiva jajnika za in vitro aktivaciju",
+      "instrument": "",
+      "time": "",
+      "price": 12000
+    },
+    {
+      "name": "Revizija",
+      "instrument": "",
+      "time": "",
+      "price": 5000
+    },
+    {
+      "name": "Sekstant (12)",
+      "instrument": "",
+      "time": "",
+      "price": 6000
+    },
+    {
+      "name": "Plitak konizat (LOOP, RF)",
+      "instrument": "",
+      "time": "",
+      "price": 4500
+    },
+    {
+      "name": "Plitak konizat i",
+      "instrument": "",
+      "time": "",
+      "price": 6000
+    },
+    {
+      "name": "Konizat (klasičan)",
+      "instrument": "",
+      "time": "",
+      "price": 5000
+    },
+    {
+      "name": "Konizat i",
+      "instrument": "",
+      "time": "",
+      "price": 6500
+    },
+    {
+      "name": "Operacija (do 5 kalupa)",
+      "instrument": "",
+      "time": "",
+      "price": 5000
+    },
+    {
+      "name": "Operacija (6-10 kalupa)",
+      "instrument": "",
+      "time": "",
+      "price": 7000
+    },
+    {
+      "name": "Radikalna operacija (maligni tumori - više od 10 kalupa)",
+      "instrument": "",
+      "time": "",
+      "price": 10000
+    },
+    {
+      "name": "Patohistološka analiza - hirurški materijal(dopuna)",
+      "instrument": "",
+      "time": "",
+      "price": 5000
+    },
+    {
+      "name": "PH urologija",
+      "instrument": "",
+      "time": "",
+      "price": 4000
+    },
+    {
+      "name": "Sekstant biopsije prostate urologija",
+      "instrument": "",
+      "time": "",
+      "price": 6500
+    },
+    {
+      "name": "Biopsija 2 urologija",
+      "instrument": "",
+      "time": "",
+      "price": 2000
+    },
+    {
+      "name": "Biopsija 3 urologija",
+      "instrument": "",
+      "time": "",
+      "price": 2000
+    },
+    {
+      "name": "Biopsija 4 urologija",
+      "instrument": "",
+      "time": "",
+      "price": 2000
+    },
+    {
+      "name": "Sekstant 12 urologija",
+      "instrument": "",
+      "time": "",
+      "price": 8500
+    },
+    {
+      "name": "Hirurški materijal-urologija",
+      "instrument": "",
+      "time": "",
+      "price": 6500
+    },
+    {
+      "name": "Braf mutacije",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 9900
+    },
+    {
+      "name": "PDL receptori",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 9600
+    },
+    {
+      "name": "HER status",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 10600
+    },
+    {
+      "name": "MSI",
+      "instrument": "Biomedika",
+      "time": "",
+      "price": 14700
+    }
+  ],
+  "OSTALO": [
+    {
+      "name": "Usluzno vadjenje u laboratoriji",
+      "instrument": "",
+      "time": "",
+      "price": 200
+    },
+    {
+      "name": "Uzimanje uzorka za laboratorijsku analizu 300",
+      "instrument": "",
+      "time": "",
+      "price": 300
+    },
+    {
+      "name": "Uzimanje uzorka za laboratorijsku analizu 600",
+      "instrument": "",
+      "time": "",
+      "price": 600
+    },
+    {
+      "name": "Uzimanje uzorka za laboratorijsku analizu 800",
+      "instrument": "",
+      "time": "",
+      "price": 800
+    },
+    {
+      "name": "Uzimanje uzorka za laboratorijsku analizu 1200",
+      "instrument": "",
+      "time": "",
+      "price": 1200
+    },
+    {
+      "name": "Određivanje antikoag. terapije",
+      "instrument": "",
+      "time": "",
+      "price": 900
+    },
+    {
+      "name": "Određivanje antikoag. terapije (kontrola do 7 dana)",
+      "instrument": "",
+      "time": "",
+      "price": 700
+    },
+    {
+      "name": "Konsultacija hemostaziologa",
+      "instrument": "",
+      "time": "",
+      "price": 3000
+    },
+    {
+      "name": "Vađenje krvi",
+      "instrument": "",
+      "time": "",
+      "price": 100
+    },
+    {
+      "name": "hK-Mikronukleusni test",
+      "instrument": "Biomedika",
+      "time": "15 dana",
+      "price": 6200
+    },
+    {
+      "name": "Uzimanje briseva",
+      "instrument": "",
+      "time": "",
+      "price": 100
+    }
+  ]
+}

@@ -1,18 +1,42 @@
 // Minimal service worker — its main job is satisfying the browser's PWA
 // installability check (a registered fetch handler) so "Add to Home
 // Screen" actually offers the install prompt instead of just a bookmark.
-// Network-first: always prefers the live deployed version (this app
-// changes often) and only falls back to the cached shell when there's no
-// connection at all. Doesn't cache Firebase calls or the login video —
-// those need to be live/fresh, not stale-cached.
-const CACHE_NAME = 'odmorpro-shell-v2';
+// Network-first: always prefers the live deployed version and only falls
+// back to the cached shell when there's no connection at all.
+const CACHE_NAME = 'biotest-shell-v6';
 const SHELL_ASSETS = [
   './',
   './index.html',
+  './katalog.html',
+  './lokacije.html',
+  './teren.html',
+  './popusti.html',
+  './blog.html',
+  './clanak.html',
+  './o-nama.html',
   './manifest.json',
-  './icon.svg',
-  './icon-192.png',
-  './icon-512.png'
+  './assets/css/style.css',
+  './assets/js/main.js',
+  './assets/js/icons.js',
+  './assets/js/index-map.js',
+  './assets/js/catalog.js',
+  './assets/js/discount.js',
+  './assets/js/promotions.js',
+  './assets/js/promo-catalog-page.js',
+  './assets/js/firebase-config.js',
+  './assets/js/firebase-init.js',
+  './assets/js/blog.js',
+  './assets/js/popusti-page.js',
+  './assets/icons/icon.svg',
+  './assets/img/hero-video-poster.jpg',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/vendor/leaflet/leaflet.css',
+  './assets/vendor/leaflet/leaflet.js',
+  './data/biotest-analize.json',
+  './data/blog-posts.json',
+  './data/test-descriptions.json',
+  './data/locations.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,11 +53,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // Ne diraj pozive ka drugim domenima (npr. Firebase/Firestore, CartoDB
+  // mape) — presretanje bi moglo da pokvari njihove streaming/WebChannel
+  // konekcije. Keširamo samo fajlove sa istog porekla kao sajt.
+  if (new URL(event.request.url).origin !== self.location.origin) return;
   event.respondWith(
-    // cache: 'no-store' — without this, "network-first" is only
-    // aspirational: fetch() still honors normal HTTP caching, so a
-    // browser can hand back a stale cached response instead of actually
-    // hitting the network, and a deployed change silently never shows up.
     fetch(event.request, { cache: 'no-store' })
       .then((response) => {
         const copy = response.clone();
