@@ -173,6 +173,19 @@
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
 
+    // QR kod nosi sve potrebne podatke direktno (ne samo kod porudžbine) —
+    // osoblje na šalteru ih vidi odmah skeniranjem, bez oslanjanja na to da
+    // baza mora biti dostupna u tom trenutku. Baza (Firestore) i dalje čuva
+    // porudžbinu kao izvor istine za status "iskorišćen/neiskorišćen".
+    const qrPayload = {
+      code,
+      name,
+      email,
+      items: cart.map((p) => ({ name: p.name, price: p.newPrice })),
+      totalNew,
+      createdAt: new Date().toISOString(),
+    };
+
     window.Biotest.db.collection('orders').doc(code).set(order)
       .then(() => sendOrderEmail(code, name, email, itemsSummary, totalOld, totalNew))
       .then(() => {
@@ -180,7 +193,7 @@
         cart = [];
         renderGrid();
         renderCart();
-        showSuccess(code);
+        showSuccess(code, qrPayload);
         checkoutForm.reset();
       })
       .catch((err) => {
@@ -212,7 +225,7 @@
     });
   }
 
-  function showSuccess(code) {
+  function showSuccess(code, qrPayload) {
     successCode.textContent = code;
     checkoutSuccess.style.display = 'block';
     calcSummary.style.display = 'none';
@@ -220,7 +233,7 @@
     calcItemsEl.style.display = 'none';
     if (typeof qrcode !== 'undefined') {
       const qr = qrcode(0, 'M');
-      qr.addData(code);
+      qr.addData(JSON.stringify(qrPayload));
       qr.make();
       successQr.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2 });
     }

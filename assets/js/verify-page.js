@@ -74,6 +74,20 @@
     return raw.trim().toUpperCase();
   }
 
+  // QR kod sa popusti.html sada nosi sve podatke porudžbine kao JSON (ne
+  // samo goli kod), da bi bili čitljivi odmah pri skeniranju. Ako skenirani
+  // tekst nije taj JSON oblik (npr. kod je ručno prekucan ili je u pitanju
+  // stariji QR), tretiramo ga kao goli kod — i dalje radi.
+  function extractCodeFromScan(raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object' && parsed.code) return parsed.code;
+    } catch {
+      // nije JSON — nastavljamo dole sa sirovim tekstom kao kodom
+    }
+    return raw;
+  }
+
   function showMsg(text, ok) {
     lookupMsg.textContent = text;
     lookupMsg.className = 'promo-status-msg ' + (ok ? 'ok' : 'err');
@@ -148,7 +162,7 @@
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, imageData.width, imageData.height);
       if (code && code.data) {
-        codeInput.value = code.data;
+        codeInput.value = extractCodeFromScan(code.data);
         stopCamera();
         lookupCode();
         return;
