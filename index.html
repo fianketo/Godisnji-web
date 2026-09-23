@@ -1929,6 +1929,56 @@ textarea { resize: vertical; min-height: 80px; }
 </div>
 
 <!-- ============================================================
+     ADMIN ADD LEAVE MODAL (admin records an absence directly for an
+     employee who was away without submitting a request — saved as
+     already approved)
+     ============================================================ -->
+<div id="admin-leave-overlay" class="modal-overlay hidden">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <span class="modal-title">➕ Unesi odsustvo za radnika</span>
+      <button class="modal-close" id="admin-leave-modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Radnik *</label>
+        <select id="admin-leave-emp"></select>
+      </div>
+      <div class="form-group">
+        <label>Tip odsustva *</label>
+        <select id="admin-leave-type">
+          <option>Godišnji odmor</option>
+          <option>Bolovanje</option>
+          <option>Bolovanje (do 2 dana)</option>
+          <option>Slobodan dan</option>
+          <option>Plaćeno odsustvo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Od *</label>
+          <input type="date" id="admin-leave-start">
+        </div>
+        <div class="form-group">
+          <label id="admin-leave-end-label">Do *</label>
+          <input type="date" id="admin-leave-end">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Napomena</label>
+        <textarea id="admin-leave-note" placeholder="npr. nije podneo zahtev, javio se telefonom"></textarea>
+      </div>
+      <div id="admin-leave-info" style="font-size:.875rem;color:var(--text2)"></div>
+      <div class="text-xs text-muted" style="margin-top:.5rem">Odsustvo se upisuje kao već odobreno. Radnik dobija obaveštenje.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="admin-leave-cancel-btn">Otkaži</button>
+      <button class="btn btn-primary" id="admin-leave-confirm-btn">💾 Sačuvaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      DAY EVENTS MODAL (full list of who's out on a given calendar day
      — the day cells only show 1-2 names + "+N" to stay compact)
      ============================================================ -->
@@ -3547,6 +3597,8 @@ function renderEmployeeDetail(id) {
       <div class="timeline-sub">
         ${r.ongoing ? 'bolovanje u toku' : `${r.days} dan(a)`} · <span class="badge badge-${r.status==='approved'?'approved':r.status==='rejected'?'rejected':'pending'}">${statusSr(r.status)}</span>
         ${r.reason ? ' · ' + r.reason : ''}
+        ${r.note ? ' · ' + r.note : ''}
+        ${r.enteredByAdmin ? ' · <span class="text-xs text-muted">upisao admin</span>' : ''}
         ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
         ${!r.ongoing && r.status !== 'pending' ? `
           <button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openEditHistoryModal('${emp.id}','${r.id}')">✏️ Izmeni</button>
@@ -3558,7 +3610,10 @@ function renderEmployeeDetail(id) {
   main.innerHTML = `
     <div class="page-header">
       <button class="btn btn-secondary" onclick="navigateTo('employees')">← Nazad</button>
-      <button class="btn btn-primary" onclick="showEditEmployee('${emp.id}')">✏️ Izmeni</button>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button class="btn btn-secondary" onclick="openAdminLeaveModal('${emp.id}')">➕ Unesi odsustvo</button>
+        <button class="btn btn-primary" onclick="showEditEmployee('${emp.id}')">✏️ Izmeni</button>
+      </div>
     </div>
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-body">
@@ -3877,6 +3932,7 @@ function renderRequests() {
   main.innerHTML = `
     <div class="page-header">
       <div class="page-title">Zahtevi za odsustvo</div>
+      <button class="btn btn-primary" onclick="openAdminLeaveModal()">➕ Unesi odsustvo za radnika</button>
     </div>
     <div class="card">
       <div class="table-wrap">
@@ -4084,6 +4140,110 @@ function approveRequest(empId, reqId) {
   renderRequests();
   renderSidebar();
 }
+
+/* ================================================================
+   ADMIN ADD LEAVE (record an absence for an employee who never
+   submitted a request — goes straight into history as approved, with
+   the same day accounting as an approved request)
+   ================================================================ */
+function openAdminLeaveModal(empId) {
+  const emps = getEmployees().slice().sort((a, b) => a.name.localeCompare(b.name, 'sr'));
+  if (!emps.length) { toast('Nema radnika', 'warning'); return; }
+  const sel = document.getElementById('admin-leave-emp');
+  sel.innerHTML = emps.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+  if (empId) sel.value = empId;
+  document.getElementById('admin-leave-type').value = 'Godišnji odmor';
+  document.getElementById('admin-leave-start').value = todayStr();
+  document.getElementById('admin-leave-end').value = todayStr();
+  document.getElementById('admin-leave-note').value = '';
+  updateAdminLeaveInfo();
+  document.getElementById('admin-leave-overlay').classList.remove('hidden');
+}
+
+function closeAdminLeaveModal() {
+  document.getElementById('admin-leave-overlay').classList.add('hidden');
+}
+
+function updateAdminLeaveInfo() {
+  const type = document.getElementById('admin-leave-type').value;
+  const start = document.getElementById('admin-leave-start').value;
+  const end = document.getElementById('admin-leave-end').value;
+  const isSick = type === 'Bolovanje';
+  document.getElementById('admin-leave-end-label').textContent = isSick ? 'Do (prazno = u toku)' : 'Do *';
+  const info = document.getElementById('admin-leave-info');
+  const emp = getEmployees().find(e => e.id === document.getElementById('admin-leave-emp').value);
+  if (start && !end && isSick) { info.textContent = '📅 Bolovanje u toku (bez određenog kraja)'; return; }
+  if (!start || !end) { info.textContent = ''; return; }
+  const days = countLeaveDays(start, end, type);
+  if (days <= 0) { info.textContent = '⚠️ Datum "Do" je pre datuma "Od"'; return; }
+  let text = `📅 ${days} dan(a) odsustva`;
+  if (emp && type === 'Godišnji odmor') text += ` · preostalo godišnjeg: ${effectiveAnnualRemaining(emp)}`;
+  info.textContent = text;
+}
+
+['admin-leave-emp', 'admin-leave-type', 'admin-leave-start', 'admin-leave-end'].forEach(id =>
+  document.getElementById(id).addEventListener('change', updateAdminLeaveInfo));
+document.getElementById('admin-leave-modal-close').onclick = closeAdminLeaveModal;
+document.getElementById('admin-leave-cancel-btn').onclick = closeAdminLeaveModal;
+document.getElementById('admin-leave-overlay').addEventListener('click', e => {
+  if (e.target.id === 'admin-leave-overlay') closeAdminLeaveModal();
+});
+
+document.getElementById('admin-leave-confirm-btn').onclick = () => {
+  const empId = document.getElementById('admin-leave-emp').value;
+  const type = document.getElementById('admin-leave-type').value;
+  const start = document.getElementById('admin-leave-start').value;
+  const end = document.getElementById('admin-leave-end').value;
+  const note = document.getElementById('admin-leave-note').value.trim();
+  const isSick = type === 'Bolovanje';
+  if (!empId) { toast('Izaberite radnika', 'warning'); return; }
+  if (!start || (!end && !isSick)) { toast('Unesite datume', 'warning'); return; }
+  const ongoing = isSick && !end;
+  const days = ongoing ? null : countLeaveDays(start, end, type);
+  if (!ongoing && days <= 0) { toast('Nevalidni datumi', 'error'); return; }
+  if (type === 'Bolovanje (do 2 dana)' && days > 2) {
+    toast('Ovaj tip bolovanja je ograničen na 2 dana. Za duže odsustvo koristite "Bolovanje".', 'error'); return;
+  }
+  const emp0 = getEmployees().find(e => e.id === empId);
+  if (!emp0) return;
+  // Unlike an employee's own request, the admin is recording something
+  // that already happened (or is agreed), so going over the remaining
+  // balance is allowed — just confirmed, not blocked.
+  if (type === 'Godišnji odmor' && days > effectiveAnnualRemaining(emp0) &&
+      !confirm(`${emp0.name} ima još ${effectiveAnnualRemaining(emp0)} dana godišnjeg, a unosite ${days}. Svejedno sačuvati?`)) return;
+
+  const now = new Date().toISOString();
+  const newReq = {
+    id: 'r' + Date.now(),
+    leaveType: type,
+    startDate: start,
+    endDate: ongoing ? null : end,
+    days,
+    ongoing,
+    note,
+    status: 'approved',
+    submittedAt: now,
+    approvedAt: now,
+    enteredByAdmin: currentUser.name || true
+  };
+  const period = `${start}${ongoing ? ' – u toku' : ' → ' + end}`;
+  const msg = `Administrator je upisao vaše odsustvo "${type}" (${period}).`;
+  const emp = mutateEmployee(empId, e => {
+    e.leave_history = e.leave_history || [];
+    if (e.leave_history.some(r => r.id === newReq.id)) return;
+    const req = JSON.parse(JSON.stringify(newReq));
+    e.leave_history.push(req);
+    allocateApprovedDays(e, req);
+    addNotification(e, msg);
+  });
+  if (!emp) return;
+  sendLeaveEmail(emp, 'Odsustvo upisano', msg);
+  applyElapsedLeaveDeductions();
+  closeAdminLeaveModal();
+  toast(`Odsustvo upisano za ${emp.name}`, 'success');
+  renderPage();
+  renderSidebar();
+};
 
 /* ================================================================
    EDIT / DELETE HISTORY ENTRY (admin correction to an already
