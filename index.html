@@ -4351,8 +4351,13 @@ function renderSettings() {
                   : `<span class="text-muted text-xs">nepoznato</span>`}
               </td>
               <td><span class="badge badge-info">${u.role === 'admin' ? '👑 Admin' : '👤 Radnik'}</span></td>
-              <td>
-                ${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Obriši</button>` : '—'}
+              <td style="white-space:nowrap">
+                ${u.id === currentUser.id
+                  ? '<span class="text-muted text-xs">(vi)</span>'
+                  : u.role === 'admin'
+                    ? `<button class="btn btn-secondary btn-sm" onclick="setUserAdmin('${u.id}', false)">Ukloni admina</button>`
+                    : `<button class="btn btn-primary btn-sm" onclick="setUserAdmin('${u.id}', true)">👑 Postavi za admina</button>
+                       <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Obriši</button>`}
               </td>
             </tr>`).join('')}
           </tbody>
@@ -4443,6 +4448,26 @@ function renderHelp() {
         ${helpRow('⚙️', 'Podešavanja', 'pregled svih korisničkih naloga i uloga, izvoz/uvoz kompletnih podataka aplikacije u JSON.')}
       </div>
     </div>` : ''}`;
+}
+
+// Promote/demote another account. Admin is purely role === 'admin', so a
+// promoted user gets exactly the same menu, pages and rights as the
+// original admin (plus their own personal pages if they have an employee
+// profile — see navItemsFor). You can't change your own role, so the app
+// can never be left without an admin by accident.
+function setUserAdmin(userId, makeAdmin) {
+  if (userId === currentUser.id) return;
+  const users = getUsers();
+  const user = users.find(u => u.id === userId);
+  if (!user) return;
+  const msg = makeAdmin
+    ? `Dodeliti administratorska prava korisniku "${user.name}"? Imaće sve iste mogućnosti kao admin (odobravanje zahteva, radnici, izveštaji, podešavanja).`
+    : `Ukloniti administratorska prava korisniku "${user.name}"? Vratiće se na običnog radnika.`;
+  if (!confirm(msg)) return;
+  user.role = makeAdmin ? 'admin' : 'employee';
+  saveUsers(users);
+  renderSettings();
+  toast(makeAdmin ? `${user.name} je sada administrator` : `${user.name} više nije administrator`, 'success');
 }
 
 async function deleteUser(userId) {
@@ -5406,6 +5431,15 @@ function startCloudListeners() {
   });
   cloudListen('users', data => {
     localStorage.setItem('users', JSON.stringify(data));
+    // Pick up a role change (admin granted/removed) made from another
+    // device right away, without needing to log out and back in.
+    if (currentUser) {
+      const fresh = data.find(u => u.id === currentUser.id);
+      if (fresh && fresh.role !== currentUser.role) {
+        currentUser = fresh;
+        if (!navItemsFor(currentUser).some(i => i.id === currentPage)) currentPage = 'dashboard';
+      }
+    }
     renderRemoteUpdate(() => { renderSidebar(); renderPage(); });
   });
 }
