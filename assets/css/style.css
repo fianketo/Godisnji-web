@@ -238,6 +238,11 @@ p { margin: 0 0 1em; color: var(--color-text-muted); }
   color: var(--color-text-faint);
   letter-spacing: 0.03em;
 }
+@media (max-width: 520px) {
+  /* Na uskim telefonima podnaslov nema dovoljno prostora i lomi se u
+     2-3 reda, razvlačeći zaglavlje i gurajući logo van centra. */
+  .brand-sub { display: none; }
+}
 
 .nav-links {
   position: relative;
