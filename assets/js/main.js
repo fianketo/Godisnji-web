@@ -101,8 +101,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Dok reprodukcija stvarno ne počne, pokušavamo ponovo na par sekundi —
     // ne samo jednom na učitavanje — za slučaj da je prvi pokušaj naišao na
-    // privremeno zaglavljeno baferovanje koje se kasnije samo oporavi.
-    const retryTimer = setInterval(() => { if (!hasStartedPlaying) tryPlay(); }, 2000);
+    // privremeno zaglavljeno baferovanje koje se kasnije samo oporavi. Ako je
+    // video.networkState već 2 (aktivno učitava), NE zovemo play() ponovo —
+    // na sporijoj vezi bi ponovni pozivi mogli da ometaju baferovanje koje je
+    // već u toku, umesto da pomognu.
+    const retryTimer = setInterval(() => {
+      if (!hasStartedPlaying && heroVideo.networkState !== 2) tryPlay();
+    }, 2000);
 
     heroVideo.addEventListener('playing', () => {
       hasStartedPlaying = true;
