@@ -53,10 +53,17 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
   // Ne diraj pozive ka drugim domenima (npr. Firebase/Firestore, CartoDB
   // mape) — presretanje bi moglo da pokvari njihove streaming/WebChannel
   // konekcije. Keširamo samo fajlove sa istog porekla kao sajt.
-  if (new URL(event.request.url).origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin) return;
+  // Ne diraj ni video fajlove — mobilni video koristi HTTP Range (delimične)
+  // zahteve za strimovanje/premotavanje, a Cache API ne ume da sačuva 206
+  // Partial Content odgovor (cache.put baca grešku). Presretanje takvih
+  // zahteva kroz fetch/cache tok ume da pokvari reprodukciju na telefonu,
+  // pa ih puštamo pravo u mrežu, bez kešovanja.
+  if (url.pathname.includes('/assets/video/') || event.request.destination === 'video') return;
   event.respondWith(
     fetch(event.request, { cache: 'no-store' })
       .then((response) => {
