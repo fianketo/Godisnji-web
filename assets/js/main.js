@@ -75,41 +75,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Hero video (Početna) — malo sporije od realnog vremena, radi mirnijeg utiska.
-  // Neki mobilni browseri (npr. Samsung Internet sa uključenim štednjom
-  // podataka) odbiju i autoplay atribut i prvi ručni play() dok se video
-  // stvarno ne učita, pa pokušavamo ponovo na SVAKI sledeći dodir/klik —
-  // ne samo jednom — dok se puštanje stvarno ne pokrene.
+  // VAŽNO: heroVideo.paused samo kaže da li je reprodukcija "zatražena", ne da
+  // li stvarno teče. Na nekim mobilnim mrežama/telefonima video ostane
+  // zaglavljen u baferovanju — .paused je false (play() je "uspeo"), ali se
+  // nikad ne pomeri sa prve slike. Zato pratimo da li je 'playing' događaj
+  // ikad stvarno opaljen (to je jedini pouzdan znak da frejmovi teku), i dok
+  // se to ne desi — ponavljamo pokušaj u petlji i pokazujemo dugme "pusti".
   const heroVideo = document.querySelector('.hero-video-frame video');
   if (heroVideo) {
     heroVideo.muted = true;
     heroVideo.playbackRate = 0.75;
+    let hasStartedPlaying = false;
     const tryPlay = () => heroVideo.play().catch(() => {});
     tryPlay();
     heroVideo.addEventListener('loadedmetadata', () => { heroVideo.playbackRate = 0.75; tryPlay(); });
     heroVideo.addEventListener('canplay', tryPlay);
 
-    const resumeOnInteraction = () => { if (heroVideo.paused) tryPlay(); };
+    const resumeOnInteraction = () => { if (!hasStartedPlaying) tryPlay(); };
     window.addEventListener('touchstart', resumeOnInteraction, { passive: true });
     window.addEventListener('click', resumeOnInteraction);
     heroVideo.addEventListener('touchstart', resumeOnInteraction, { passive: true });
     heroVideo.addEventListener('click', resumeOnInteraction);
 
+    const playHint = document.getElementById('play-hint');
+
+    // Dok reprodukcija stvarno ne počne, pokušavamo ponovo na par sekundi —
+    // ne samo jednom na učitavanje — za slučaj da je prvi pokušaj naišao na
+    // privremeno zaglavljeno baferovanje koje se kasnije samo oporavi.
+    const retryTimer = setInterval(() => { if (!hasStartedPlaying) tryPlay(); }, 2000);
+
     heroVideo.addEventListener('playing', () => {
+      hasStartedPlaying = true;
+      clearInterval(retryTimer);
       window.removeEventListener('touchstart', resumeOnInteraction);
       window.removeEventListener('click', resumeOnInteraction);
       heroVideo.removeEventListener('touchstart', resumeOnInteraction);
       heroVideo.removeEventListener('click', resumeOnInteraction);
-      playHint.classList.remove('is-visible');
+      if (playHint) playHint.classList.remove('is-visible');
     });
 
-    // Ako se ni posle par sekundi ne pokrene (npr. štednja podataka na
-    // mobilnom blokira i autoplay i tihi play() bez direktnog dodira na
-    // sam video), pokaži vidljivo dugme "pusti" umesto da video ostane
-    // zamrznut na poster slici bez ikakvog znaka da je uopšte video.
-    const playHint = document.getElementById('play-hint');
+    // Ako se reprodukcija ni posle par sekundi stvarno ne pokrene, pokaži
+    // vidljivo dugme "pusti" umesto da video ostane zamrznut na poster
+    // slici bez ikakvog znaka da je uopšte video.
     if (playHint) {
       setTimeout(() => {
-        if (heroVideo.paused) playHint.classList.add('is-visible');
+        if (!hasStartedPlaying) playHint.classList.add('is-visible');
       }, 1500);
       playHint.addEventListener('click', () => {
         tryPlay();
