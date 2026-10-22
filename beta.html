@@ -6065,7 +6065,7 @@ function renderShiftPickerList() {
       <div>
         <div>${escapeHtml(e.name)}</div>
         ${leave ? `<div class="rs-pick-sub warn">🌴 Na odsustvu: ${escapeHtml(leave.leaveType)}</div>` : ''}
-        ${elsewhere.length ? `<div class="rs-pick-sub warn">⚠️ Već raspoređen: ${escapeHtml(elsewhere.join('; '))}</div>` : ''}
+        ${elsewhere.length ? `<div class="rs-pick-sub warn">${checked ? '⚠️ Takođe u' : '↪️ Biće premešten/a iz'}: ${escapeHtml(elsewhere.join('; '))}</div>` : ''}
         ${!leave && !elsewhere.length && e.department ? `<div class="rs-pick-sub">${escapeHtml(e.department)}</div>` : ''}
       </div>
     </label>`).join('') : '<div class="text-muted text-sm">Nema radnika.</div>';
@@ -6074,8 +6074,36 @@ function renderShiftPickerList() {
 function rsToggleAssign(empId, on) {
   if (!pickerCtx) return;
   const { labId, shiftId, date } = pickerCtx;
-  extraSet(`lab_schedule/${date}/${labId}/${shiftId}/${empId}`, on ? true : null);
+  const updates = { [`lab_schedule/${date}/${labId}/${shiftId}/${empId}`]: on ? true : null };
+  // One person, one place per day: adding someone who's already scheduled
+  // elsewhere that day moves them here instead of double-booking them.
+  const movedFrom = [];
+  if (on) {
+    const day = extraGet('lab_schedule')[date] || {};
+    labsList().forEach(l => SHIFTS.forEach(s => {
+      if ((l.id !== labId || s.id !== shiftId) && day[l.id] && day[l.id][s.id] && day[l.id][s.id][empId]) {
+        updates[`lab_schedule/${date}/${l.id}/${s.id}/${empId}`] = null;
+        movedFrom.push(`${l.name} (${s.label})`);
+      }
+    }));
+  }
+  extraUpdate(updates);
+  if (movedFrom.length) notifyShiftMove(empId, movedFrom, labId, shiftId, date);
   renderShiftPickerList();
+}
+
+function notifyShiftMove(empId, movedFrom, labId, shiftId, date) {
+  const emp = getEmployees().find(e => e.id === empId);
+  const lab = labsList().find(l => l.id === labId);
+  const shift = SHIFTS.find(s => s.id === shiftId);
+  if (!emp || !lab || !shift) return;
+  const d = parseDateStr(date);
+  const when = `${DAYS_FULL_SR[d.getDay()]}, ${d.getDate()}. ${MONTHS_SR[d.getMonth()].toLowerCase()}`;
+  const to = `${lab.name} (${shift.label}, ${lab[shift.timeKey] || shift.defaultTime})`;
+  const message = `📍 Premešteni ste sa ${movedFrom.join(', ')} u ${to} za ${when}.`;
+  mutateEmployee(empId, e => addNotification(e, message));
+  sendLeaveEmail(emp, 'Promena rasporeda', message);
+  toast(`${emp.name} premešten/a sa ${movedFrom.join(', ')} u ${lab.name} — poslato obaveštenje.`, 'success', 5000);
 }
 
 /* --- labs manager --- */
