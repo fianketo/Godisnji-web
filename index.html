@@ -1804,12 +1804,18 @@ html, body { overscroll-behavior-x: none; }
 .rs-pick input { width: 18px; height: 18px; flex-shrink: 0; }
 .rs-pick-sub { font-size: .75rem; color: var(--text2); }
 .rs-pick-sub.warn { color: var(--warning); }
-.rs-lab-edit { display: grid; grid-template-columns: 1fr 110px 110px 36px 36px; gap: .5rem; align-items: center; margin-bottom: .625rem; }
+.rs-time-cell { display: flex; align-items: center; gap: .25rem; min-width: 0; }
+.rs-time-cell label { display: inline-flex; align-items: center; gap: .125rem; font-size: .75rem; color: var(--text2); cursor: pointer; flex-shrink: 0; }
+.rs-time-cell input[type="text"] { min-width: 0; }
+.rs-time-cell.off input[type="text"] { opacity: .4; text-decoration: line-through; }
+.rs-lab-edit { display: flex; flex-direction: column; gap: .5rem; padding-bottom: .75rem; margin-bottom: .75rem; border-bottom: 1px solid var(--border); }
+.rs-lab-edit-top { display: flex; gap: .5rem; align-items: center; }
+.rs-lab-edit-top .rs-lab-name-in { flex: 1; min-width: 0; }
+.rs-lab-edit-times { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.rs-time-cell { flex-direction: column; align-items: stretch !important; }
 .rs-lab-edit input[type="color"] { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: none; }
 .rs-lab-edit-head { font-size: .75rem; color: var(--text3); font-weight: 600; }
 @media (max-width: 600px) {
-  .rs-lab-edit { grid-template-columns: 1fr 1fr 36px 36px; }
-  .rs-lab-edit .rs-lab-name-in { grid-column: 1 / -1; }
   .rs-lab-edit-head { display: none; }
   .rs-shift-label { width: 92px; }
   .rs-shift { gap: .5rem; padding: .625rem .875rem; }
@@ -6212,6 +6218,14 @@ const SHIFTS = [
   { id: 's1', label: '1. smena', timeKey: 'shift1Time', defaultTime: '07:00–14:00' },
   { id: 's2', label: '2. smena', timeKey: 'shift2Time', defaultTime: '14:00–21:00' }
 ];
+// Shifts a lab actually runs — a lab can switch off e.g. the 2nd shift in
+// "Dodaj / izmeni laboratorije" (stored as offShifts: { s2: true }).
+function labShifts(lab) {
+  const off = (lab && lab.offShifts) || {};
+  const on = SHIFTS.filter(s => !off[s.id]);
+  return on.length ? on : SHIFTS;
+}
+
 const LAB_COLORS = ['#06b6d4', '#8b5cf6', '#22c55e', '#f59e0b', '#ec4899', '#3b82f6', '#ef4444', '#84cc16'];
 const DAYS_SHORT_SR = ['Ned', 'Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub'];
 const DAYS_FULL_SR = ['nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'];
@@ -6260,7 +6274,7 @@ function isMeScheduledOn(dateStr) {
   const myEmp = currentUser.employeeId;
   if (!myEmp) return false;
   const day = extraGet('lab_schedule')[dateStr] || {};
-  return labsList().some(l => SHIFTS.some(s => day[l.id] && day[l.id][s.id] && day[l.id][s.id][myEmp]));
+  return labsList().some(l => labShifts(l).some(s => day[l.id] && day[l.id][s.id] && day[l.id][s.id][myEmp]));
 }
 
 // A shift with nobody available (nobody assigned, or everyone assigned is
@@ -6278,7 +6292,7 @@ function shiftCoverageWarn(dateStr, labId, shiftId, empById) {
   return '';
 }
 function dayCoverageWarn(dateStr, empById) {
-  return labsList().some(l => SHIFTS.some(s => shiftCoverageWarn(dateStr, l.id, s.id, empById)));
+  return labsList().some(l => labShifts(l).some(s => shiftCoverageWarn(dateStr, l.id, s.id, empById)));
 }
 
 function rsSetDate(s) { rasporedDate = s; renderPage(); }
@@ -6301,7 +6315,7 @@ function renderRaspored() {
 
   let labs = labsList();
   if (rasporedMine && myEmp) {
-    labs = labs.filter(l => SHIFTS.some(s => shiftEmpIds(sel, l.id, s.id).includes(myEmp)));
+    labs = labs.filter(l => labShifts(l).some(s => shiftEmpIds(sel, l.id, s.id).includes(myEmp)));
   }
 
   const weekHtml = days.map(d => {
@@ -6318,7 +6332,7 @@ function renderRaspored() {
   const labsHtml = labs.map((lab, i) => {
     const color = lab.color || LAB_COLORS[i % LAB_COLORS.length];
     let total = 0;
-    const shiftsHtml = SHIFTS.map(s => {
+    const shiftsHtml = labShifts(lab).map(s => {
       const ids = shiftEmpIds(sel, lab.id, s.id).filter(id => empById[id]);
       total += ids.length;
       const pills = ids.map(id => {
@@ -6480,7 +6494,7 @@ function renderShiftPickerList() {
     .map(e => {
       const leave = approvedLeaveOn(e, date);
       const elsewhere = [];
-      labs.forEach(l => SHIFTS.forEach(s => {
+      labs.forEach(l => labShifts(l).forEach(s => {
         if ((l.id !== labId || s.id !== shiftId) && day[l.id] && day[l.id][s.id] && day[l.id][s.id][e.id]) elsewhere.push(`${l.name}, ${s.label}`);
       }));
       return { e, leave, elsewhere, checked: assigned.has(e.id) };
@@ -6508,7 +6522,7 @@ function rsToggleAssign(empId, on) {
   const movedFrom = [];
   if (on) {
     const day = extraGet('lab_schedule')[date] || {};
-    labsList().forEach(l => SHIFTS.forEach(s => {
+    labsList().forEach(l => labShifts(l).forEach(s => {
       if ((l.id !== labId || s.id !== shiftId) && day[l.id] && day[l.id][s.id] && day[l.id][s.id][empId]) {
         updates[`lab_schedule/${date}/${l.id}/${s.id}/${empId}`] = null;
         movedFrom.push(`${l.name} (${s.label})`);
@@ -6564,7 +6578,7 @@ function myShiftsOn(dateStr) {
   const myEmp = currentUser.employeeId;
   const day = extraGet('lab_schedule')[dateStr] || {};
   const out = [];
-  labsList().forEach(l => SHIFTS.forEach(s => {
+  labsList().forEach(l => labShifts(l).forEach(s => {
     if (day[l.id] && day[l.id][s.id] && day[l.id][s.id][myEmp]) out.push({ lab: l, shift: s });
   }));
   return out;
@@ -6620,7 +6634,7 @@ function rsPublishWeek() {
     const d = addDaysStr(start, i);
     const day = sched[d] || {};
     const dd = parseDateStr(d);
-    labs.forEach(l => SHIFTS.forEach(s => {
+    labs.forEach(l => labShifts(l).forEach(s => {
       Object.keys((day[l.id] || {})[s.id] || {}).forEach(empId => {
         (byEmp[empId] = byEmp[empId] || []).push(`${DAYS_SHORT_SR[dd.getDay()]} ${dd.getDate()}.${dd.getMonth() + 1}. ${l.name} (${s.label}, ${l[s.timeKey] || s.defaultTime})`);
       });
@@ -6673,8 +6687,8 @@ function rsPrintWeek() {
   const emps = getEmployees();
   const nameOf = id => { const e = emps.find(x => x.id === id); return e ? e.name : null; };
   const head = days.map(d => { const dd = parseDateStr(d); return `<th>${DAYS_SHORT_SR[dd.getDay()]} ${dd.getDate()}.${dd.getMonth() + 1}.</th>`; }).join('');
-  const rows = labsList().map(l => SHIFTS.map((s, si) => `<tr>
-      ${si === 0 ? `<td class="lab" rowspan="${SHIFTS.length}">${escapeHtml(l.name)}</td>` : ''}
+  const rows = labsList().map(l => labShifts(l).map((s, si) => `<tr>
+      ${si === 0 ? `<td class="lab" rowspan="${labShifts(l).length}">${escapeHtml(l.name)}</td>` : ''}
       <td>${s.label}<br><span class="muted">${escapeHtml(l[s.timeKey] || s.defaultTime)}</span></td>
       ${days.map(d => {
         const names = shiftEmpIds(d, l.id, s.id).map(nameOf).filter(Boolean);
@@ -6698,7 +6712,7 @@ function rsReportData() {
   for (let d = 1; d <= daysInMonth; d++) {
     const ds = `${rsReportMonth}-${String(d).padStart(2, '0')}`;
     const day = sched[ds] || {};
-    labs.forEach(l => SHIFTS.forEach(s => {
+    labs.forEach(l => labShifts(l).forEach(s => {
       Object.keys((day[l.id] || {})[s.id] || {}).forEach(id => {
         const st = stats[id];
         if (!st) return;
@@ -6783,7 +6797,8 @@ function rsReportPrint() {
 /* --- labs manager --- */
 let labsDraft = [];
 function openLabsManager() {
-  labsDraft = labsList().map(l => ({ id: l.id, name: l.name, shift1Time: l.shift1Time || '', shift2Time: l.shift2Time || '', color: l.color || '' }));
+  labsDraft = labsList().map(l => ({ id: l.id, name: l.name, shift1Time: l.shift1Time || '', shift2Time: l.shift2Time || '', color: l.color || '',
+    on1: !(l.offShifts && l.offShifts.s1), on2: !(l.offShifts && l.offShifts.s2) }));
   if (!labsDraft.length) labsDraft.push(blankLab(0));
   openExtraModal('rs-labs', '🧪 Laboratorije', '<div id="rs-labs-body"></div>',
     `<button class="btn btn-secondary" onclick="closeExtraModal('rs-labs')">Otkaži</button>
@@ -6792,27 +6807,35 @@ function openLabsManager() {
 }
 
 function blankLab(i) {
-  return { id: newExtraId('l', 'labs'), name: '', shift1Time: SHIFTS[0].defaultTime, shift2Time: SHIFTS[1].defaultTime, color: LAB_COLORS[i % LAB_COLORS.length] };
+  return { id: newExtraId('l', 'labs'), name: '', shift1Time: SHIFTS[0].defaultTime, shift2Time: SHIFTS[1].defaultTime, color: LAB_COLORS[i % LAB_COLORS.length], on1: true, on2: true };
 }
 
 function renderLabsDraft() {
   const body = document.getElementById('rs-labs-body');
   if (!body) return;
   body.innerHTML = `
-    <div class="rs-lab-edit"><span class="rs-lab-edit-head">Naziv</span><span class="rs-lab-edit-head">1. smena</span><span class="rs-lab-edit-head">2. smena</span><span></span><span></span></div>
     ${labsDraft.map((l, i) => `
       <div class="rs-lab-edit">
-        <input type="text" class="rs-lab-name-in" placeholder="npr. Bulevar" value="${escapeHtml(l.name)}" oninput="labsDraft[${i}].name = this.value">
-        <input type="text" placeholder="07:00–14:00" value="${escapeHtml(l.shift1Time)}" oninput="labsDraft[${i}].shift1Time = this.value">
-        <input type="text" placeholder="14:00–21:00" value="${escapeHtml(l.shift2Time)}" oninput="labsDraft[${i}].shift2Time = this.value">
-        <input type="color" value="${l.color || LAB_COLORS[i % LAB_COLORS.length]}" oninput="labsDraft[${i}].color = this.value" title="Boja">
-        <button class="btn btn-secondary btn-sm" onclick="labsDraft.splice(${i}, 1); renderLabsDraft()" title="Ukloni">🗑️</button>
+        <div class="rs-lab-edit-top">
+          <input type="text" class="rs-lab-name-in" placeholder="npr. Bulevar" value="${escapeHtml(l.name)}" oninput="labsDraft[${i}].name = this.value">
+          <input type="color" value="${l.color || LAB_COLORS[i % LAB_COLORS.length]}" oninput="labsDraft[${i}].color = this.value" title="Boja">
+          <button class="btn btn-secondary btn-sm" onclick="labsDraft.splice(${i}, 1); renderLabsDraft()" title="Ukloni">🗑️</button>
+        </div>
+        <div class="rs-lab-edit-times">
+        ${[1, 2].map(n => `<div class="rs-time-cell ${l['on' + n] ? '' : 'off'}">
+          <label title="${n}. smena postoji u ovoj laboratoriji"><input type="checkbox" ${l['on' + n] ? 'checked' : ''} onchange="labsDraft[${i}].on${n} = this.checked; renderLabsDraft()"><span>${n}. smena</span></label>
+          <input type="text" placeholder="${n === 1 ? '07:00–14:00' : '14:00–21:00'}" value="${escapeHtml(l['shift' + n + 'Time'])}" ${l['on' + n] ? '' : 'disabled'} oninput="labsDraft[${i}].shift${n}Time = this.value">
+        </div>`).join('')}
+        </div>
       </div>`).join('')}
+    <p class="text-xs text-muted mt-2">Odčekirajte smenu koju laboratorija nema (npr. bez 2. smene) — neće se prikazivati u rasporedu.</p>
     <button class="btn btn-secondary btn-sm mt-2" onclick="labsDraft.push(blankLab(labsDraft.length)); renderLabsDraft()">➕ Dodaj laboratoriju</button>`;
 }
 
 function saveLabs() {
   const clean = labsDraft.filter(l => l.name.trim());
+  const noShift = clean.find(l => !l.on1 && !l.on2);
+  if (noShift) { toast(`Laboratorija „${noShift.name.trim()}” mora imati bar jednu smenu.`, 'error'); return; }
   const oldIds = Object.keys(extraGet('labs'));
   const removed = oldIds.filter(id => !clean.some(l => l.id === id));
   if (removed.length && !confirm(`Ukloniti ${removed.length} laboratoriju/e? Njihov raspored više neće biti prikazan.`)) return;
@@ -6824,6 +6847,7 @@ function saveLabs() {
       shift1Time: l.shift1Time.trim() || SHIFTS[0].defaultTime,
       shift2Time: l.shift2Time.trim() || SHIFTS[1].defaultTime,
       color: l.color || LAB_COLORS[i % LAB_COLORS.length],
+      offShifts: (!l.on1 || !l.on2) ? Object.assign({}, l.on1 ? {} : { s1: true }, l.on2 ? {} : { s2: true }) : null,
       order: i
     };
   });
