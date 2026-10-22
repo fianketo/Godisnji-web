@@ -1705,7 +1705,13 @@ html, body { overscroll-behavior-x: none; }
 .feed-post-head { display: flex; align-items: center; gap: .875rem; padding: 1.125rem 1.25rem .5rem; }
 .feed-post-author { font-size: 1.0625rem; font-weight: 600; line-height: 1.3; }
 .feed-post-time { font-size: .8125rem; color: var(--text2); }
-.feed-post-del { margin-left: auto; }
+.feed-post-actions { margin-left: auto; display: flex; gap: .375rem; }
+.feed-post-tags { display: flex; gap: .375rem; padding: 0 1.25rem .375rem; }
+.feed-tag { font-size: .75rem; font-weight: 700; padding: .125rem .5rem; border-radius: 99px; background: var(--primary-light); color: var(--primary); }
+.feed-tag.important { background: var(--warning-light); color: var(--warning); }
+.feed-post.important { border-color: var(--warning); }
+.feed-admin-opts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .75rem; font-size: .8125rem; color: var(--text2); }
+.feed-admin-opts label { display: inline-flex; align-items: center; gap: .375rem; cursor: pointer; }
 .feed-post-text { padding: .25rem 1.25rem .875rem; font-size: 1rem; line-height: 1.65; white-space: pre-wrap; word-wrap: break-word; }
 .feed-post-text a { color: var(--primary); }
 .feed-post-img { display: block; width: 100%; max-height: 520px; object-fit: cover; cursor: zoom-in; background: var(--surface2); }
@@ -1728,6 +1734,21 @@ html, body { overscroll-behavior-x: none; }
 .avatar-sm { width: 30px; height: 30px; font-size: .75rem; flex-shrink: 0; }
 .feed-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 1rem; cursor: zoom-out; }
 .feed-lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+
+.rs-day .rs-mark.warn { background: var(--danger); }
+.rs-shift-warn { background: var(--danger-light); }
+.rs-warn { font-size: .8125rem; font-weight: 700; color: var(--danger); }
+.ms-list { display: flex; flex-direction: column; }
+.ms-row { display: flex; align-items: center; gap: .875rem; padding: .625rem 1.25rem; border: none; border-top: 1px solid var(--border); background: none; color: var(--text); text-align: left; cursor: pointer; font-family: inherit; font-size: .875rem; }
+.ms-row:first-child { border-top: none; }
+.ms-row:hover { background: var(--surface2); }
+.ms-row.today { background: var(--primary-light); }
+.ms-day { width: 86px; flex-shrink: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.ms-day-label { font-weight: 700; text-transform: capitalize; }
+.ms-date { font-size: .75rem; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ms-what { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.ms-shift { border-left: 3px solid var(--lab-color); padding-left: .5rem; }
+.ms-off { color: var(--text3); }
 
 /* ---------- BETA: Raspored po laboratorijama ---------- */
 .rs-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; flex-wrap: wrap; }
@@ -3196,6 +3217,7 @@ const PAGE_TITLES = {
   'dashboard': 'Dashboard',
   'feed': 'Feed',
   'raspored': 'Raspored',
+  'raspored-pregled': 'Pregled smena',
   'employees': 'Radnici',
   'add-employee': 'Dodaj radnika',
   'requests': 'Zahtevi za odsustvo',
@@ -3216,9 +3238,10 @@ function renderPage() {
   captureFocusInMain();
   main.innerHTML = '';
   switch (currentPage) {
-    case 'dashboard': renderDashboard(); break;
+    case 'dashboard': renderDashboard(); insertMyShiftsCard(); break;
     case 'feed': renderFeed(); break;
     case 'raspored': renderRaspored(); break;
+    case 'raspored-pregled': renderRasporedPregled(); break;
     case 'employees': renderEmployees(); break;
     case 'add-employee': renderAddEmployee(); break;
     case 'requests': renderRequests(); break;
@@ -4865,7 +4888,7 @@ function renderHelp() {
         ${helpRow('📊', 'Dashboard', 'pregled koliko vam je dana godišnjeg i slobodnih dana preostalo, i koliko zahteva čeka na odgovor.')}
         ${helpRow('👆', 'Prevlačenje prstom', 'na telefonu prevucite prstom levo ili desno da pređete na sledeću ili prethodnu stranicu iz donje trake. Na Rasporedu, prevlačenje preko trake sa danima menja nedelju.')}
         ${helpRow('📰', 'Feed', 'objave za ceo tim — napišite nešto, dodajte sliku, lajkujte i komentarišite. Broj na dugmetu Feed pokazuje nove objave.')}
-        ${helpRow('🧪', 'Raspored', 'za svaki dan vidite ko radi u kojoj laboratoriji, u 1. i 2. smeni. „Moj raspored” prikazuje samo vaše smene, a tačka ispod dana označava dane kada radite.')}
+        ${helpRow('🧪', 'Raspored', 'za svaki dan vidite ko radi u kojoj laboratoriji, u 1. i 2. smeni. „Moj raspored” prikazuje samo vaše smene, a tačka ispod dana označava dane kada radite. Na Dashboard-u kartica „Moje smene” pokazuje vaše smene za narednih 7 dana.')}
         ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
         ${helpRow('📅', 'Moj kalendar', 'kliknite ili prevucite preko dana da odmah zatražite odsustvo za taj period.')}
         ${helpRow('👤', 'Moj profil', 'detaljan pregled iskorišćenih i rezervisanih dana, i istorija svih prethodnih zahteva.')}
@@ -4885,7 +4908,8 @@ function renderHelp() {
     <div class="card">
       <div class="card-header"><div class="card-title">🛠️ Administracija</div></div>
       <div class="card-body" style="padding:.25rem 1.5rem">
-        ${helpRow('🧪', 'Raspored', '„Dodaj / izmeni laboratorije” za nazive i vremena smena; „+ Dodaj” stavlja radnike u 1. ili 2. smenu. Ako je radnik tog dana već negde raspoređen, biće premešten i dobija obaveštenje. Raspored se može kopirati sa prethodnog dana ili iz prošle nedelje.')}
+        ${helpRow('🧪', 'Raspored', '„Dodaj / izmeni laboratorije” za nazive i vremena smena; „+ Dodaj” stavlja radnike u 1. ili 2. smenu. Ako je radnik tog dana već negde raspoređen, biće premešten i dobija obaveštenje. Raspored se može kopirati sa prethodnog dana ili iz prošle nedelje. Smena bez ljudi (ili gde su svi na odsustvu) je označena crveno, a crvena tačka ispod dana upozorava na takav dan. „📣 Obavesti radnike” šalje svakom njegove smene za nedelju; „🖨️ Štampaj nedelju” i „📊 Mesečni pregled” (sa izvozom u Excel) su na istom mestu.')}
+        ${helpRow('📌', 'Feed za admina', '📌 zakači objavu na vrh; „⭐ Važna objava” šalje obaveštenje svim radnicima, po želji i mejlom.')}
         ${helpRow('➕', 'Dodaj radnika', 'unesite ime, lozinku i (opciono) email — bez email-a, radnik dobija korisničko ime za prijavu automatski.')}
         ${helpRow('👥', 'Radnici', 'pregled svih radnika, sa opcijom da izmenite podatke (sektor, pozicija, dani odmora) ili obrišete radnika.')}
         ${helpRow('📋', 'Zahtevi', 'odobrite ili odbijte zahteve na čekanju — upozorenje se prikazuje ako se period preklapa sa nekim ko je već odsutan, a kalendar ispod pokazuje ko je sve trenutno na odmoru.')}
@@ -5688,7 +5712,7 @@ function extraSet(path, value) {
 function rerenderExtras() {
   if (!currentUser) return;
   renderSidebar();
-  if (currentPage === 'feed' || currentPage === 'raspored') renderPage();
+  if (['feed', 'raspored', 'raspored-pregled', 'dashboard'].includes(currentPage)) renderPage();
 }
 
 const FEED_LIMIT = 100;
@@ -5704,6 +5728,7 @@ function startExtraListeners() {
   firebaseDB.ref('feed').orderByKey().limitToLast(FEED_LIMIT).on('value', onValue('feed'));
   firebaseDB.ref('labs').on('value', onValue('labs'));
   firebaseDB.ref('lab_schedule').on('value', onValue('lab_schedule'));
+  firebaseDB.ref('lab_schedule_meta').on('value', onValue('lab_schedule_meta'));
 }
 
 function newExtraId(prefix, key) {
@@ -5750,6 +5775,8 @@ function restoreFocusInMain() {
 /* ---------------- FEED ---------------- */
 let feedDraft = '';
 let feedDraftImage = null;
+let feedDraftImportant = false;
+let feedDraftEmail = false;
 let feedPosting = false;
 const feedCommentDrafts = {};
 const feedOpenComments = new Set();
@@ -5759,7 +5786,7 @@ function feedPosts() {
   return Object.keys(feed).map(id => Object.assign({}, feed[id], { id }))
     .filter(p => SAFE_ID.test(p.id) && typeof p.createdAt === 'string')
     .map(p => (p.image && !/^data:image\//.test(p.image)) ? Object.assign(p, { image: null }) : p)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    .sort((a, b) => (!!b.pinned - !!a.pinned) || b.createdAt.localeCompare(a.createdAt));
 }
 
 function feedSeenKey() { return 'feedSeen_' + (currentUser ? currentUser.id : ''); }
@@ -5835,15 +5862,19 @@ function renderFeed() {
         </form>
       </div>` : '';
     return `
-      <article class="card feed-post">
+      <article class="card feed-post ${p.important ? 'important' : ''}">
         <div class="feed-post-head">
           ${makeAvatar(p.authorName || '?', 'avatar-lg')}
           <div>
             <div class="feed-post-author">${escapeHtml(p.authorName)}</div>
             <div class="feed-post-time" title="${new Date(p.createdAt).toLocaleString('sr-RS')}">${timeAgo(p.createdAt)}</div>
           </div>
-          ${canDelete ? `<button class="btn btn-secondary btn-sm feed-post-del" onclick="deleteFeedPost('${p.id}')" title="Obriši objavu">🗑️</button>` : ''}
+          <div class="feed-post-actions">
+            ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="toggleFeedPin('${p.id}')" title="${p.pinned ? 'Otkači' : 'Zakači na vrh'}">${p.pinned ? '📍' : '📌'}</button>` : ''}
+            ${canDelete ? `<button class="btn btn-secondary btn-sm" onclick="deleteFeedPost('${p.id}')" title="Obriši objavu">🗑️</button>` : ''}
+          </div>
         </div>
+        ${p.pinned || p.important ? `<div class="feed-post-tags">${p.pinned ? '<span class="feed-tag">📌 Zakačeno</span>' : ''}${p.important ? '<span class="feed-tag important">⭐ Važno</span>' : ''}</div>` : ''}
         ${p.text ? `<div class="feed-post-text">${linkify(escapeHtml(p.text))}</div>` : ''}
         ${p.image ? `<img class="feed-post-img" src="${escapeHtml(p.image)}" alt="" loading="lazy" onclick="openFeedLightbox('${p.id}')">` : ''}
         <div class="feed-post-bar">
@@ -5881,6 +5912,10 @@ function renderFeed() {
           </label>
           <button class="btn btn-primary" onclick="submitFeedPost()" ${feedPosting ? 'disabled' : ''}>Objavi</button>
         </div>
+        ${isAdmin() ? `<div class="feed-admin-opts">
+          <label><input type="checkbox" id="feed-important" ${feedDraftImportant ? 'checked' : ''} onchange="feedDraftImportant = this.checked; renderPage()"> ⭐ Važna objava — obavesti sve radnike</label>
+          ${feedDraftImportant && EMAILJS_ENABLED ? `<label><input type="checkbox" id="feed-email" ${feedDraftEmail ? 'checked' : ''} onchange="feedDraftEmail = this.checked"> ✉️ Pošalji i mejlom</label>` : ''}
+        </div>` : ''}
       </div>
       ${postsHtml}
     </div>`;
@@ -5915,10 +5950,27 @@ function submitFeedPost() {
     createdAt: new Date().toISOString()
   };
   if (feedDraftImage) post.image = feedDraftImage;
+  const important = isAdmin() && feedDraftImportant;
+  const withEmail = important && feedDraftEmail;
+  if (important) post.important = true;
   feedDraft = '';
   feedDraftImage = null;
+  feedDraftImportant = false;
+  feedDraftEmail = false;
   extraSet('feed/' + id, post);
   toast('Objavljeno!', 'success');
+  if (important) {
+    const preview = text.length > 160 ? text.slice(0, 157) + '…' : (text || '(slika)');
+    const message = `⭐ Važna objava od ${post.authorName}: ${preview}`;
+    const items = getEmployees().filter(e => e.id !== currentUser.employeeId).map(emp => ({ emp, message }));
+    notifyManyEmployees(items, `Važna objava: ${post.authorName}`, withEmail);
+  }
+}
+
+function toggleFeedPin(id) {
+  const post = extraGet('feed')[id];
+  if (!post) return;
+  extraSet(`feed/${id}/pinned`, post.pinned ? null : true);
 }
 
 function deleteFeedPost(id) {
@@ -6027,6 +6079,24 @@ function isMeScheduledOn(dateStr) {
   return labsList().some(l => SHIFTS.some(s => day[l.id] && day[l.id][s.id] && day[l.id][s.id][myEmp]));
 }
 
+// A shift with nobody available (nobody assigned, or everyone assigned is
+// on approved leave). Only flagged on days that have *some* schedule, so
+// days nobody has planned yet (or closed days) don't light up red.
+function dayHasSchedule(dateStr) {
+  const day = extraGet('lab_schedule')[dateStr] || {};
+  return Object.values(day).some(lab => lab && Object.values(lab).some(sh => sh && Object.keys(sh).length));
+}
+function shiftCoverageWarn(dateStr, labId, shiftId, empById) {
+  if (!dayHasSchedule(dateStr)) return '';
+  const ids = shiftEmpIds(dateStr, labId, shiftId).filter(id => empById[id]);
+  if (!ids.length) return '⚠️ Niko nije raspoređen';
+  if (ids.every(id => approvedLeaveOn(empById[id], dateStr))) return '⚠️ Svi su na odsustvu';
+  return '';
+}
+function dayCoverageWarn(dateStr, empById) {
+  return labsList().some(l => SHIFTS.some(s => shiftCoverageWarn(dateStr, l.id, s.id, empById)));
+}
+
 function rsSetDate(s) { rasporedDate = s; renderPage(); }
 function rsShiftWeek(n) { rasporedDate = addDaysStr(rasporedDate, n * 7); renderPage(); }
 function rsToggleMine() { rasporedMine = !rasporedMine; renderPage(); }
@@ -6057,7 +6127,7 @@ function renderRaspored() {
     return `<button class="${cls}" onclick="rsSetDate('${d}')">
       <span class="rs-day-name">${DAYS_SHORT_SR[dow]}</span>
       <span class="rs-day-num">${String(dd.getDate()).padStart(2, '0')}</span>
-      <span class="rs-mark ${myEmp && isMeScheduledOn(d) ? '' : 'empty'}"></span>
+      <span class="rs-mark ${admin && dayCoverageWarn(d, empById) ? 'warn' : myEmp && isMeScheduledOn(d) ? '' : 'empty'}"></span>
     </button>`;
   }).join('');
 
@@ -6077,13 +6147,15 @@ function renderRaspored() {
           ${admin ? `<button class="rs-pill-x" onclick="rsUnassign('${lab.id}','${s.id}','${id}')" title="Ukloni iz smene">✕</button>` : ''}
         </span>`;
       }).join('');
-      return `<div class="rs-shift">
+      const warn = shiftCoverageWarn(sel, lab.id, s.id, empById);
+      return `<div class="rs-shift ${warn ? 'rs-shift-warn' : ''}">
         <div class="rs-shift-label">
           <div class="rs-shift-name">${s.label}</div>
           <div class="rs-shift-time">🕒 ${escapeHtml(lab[s.timeKey] || s.defaultTime)}</div>
         </div>
         <div class="rs-people">
-          ${pills || (admin ? '' : '<span class="rs-empty-shift">Nije raspoređeno</span>')}
+          ${pills || (admin || warn ? '' : '<span class="rs-empty-shift">Nije raspoređeno</span>')}
+          ${warn ? `<span class="rs-warn">${warn}</span>` : ''}
           ${admin ? `<button class="rs-add" onclick="openShiftPicker('${lab.id}','${s.id}')">+ Dodaj</button>` : ''}
         </div>
       </div>`;
@@ -6135,7 +6207,11 @@ function renderRaspored() {
         <button class="btn btn-secondary btn-sm" onclick="openLabsManager()">⚙️ Dodaj / izmeni laboratorije</button>
         <button class="btn btn-secondary btn-sm" onclick="rsCopyPrevDay()">📋 Kopiraj prethodni dan</button>
         <button class="btn btn-secondary btn-sm" onclick="rsCopyPrevWeek()">📋 Kopiraj prošlu nedelju</button>
-      </div>` : ''}
+        <button class="btn btn-primary btn-sm" onclick="rsPublishWeek()">📣 Obavesti radnike za ovu nedelju</button>
+        <button class="btn btn-secondary btn-sm" onclick="rsPrintWeek()">🖨️ Štampaj nedelju</button>
+        <button class="btn btn-secondary btn-sm" onclick="navigateTo('raspored-pregled')">📊 Mesečni pregled</button>
+      </div>
+      ${(() => { const meta = extraGet('lab_schedule_meta')[start]; return meta && meta.publishedAt ? `<div class="text-xs text-muted" style="margin:-.5rem 0 1rem">📣 Radnici obavešteni ${new Date(meta.publishedAt).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}${meta.by ? ' · ' + escapeHtml(meta.by) : ''}</div>` : ''; })()}` : labsList().length ? `<div class="rs-tools"><button class="btn btn-secondary btn-sm" onclick="rsPrintWeek()">🖨️ Štampaj nedelju</button></div>` : ''}
       ${labsHtml}
       ${emptyHtml}
     </div>`;
@@ -6272,6 +6348,252 @@ function notifyShiftMove(empId, movedFrom, labId, shiftId, date) {
   mutateEmployee(empId, e => addNotification(e, message));
   sendLeaveEmail(emp, 'Promena rasporeda', message);
   toast(`${emp.name} premešten/a sa ${movedFrom.join(', ')} u ${lab.name} — poslato obaveštenje.`, 'success', 5000);
+}
+
+/* ---------------- BULK NOTIFY (week publish, important posts) ---------------- */
+// items: [{ emp, message }]. Adds an in-app notification to each and, when
+// withEmail is set, emails everyone with a real address — reporting the
+// outcome in one toast instead of one toast per person.
+function notifyManyEmployees(items, subject, withEmail) {
+  items.forEach(({ emp, message }) => mutateEmployee(emp.id, e => addNotification(e, message)));
+  if (!withEmail || !EMAILJS_ENABLED) return;
+  const withAddr = items.filter(({ emp }) => hasRealEmail(emp));
+  const noAddr = items.length - withAddr.length;
+  if (!withAddr.length) {
+    toast('Niko od njih nema email adresu — poslato je samo obaveštenje u aplikaciji.', 'info', 5000);
+    return;
+  }
+  Promise.allSettled(withAddr.map(({ emp, message }) => sendEmailRaw(emp.email, emp.name, subject, message)))
+    .then(results => {
+      const ok = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length) console.error('EmailJS grupno slanje:', failed.map(f => f.reason));
+      let msg = `✉️ Mejlova poslato: ${ok}`;
+      if (failed.length) msg += `, nije poslato: ${failed.length} (${emailErrorText(failed[0].reason)})`;
+      if (noAddr) msg += `, bez email adrese: ${noAddr}`;
+      toast(msg, failed.length ? 'error' : 'success', 8000);
+    });
+}
+
+/* ---------------- MOJE SMENE (Dashboard) ---------------- */
+function myShiftsOn(dateStr) {
+  const myEmp = currentUser.employeeId;
+  const day = extraGet('lab_schedule')[dateStr] || {};
+  const out = [];
+  labsList().forEach(l => SHIFTS.forEach(s => {
+    if (day[l.id] && day[l.id][s.id] && day[l.id][s.id][myEmp]) out.push({ lab: l, shift: s });
+  }));
+  return out;
+}
+
+function myShiftsCardHtml() {
+  if (!currentUser.employeeId || !labsList().length) return '';
+  const emp = getEmployees().find(e => e.id === currentUser.employeeId);
+  const today = todayStr();
+  const rows = Array.from({ length: 7 }, (_, i) => addDaysStr(today, i)).map((d, i) => {
+    const dd = parseDateStr(d);
+    const label = i === 0 ? 'Danas' : i === 1 ? 'Sutra' : DAYS_FULL_SR[dd.getDay()];
+    const shifts = myShiftsOn(d);
+    const leave = emp ? approvedLeaveOn(emp, d) : null;
+    let what;
+    if (leave) what = `<span class="ms-off">🌴 ${escapeHtml(leave.leaveType)}</span>`;
+    else if (shifts.length) what = shifts.map(({ lab, shift }) =>
+      `<span class="ms-shift" style="--lab-color:${escapeHtml(lab.color || 'var(--primary)')}"><strong>${escapeHtml(lab.name)}</strong> · ${shift.label} · ${escapeHtml(lab[shift.timeKey] || shift.defaultTime)}</span>`).join('');
+    else what = '<span class="ms-off">Nije raspoređeno</span>';
+    return `<button class="ms-row ${i === 0 ? 'today' : ''}" onclick="rasporedDate='${d}'; navigateTo('raspored')">
+      <span class="ms-day"><span class="ms-day-label">${label}</span><span class="ms-date">${dd.getDate()}.${dd.getMonth() + 1}.</span></span>
+      <span class="ms-what">${what}</span>
+    </button>`;
+  }).join('');
+  return `<div class="card ms-card" style="margin-bottom:1.5rem">
+    <div class="card-header"><div class="card-title">🧪 Moje smene</div>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="navigateTo('raspored')">Ceo raspored →</button></div>
+    <div class="ms-list">${rows}</div>
+  </div>`;
+}
+
+function insertMyShiftsCard() {
+  const html = myShiftsCardHtml();
+  if (!html) return;
+  const main = document.getElementById('main-content');
+  const header = main.querySelector('.page-header');
+  if (header) header.insertAdjacentHTML('afterend', html);
+  else main.insertAdjacentHTML('afterbegin', html);
+}
+
+/* ---------------- OBJAVI NEDELJU ---------------- */
+function weekLabel(start) {
+  const a = parseDateStr(start), b = parseDateStr(addDaysStr(start, 6));
+  return `${a.getDate()}.${a.getMonth() + 1}. – ${b.getDate()}.${b.getMonth() + 1}.${b.getFullYear()}.`;
+}
+
+function rsPublishWeek() {
+  const start = weekStartStr(rasporedDate);
+  const sched = extraGet('lab_schedule');
+  const labs = labsList();
+  const byEmp = {};
+  for (let i = 0; i < 7; i++) {
+    const d = addDaysStr(start, i);
+    const day = sched[d] || {};
+    const dd = parseDateStr(d);
+    labs.forEach(l => SHIFTS.forEach(s => {
+      Object.keys((day[l.id] || {})[s.id] || {}).forEach(empId => {
+        (byEmp[empId] = byEmp[empId] || []).push(`${DAYS_SHORT_SR[dd.getDay()]} ${dd.getDate()}.${dd.getMonth() + 1}. ${l.name} (${s.label}, ${l[s.timeKey] || s.defaultTime})`);
+      });
+    }));
+  }
+  const emps = getEmployees();
+  const items = Object.keys(byEmp).map(id => {
+    const emp = emps.find(e => e.id === id);
+    return emp ? { emp, message: `📅 Vaš raspored za nedelju ${weekLabel(start)}: ${byEmp[id].join('; ')}.` } : null;
+  }).filter(Boolean);
+  if (!items.length) { toast('Ove nedelje još niko nije raspoređen.', 'warning'); return; }
+
+  openExtraModal('rs-publish', '📣 Obavesti radnike',
+    `<p class="text-sm" style="margin-bottom:.75rem">Svako od <strong>${items.length}</strong> raspoređenih radnika dobija obaveštenje sa svojim smenama za nedelju <strong>${weekLabel(start)}</strong>.</p>
+     <label class="rs-pick" style="border:none;padding:0"><input type="checkbox" id="rs-publish-email" ${EMAILJS_ENABLED ? 'checked' : 'disabled'}> Pošalji i mejlom (troši ${items.filter(x => hasRealEmail(x.emp)).length} od mesečnih besplatnih mejlova)</label>`,
+    `<button class="btn btn-secondary" onclick="closeExtraModal('rs-publish')">Otkaži</button>
+     <button class="btn btn-primary" id="rs-publish-go">Pošalji</button>`);
+  document.getElementById('rs-publish-go').onclick = () => {
+    const withEmail = document.getElementById('rs-publish-email').checked;
+    closeExtraModal('rs-publish');
+    notifyManyEmployees(items, `Raspored za nedelju ${weekLabel(start)}`, withEmail);
+    extraSet('lab_schedule_meta/' + start, { publishedAt: new Date().toISOString(), by: currentUser.name || '' });
+    toast(`Obavešteno radnika: ${items.length}`, 'success');
+  };
+}
+
+/* ---------------- ŠTAMPA ---------------- */
+function printHtml(title, bodyHtml) {
+  const w = window.open('', '_blank');
+  if (!w) { toast('Browser je blokirao novi prozor — dozvolite iskačuće prozore za ovaj sajt.', 'error', 6000); return; }
+  w.document.write(`<!DOCTYPE html><html lang="sr"><head><meta charset="UTF-8"><title>${escapeHtml(title)}</title>
+    <style>
+      body { font-family: Arial, sans-serif; color: #111; margin: 16px; }
+      h1 { font-size: 18px; margin: 0 0 12px; }
+      table { border-collapse: collapse; width: 100%; font-size: 12px; }
+      th, td { border: 1px solid #999; padding: 5px 6px; text-align: left; vertical-align: top; }
+      th { background: #eee; }
+      td.num { text-align: center; }
+      .lab { font-weight: bold; }
+      .muted { color: #777; }
+      @page { size: landscape; margin: 10mm; }
+    </style></head><body><h1>${escapeHtml(title)}</h1>${bodyHtml}
+    <script>window.onload = () => { window.focus(); window.print(); };<\/script></body></html>`);
+  w.document.close();
+}
+
+function rsPrintWeek() {
+  const start = weekStartStr(rasporedDate);
+  const days = Array.from({ length: 7 }, (_, i) => addDaysStr(start, i));
+  const emps = getEmployees();
+  const nameOf = id => { const e = emps.find(x => x.id === id); return e ? e.name : null; };
+  const head = days.map(d => { const dd = parseDateStr(d); return `<th>${DAYS_SHORT_SR[dd.getDay()]} ${dd.getDate()}.${dd.getMonth() + 1}.</th>`; }).join('');
+  const rows = labsList().map(l => SHIFTS.map((s, si) => `<tr>
+      ${si === 0 ? `<td class="lab" rowspan="${SHIFTS.length}">${escapeHtml(l.name)}</td>` : ''}
+      <td>${s.label}<br><span class="muted">${escapeHtml(l[s.timeKey] || s.defaultTime)}</span></td>
+      ${days.map(d => {
+        const names = shiftEmpIds(d, l.id, s.id).map(nameOf).filter(Boolean);
+        return `<td>${names.length ? names.map(escapeHtml).join('<br>') : '<span class="muted">—</span>'}</td>`;
+      }).join('')}
+    </tr>`).join('')).join('');
+  printHtml(`Raspored ${weekLabel(start)}`, `<table><thead><tr><th>Laboratorija</th><th>Smena</th>${head}</tr></thead><tbody>${rows}</tbody></table>`);
+}
+
+/* ---------------- MESEČNI PREGLED ---------------- */
+let rsReportMonth = null; // 'YYYY-MM'
+
+function rsReportData() {
+  const [y, m] = rsReportMonth.split('-').map(Number);
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const sched = extraGet('lab_schedule');
+  const labs = labsList();
+  const emps = getEmployees();
+  const stats = {};
+  emps.forEach(e => { stats[e.id] = { emp: e, total: 0, s1: 0, s2: 0, byLab: {} }; });
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${rsReportMonth}-${String(d).padStart(2, '0')}`;
+    const day = sched[ds] || {};
+    labs.forEach(l => SHIFTS.forEach(s => {
+      Object.keys((day[l.id] || {})[s.id] || {}).forEach(id => {
+        const st = stats[id];
+        if (!st) return;
+        st.total++;
+        st[s.id]++;
+        st.byLab[l.id] = (st.byLab[l.id] || 0) + 1;
+      });
+    }));
+  }
+  const rows = Object.values(stats).sort((a, b) => b.total - a.total || a.emp.name.localeCompare(b.emp.name));
+  return { labs, rows, title: `${MONTHS_SR[m - 1]} ${y}` };
+}
+
+function rsReportShift(n) {
+  const [y, m] = rsReportMonth.split('-').map(Number);
+  const d = new Date(y, m - 1 + n, 1);
+  rsReportMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  renderPage();
+}
+
+function renderRasporedPregled() {
+  const main = document.getElementById('main-content');
+  if (!rsReportMonth) rsReportMonth = todayStr().slice(0, 7);
+  const { labs, rows, title } = rsReportData();
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">Mesečni pregled smena</div>
+        <div class="page-subtitle">Koliko je ko imao 1. i 2. smena, po laboratorijama</div>
+      </div>
+      <button class="btn btn-secondary" onclick="navigateTo('raspored')">← Raspored</button>
+    </div>
+    <div class="rs-month-row" style="margin-bottom:1rem">
+      <div class="rs-month">${title}</div>
+      <div class="rs-week-nav">
+        <button class="btn btn-secondary btn-sm" onclick="rsReportShift(-1)">‹</button>
+        <button class="btn btn-secondary btn-sm" onclick="rsReportShift(1)">›</button>
+      </div>
+    </div>
+    <div class="rs-tools">
+      <button class="btn btn-secondary btn-sm" onclick="rsReportCsv()">⬇️ Excel (CSV)</button>
+      <button class="btn btn-secondary btn-sm" onclick="rsReportPrint()">🖨️ Štampaj / PDF</button>
+    </div>
+    <div class="card"><div class="table-wrap">
+      <table>
+        <thead><tr><th>Radnik</th><th>Ukupno</th><th>1. smena</th><th>2. smena</th>${labs.map(l => `<th>${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `<tr style="${r.total ? '' : 'color:var(--text3)'}">
+          <td style="white-space:nowrap">${escapeHtml(r.emp.name)}</td>
+          <td><strong>${r.total}</strong></td><td>${r.s1}</td><td>${r.s2}</td>
+          ${labs.map(l => `<td>${r.byLab[l.id] || 0}</td>`).join('')}
+        </tr>`).join('')}</tbody>
+      </table>
+    </div></div>`;
+}
+
+function rsReportCsv() {
+  const { labs, rows, title } = rsReportData();
+  // Semicolons + BOM: what Excel with Serbian regional settings opens
+  // correctly (comma is the decimal separator there).
+  const cell = v => `"${String(v).replace(/"/g, '""')}"`;
+  const lines = [['Radnik', 'Ukupno', '1. smena', '2. smena', ...labs.map(l => l.name)].map(cell).join(';')];
+  rows.forEach(r => lines.push([r.emp.name, r.total, r.s1, r.s2, ...labs.map(l => r.byLab[l.id] || 0)].map(cell).join(';')));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `smene-${rsReportMonth}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Preuzeto: smene ${title}`, 'success');
+}
+
+function rsReportPrint() {
+  const { labs, rows, title } = rsReportData();
+  printHtml(`Pregled smena — ${title}`, `<table>
+    <thead><tr><th>Radnik</th><th>Ukupno</th><th>1. smena</th><th>2. smena</th>${labs.map(l => `<th>${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr><td>${escapeHtml(r.emp.name)}</td><td class="num"><b>${r.total}</b></td><td class="num">${r.s1}</td><td class="num">${r.s2}</td>${labs.map(l => `<td class="num">${r.byLab[l.id] || 0}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`);
 }
 
 /* --- labs manager --- */
