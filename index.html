@@ -2438,7 +2438,21 @@ function getUsers() {
 
 function saveUsers(arr) {
   localStorage.setItem('users', JSON.stringify(arr));
-  if (firebaseDB) cloudPush('users', arr);
+  if (!firebaseDB) return;
+  // In the cloud, readable passwords live apart from /users (which every
+  // signed-in person can read) under /user_passwords, which the database
+  // rules let only admins read — see SECURITY below.
+  const passwords = {};
+  const stripped = arr.map(u => {
+    if (!u || !u.password) return u;
+    passwords[u.id] = u.password;
+    const copy = Object.assign({}, u);
+    delete copy.password;
+    return copy;
+  });
+  cloudPush('users', stripped);
+  storeUserPasswords(stripped, passwords);
+  syncRolesIndex(stripped);
 }
 
 // Firebase stores /employees and /users keyed by record id (an object),
@@ -2601,6 +2615,156 @@ async function refreshCloudBaseline() {
     localStorage.setItem('users', JSON.stringify(users));
   } catch (ex) {
     console.error('Osvežavanje podataka iz baze nije uspelo, koristi se lokalna kopija:', ex);
+  }
+}
+
+/* ================================================================
+   SECURITY — role index + admin-only passwords
+   ================================================================ */
+// Database rules can't search /users by login uid, so admins keep a small
+// index /roles/{uid} = { role, userId, employeeId } that the rules use to
+// decide who may write what (see DATABASE_RULES / Podešavanja → Zaštita).
+// Only admins (or the very first registration, while it's still empty)
+// may write it.
+let userPasswordsCache = {};
+let passwordListenerActive = false;
+
+function canMaintainSecurity() {
+  return !currentUser || currentUser.role === 'admin';
+}
+
+function storeUserPasswords(users, passwords) {
+  if (!firebaseDB || !canMaintainSecurity()) return;
+  const updates = {};
+  Object.keys(passwords).forEach(id => {
+    if (userPasswordsCache[id] !== passwords[id]) updates[id] = passwords[id];
+  });
+  const ids = new Set(users.map(u => u && u.id));
+  Object.keys(userPasswordsCache).forEach(id => { if (!ids.has(id)) updates[id] = null; });
+  if (!Object.keys(updates).length) return;
+  Object.keys(updates).forEach(id => {
+    if (updates[id] == null) delete userPasswordsCache[id]; else userPasswordsCache[id] = updates[id];
+  });
+  firebaseDB.ref('user_passwords').update(updates).catch(err => console.error('user_passwords:', err));
+}
+
+function rolesIndexFor(users) {
+  const index = {};
+  users.forEach(u => {
+    if (!u || !u.uid) return;
+    index[u.uid] = { role: u.role === 'admin' ? 'admin' : 'employee', userId: u.id, employeeId: u.employeeId || null };
+  });
+  return index;
+}
+
+async function syncRolesIndex(users) {
+  if (!firebaseDB || !canMaintainSecurity()) return;
+  try {
+    const snap = await firebaseDB.ref('roles').once('value');
+    const current = snap.val() || {};
+    const wanted = rolesIndexFor(users);
+    const updates = {};
+    // Firebase drops null fields, so compare on a normalized shape.
+    const norm = r => r ? JSON.stringify({ role: r.role, userId: r.userId, employeeId: r.employeeId || null }) : '';
+    Object.keys(wanted).forEach(uid => {
+      if (norm(current[uid]) !== norm(wanted[uid])) updates[uid] = wanted[uid];
+    });
+    Object.keys(current).forEach(uid => { if (!wanted[uid]) updates[uid] = null; });
+    if (Object.keys(updates).length) await firebaseDB.ref('roles').update(updates);
+  } catch (err) {
+    console.error('Indeks uloga nije ažuriran:', err);
+  }
+}
+
+function startPasswordListener() {
+  if (passwordListenerActive || !firebaseDB || !currentUser || currentUser.role !== 'admin') return;
+  passwordListenerActive = true;
+  firebaseDB.ref('user_passwords').on('value', snap => {
+    userPasswordsCache = snap.val() || {};
+    if (currentPage === 'settings') renderRemoteUpdate(() => renderPage());
+  }, err => { passwordListenerActive = false; console.error('user_passwords:', err); });
+}
+
+// Runs once per admin login: moves any passwords still sitting in /users
+// into /user_passwords and brings the role index up to date.
+async function adminSecurityMaintenance() {
+  if (!firebaseDB || !currentUser || currentUser.role !== 'admin') return;
+  try {
+    const snap = await firebaseDB.ref('user_passwords').once('value');
+    userPasswordsCache = snap.val() || {};
+  } catch (err) { console.error(err); }
+  const users = getUsers();
+  if (users.some(u => u.password)) saveUsers(users);
+  else syncRolesIndex(users);
+}
+
+// Login-time housekeeping (elapsed leave, year rollover, reminders) used to
+// touch every employee from whoever logged in. With database rules in
+// place a regular employee may only write their own record, so they only
+// process themselves; an admin's login covers everyone.
+function canWriteEmployee(emp) {
+  return !FIREBASE_ENABLED || !currentUser || currentUser.role === 'admin' || emp.id === currentUser.employeeId;
+}
+
+const DATABASE_RULES = (() => {
+  const admin = "root.child('roles').child(auth.uid).child('role').val() === 'admin'";
+  const bootstrap = "!root.child('roles').exists()";
+  const me = "root.child('roles').child(auth.uid).child('userId').val()";
+  const signedIn = 'auth != null';
+  const adminWrite = { '.read': signedIn, '.write': `${signedIn} && ${admin}` };
+  return {
+    rules: {
+      roles: { '.read': signedIn, '.write': `${signedIn} && (${admin} || ${bootstrap})` },
+      user_passwords: { '.read': `${signedIn} && ${admin}`, '.write': `${signedIn} && (${admin} || ${bootstrap})` },
+      users: { '.read': signedIn, '.write': `${signedIn} && (${admin} || ${bootstrap})` },
+      employees: {
+        '.read': signedIn,
+        '.write': `${signedIn} && (${admin} || ${bootstrap})`,
+        '$empId': { '.write': `${signedIn} && root.child('roles').child(auth.uid).child('employeeId').val() === $empId` }
+      },
+      labs: adminWrite,
+      lab_schedule: adminWrite,
+      lab_schedule_meta: adminWrite,
+      feed: {
+        '.read': signedIn,
+        '.write': `${signedIn} && ${admin}`,
+        '$postId': {
+          '.write': `${signedIn} && ((!data.exists() && newData.child('authorUserId').val() === ${me}) || (data.exists() && data.child('authorUserId').val() === ${me}))`,
+          likes: { '$userId': { '.write': `${signedIn} && $userId === ${me}` } },
+          comments: { '$commentId': { '.write': `${signedIn} && ((!data.exists() && newData.child('authorUserId').val() === ${me}) || (data.exists() && data.child('authorUserId').val() === ${me}))` } }
+        }
+      }
+    }
+  };
+})();
+
+function copyDatabaseRules() {
+  const text = JSON.stringify(DATABASE_RULES, null, 2);
+  const done = () => toast('Pravila kopirana — nalepite ih u Firebase konzolu.', 'success');
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done).catch(() => selectRulesText());
+  else selectRulesText();
+}
+function selectRulesText() {
+  const el = document.getElementById('db-rules-text');
+  if (!el) return;
+  el.style.display = 'block';
+  el.select();
+  toast('Označeno — pritisnite Ctrl+C (ili dugo pritisnite → Kopiraj).', 'info');
+}
+
+async function securityStatusHtml() {
+  if (!firebaseDB) return 'Lokalni demo režim — bez baze u oblaku.';
+  try {
+    const snap = await firebaseDB.ref('roles').once('value');
+    const roles = snap.val() || {};
+    const users = getUsers().filter(u => u.uid);
+    const missing = users.filter(u => !roles[u.uid] || roles[u.uid].role !== (u.role === 'admin' ? 'admin' : 'employee'));
+    const plainInUsers = getUsers().filter(u => u.password).length;
+    return missing.length || plainInUsers
+      ? `⚠️ Priprema još nije gotova (${missing.length} korisnika bez indeksa, ${plainInUsers} lozinki u javnom delu). Osvežite stranicu kao admin pa pogledajte ponovo.`
+      : `✅ Spremno: svih ${users.length} korisnika je u indeksu uloga, a lozinke su sklonjene u deo koji vide samo admini. Možete objaviti pravila.`;
+  } catch (err) {
+    return 'Status nije moguće pročitati: ' + escapeHtml(err.message || String(err));
   }
 }
 
@@ -3247,7 +3411,7 @@ function renderPage() {
     case 'requests': renderRequests(); break;
     case 'history': renderHistory(); break;
     case 'reports': renderReports(); break;
-    case 'settings': renderSettings(); break;
+    case 'settings': renderSettings(); fillSecurityStatus(); break;
     case 'my-calendar': renderMyCalendar(); break;
     case 'my-request': renderMyRequest(); break;
     case 'my-profile': renderMyProfile(); break;
@@ -3508,7 +3672,7 @@ function applyYearRollover() {
   const year = new Date().getFullYear();
   const emps = getEmployees();
   let changed = false;
-  emps.forEach(emp => {
+  emps.filter(canWriteEmployee).forEach(emp => {
     if (emp.lastRolloverYear === undefined) {
       // Existing employee predating this feature — start tracking from
       // this year without retroactively rolling over past years.
@@ -4360,7 +4524,7 @@ function applyElapsedLeaveDeductions() {
   const today = todayStr();
   const emps = getEmployees();
   let changed = false;
-  emps.forEach(emp => {
+  emps.filter(canWriteEmployee).forEach(emp => {
     (emp.leave_history||[]).forEach(req => {
       if (req.status !== 'approved' || req.ongoing) return;
       if (req.leaveType !== 'Godišnji odmor' && req.leaveType !== 'Slobodan dan') return;
@@ -4398,7 +4562,7 @@ function sendUpcomingLeaveReminders() {
   const remindableTypes = ['Godišnji odmor', 'Slobodan dan', 'Plaćeno odsustvo'];
   const emps = getEmployees();
   let changed = false;
-  emps.forEach(emp => {
+  emps.filter(canWriteEmployee).forEach(emp => {
     (emp.leave_history||[]).forEach(req => {
       if (req.status !== 'approved' || req.reminderSent || req.ongoing) return;
       if (!remindableTypes.includes(req.leaveType)) return;
@@ -4782,7 +4946,7 @@ function renderSettings() {
   const users = getUsers();
   const emps = getEmployees();
   settingsPasswordMap = {};
-  users.forEach(u => { if (u.password) settingsPasswordMap[u.id] = u.password; });
+  users.forEach(u => { const pw = u.password || userPasswordsCache[u.id]; if (pw) settingsPasswordMap[u.id] = pw; });
 
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podešavanja</div></div>
@@ -4798,6 +4962,20 @@ function renderSettings() {
       </div>
     </div>
     <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">🔒 Zaštita baze</div></div>
+      <div class="card-body text-sm">
+        <p class="text-muted" style="margin-bottom:.75rem">Pravila u Firebase-u određuju ko sme šta da menja: radnik samo svoje podatke i svoje objave, admin sve. Lozinke vide samo admini.</p>
+        <div id="security-status" style="margin-bottom:.75rem">Proveravam…</div>
+        <ol style="padding-left:1.25rem;margin-bottom:.75rem;color:var(--text2)">
+          <li>Kliknite <strong>Kopiraj pravila</strong>.</li>
+          <li>Firebase konzola → <strong>Realtime Database</strong> → kartica <strong>Rules</strong>.</li>
+          <li>Obrišite sve što piše, nalepite i kliknite <strong>Publish</strong>.</li>
+        </ol>
+        <button class="btn btn-primary btn-sm" onclick="copyDatabaseRules()">📋 Kopiraj pravila</button>
+        <textarea id="db-rules-text" readonly style="display:none;margin-top:.75rem;font-family:monospace;font-size:.75rem;min-height:200px;width:100%">${escapeHtml(JSON.stringify(DATABASE_RULES, null, 2))}</textarea>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
       <div class="card-header"><div class="card-title">👥 Korisnici sistema</div></div>
       <p class="text-sm text-muted" style="padding:0 1.5rem;margin-top:-.5rem">Lozinka je vidljiva samo za naloge napravljene (ili čija je lozinka postavljena) nakon uvođenja ove opcije.</p>
       <div class="table-wrap">
@@ -4808,7 +4986,7 @@ function renderSettings() {
               <td>${u.name}</td>
               <td>${u.email}</td>
               <td>
-                ${u.password
+                ${settingsPasswordMap[u.id]
                   ? `<span style="display:inline-flex;align-items:center;gap:.4rem;white-space:nowrap">
                        <span class="pw-mask" id="pw-${u.id}">••••••••</span>
                        <button class="btn btn-secondary btn-sm" style="padding:.2rem .5rem" onclick="togglePasswordVisibility('${u.id}')" title="Prikaži/sakrij">👁️</button>
@@ -4846,6 +5024,12 @@ function renderSettings() {
         <button class="btn btn-secondary" style="margin-top:.75rem" onclick="toast('Firebase nije konfigurisan', 'warning')">Testiraj konekciju</button>
       </div>
     </div>`;
+}
+
+function fillSecurityStatus() {
+  const el = document.getElementById('security-status');
+  if (!el) return;
+  securityStatusHtml().then(html => { const cur = document.getElementById('security-status'); if (cur) cur.innerHTML = html; });
 }
 
 function togglePasswordVisibility(userId) {
@@ -4936,7 +5120,7 @@ function setUserAdmin(userId, makeAdmin) {
   if (!confirm(msg)) return;
   user.role = makeAdmin ? 'admin' : 'employee';
   saveUsers(users);
-  renderSettings();
+  renderPage();
   toast(makeAdmin ? `${user.name} je sada administrator` : `${user.name} više nije administrator`, 'success');
 }
 
@@ -4953,7 +5137,7 @@ async function deleteUser(userId) {
   }
   if (user) await deleteAuthAccountForUid(user.uid);
 
-  renderSettings();
+  renderPage();
   toast('Korisnik obrisan', 'success');
 }
 
@@ -6911,6 +7095,7 @@ function startCloudListeners() {
       const fresh = data.find(u => u.id === currentUser.id);
       if (fresh && fresh.role !== currentUser.role) {
         currentUser = fresh;
+        startPasswordListener();
         if (!navItemsFor(currentUser).some(i => i.id === currentPage)) currentPage = 'dashboard';
       }
     }
@@ -6933,6 +7118,8 @@ async function startApp() {
   renderSidebar();
   renderPage();
   startCloudListeners();
+  startPasswordListener();
+  adminSecurityMaintenance();
 }
 
 /* ================================================================
