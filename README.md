@@ -44,11 +44,21 @@ Aplikacija je jedan samostalan HTML fajl (`index.html`) — bez servera, bez bui
 7. **Authentication → Settings → Authorized domains** → dodaj domen na kom će sajt živeti (npr. `tvoje-korisnicko-ime.github.io`). **Bez ovog koraka registracija/prijava neće raditi na živom sajtu** (radiće samo na `localhost` dok testiraš lokalno).
 8. Otvori `index.html?register` (napomena: `?register` na kraju — registracija je namerno skrivena sa običnog login ekrana) i registruj se svojim pravim email-om. Taj nalog (prvi ikad registrovan) automatski postaje Admin. Ubuduće koristi običan `index.html` i dodaj ostale zaposlene kroz *Dodaj radnika* — link za registraciju ostaje skriven za njih.
 
-### Bezbednosna napomena
+### Bezbednosna pravila baze (preporučeno)
 
-Pravila iz koraka 4 (`auth != null`) znače da **bilo koji prijavljeni korisnik može da čita i menja sve podatke** (nema razdvajanja po ulogama na nivou baze — to app radi na UI nivou). Za malu firmu sa poverljivim timom ovo je uobičajeno i prihvatljivo (slično deljenom Excel fajlu koji svi članovi tima mogu da menjaju). Ako ti zatreba stroža podela (npr. da običan zaposleni ne može direktno da piše u bazu mimo aplikacije), to zahteva finije Firebase security rules po ulozi — javi ako ti to zatreba.
+Osnovna pravila iz koraka 4 (`auth != null`) znače da bilo koji prijavljeni korisnik može da čita i menja sve podatke. Aplikacija sada ima i stroža pravila po ulozi (`database.rules.json`):
 
-Stvarnu prijavu i dalje proverava Firebase Authentication (industrijski standard, hashovano) — ali aplikacija **dodatno čuva čitljivu kopiju lozinke** u bazi (vidljivu adminu u *Podešavanja*), po eksplicitnom zahtevu, radi lakšeg administriranja male firme. Ovo je svestan bezbednosni kompromis: ako baza ikad bude neovlašćeno dostupna, sve sačuvane lozinke su odmah čitljive (za razliku od heševa koje inače čuva Firebase). Vidljivo je samo za naloge napravljene nakon uvođenja ove opcije — stariji nalozi ostaju "nepoznato".
+- radnik menja samo **svoj** profil i zahteve, svoje objave i komentare na Feed-u i svoje lajkove;
+- samo admin menja korisnike, uloge, druge radnike, laboratorije i raspored;
+- čitljive lozinke koje admin vidi u *Podešavanjima* su u posebnom delu baze (`user_passwords`) koji **samo admini** mogu da čitaju — više nisu u `users`, koje čitaju svi.
+
+Pravila se oslanjaju na mali indeks `roles/{uid}` koji aplikacija sama održava kad se admin prijavi. Redosled:
+
+1. Posle objave nove verzije aplikacije, **prijavi se kao admin** (aplikacija tada napravi indeks i premesti lozinke).
+2. Otvori *Podešavanja → 🔒 Zaštita baze*: treba da piše „✅ Spremno”.
+3. Klikni **Kopiraj pravila**, pa u Firebase konzoli → **Realtime Database → Rules** obriši sve, nalepi i klikni **Publish**.
+
+Stvarnu prijavu i dalje proverava Firebase Authentication (hashovano). Čitljiva kopija lozinke postoji samo radi lakšeg administriranja, po izričitom zahtevu — vidljiva je samo adminima.
 
 Ako ne podesiš Firebase (ostaviš placeholder vrednosti u `FIREBASE_CONFIG`), aplikacija i dalje radi normalno u lokalnom demo režimu (admin/admin123, podaci samo na tom uređaju).
 

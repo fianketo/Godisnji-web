@@ -1,0 +1,52 @@
+{
+  "rules": {
+    "roles": {
+      ".read": "auth != null",
+      ".write": "auth != null && (root.child('roles').child(auth.uid).child('role').val() === 'admin' || !root.child('roles').exists())"
+    },
+    "user_passwords": {
+      ".read": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && (root.child('roles').child(auth.uid).child('role').val() === 'admin' || !root.child('roles').exists())"
+    },
+    "users": {
+      ".read": "auth != null",
+      ".write": "auth != null && (root.child('roles').child(auth.uid).child('role').val() === 'admin' || !root.child('roles').exists())"
+    },
+    "employees": {
+      ".read": "auth != null",
+      ".write": "auth != null && (root.child('roles').child(auth.uid).child('role').val() === 'admin' || !root.child('roles').exists())",
+      "$empId": {
+        ".write": "auth != null && root.child('roles').child(auth.uid).child('employeeId').val() === $empId"
+      }
+    },
+    "labs": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "lab_schedule": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "lab_schedule_meta": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "feed": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      "$postId": {
+        ".write": "auth != null && ((!data.exists() && newData.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()) || (data.exists() && data.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()))",
+        "likes": {
+          "$userId": {
+            ".write": "auth != null && $userId === root.child('roles').child(auth.uid).child('userId').val()"
+          }
+        },
+        "comments": {
+          "$commentId": {
+            ".write": "auth != null && ((!data.exists() && newData.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()) || (data.exists() && data.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()))"
+          }
+        }
+      }
+    }
+  }
+}
