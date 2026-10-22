@@ -2222,14 +2222,51 @@ function hasRealEmail(emp) {
   return !!emp.email && !emp.email.endsWith('@' + LOCAL_LOGIN_DOMAIN);
 }
 
-function sendLeaveEmail(emp, subject, message) {
-  if (!EMAILJS_ENABLED || !hasRealEmail(emp)) return;
-  emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-    to_email: emp.email,
-    to_name: emp.name,
+// EmailJS rejects with { status, text } — turn that into something an
+// admin can act on instead of a silent console line.
+function emailErrorText(err) {
+  if (!err) return 'nepoznata greška';
+  if (err.status != null || err.text) return `${err.status || ''} ${err.text || ''}`.trim();
+  return err.message || String(err);
+}
+
+function sendEmailRaw(toEmail, toName, subject, message) {
+  if (typeof emailjs === 'undefined') {
+    return Promise.reject(new Error('EmailJS biblioteka nije učitana (proverite internet ili blokator reklama).'));
+  }
+  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+    to_email: toEmail,
+    to_name: toName,
     subject,
     message
-  }).catch(err => console.error('EmailJS slanje nije uspelo:', err));
+  });
+}
+
+function sendLeaveEmail(emp, subject, message) {
+  if (!EMAILJS_ENABLED) return;
+  const isAdminUser = currentUser && currentUser.role === 'admin';
+  if (!hasRealEmail(emp)) {
+    if (isAdminUser) toast(`${emp.name} nema email adresu — poslato je samo obaveštenje u aplikaciji.`, 'info', 5000);
+    return;
+  }
+  sendEmailRaw(emp.email, emp.name, subject, message)
+    .then(() => { if (isAdminUser) toast(`✉️ Mejl poslat: ${emp.email}`, 'success'); })
+    .catch(err => {
+      console.error('EmailJS slanje nije uspelo:', err);
+      if (isAdminUser) toast(`Mejl za ${emp.email} nije poslat: ${emailErrorText(err)}`, 'error', 10000);
+    });
+}
+
+function sendTestEmail() {
+  const input = document.getElementById('test-email-to');
+  const out = document.getElementById('test-email-result');
+  const to = input.value.trim();
+  if (!to || !to.includes('@')) { out.textContent = 'Upišite ispravnu email adresu.'; out.style.color = 'var(--danger)'; return; }
+  if (!EMAILJS_ENABLED) { out.textContent = 'EmailJS nije podešen (EMAILJS_CONFIG u index.html).'; out.style.color = 'var(--danger)'; return; }
+  out.textContent = 'Šaljem…'; out.style.color = 'var(--text2)';
+  sendEmailRaw(to, currentUser.name || 'OdmorPro', 'Probni mejl iz OdmorPro', 'Ovo je probni mejl. Ako ga vidite, slanje mejlova iz aplikacije radi.')
+    .then(() => { out.textContent = `✅ Poslato na ${to} — proverite inbox (i Spam).`; out.style.color = 'var(--success)'; })
+    .catch(err => { console.error(err); out.textContent = `❌ Nije poslato: ${emailErrorText(err)}`; out.style.color = 'var(--danger)'; });
 }
 
 // Records an in-app notification (bell icon) and — if EmailJS is
@@ -4612,6 +4649,17 @@ function renderSettings() {
 
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podešavanja</div></div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">✉️ Probni mejl</div></div>
+      <div class="card-body">
+        <p class="text-sm text-muted" style="margin-bottom:.75rem">Pošaljite probni mejl da proverite da li slanje radi. Ako ne radi, ovde će pisati tačna greška.</p>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <input type="email" id="test-email-to" placeholder="vaš@email.com" style="flex:1;min-width:200px" value="${(currentUser.email && currentUser.email.includes('@') && !currentUser.email.endsWith('@' + LOCAL_LOGIN_DOMAIN)) ? currentUser.email : ''}">
+          <button class="btn btn-primary" onclick="sendTestEmail()">Pošalji probni mejl</button>
+        </div>
+        <div id="test-email-result" class="text-sm mt-2"></div>
+      </div>
+    </div>
     <div class="card" style="margin-bottom:1.5rem">
       <div class="card-header"><div class="card-title">👥 Korisnici sistema</div></div>
       <p class="text-sm text-muted" style="padding:0 1.5rem;margin-top:-.5rem">Lozinka je vidljiva samo za naloge napravljene (ili čija je lozinka postavljena) nakon uvođenja ove opcije.</p>
