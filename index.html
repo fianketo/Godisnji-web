@@ -1680,6 +1680,14 @@ textarea { resize: vertical; min-height: 80px; }
 .text-muted { color: var(--text2); }
 .font-bold { font-weight: 700; }
 .hidden { display: none !important; }
+/* Sideways swipes switch tabs (see SWIPE BETWEEN TABS) — keep the browser
+   from also treating them as back/forward navigation. */
+html, body { overscroll-behavior-x: none; }
+.swipe-in-left { animation: swipeInLeft .22s ease; }
+.swipe-in-right { animation: swipeInRight .22s ease; }
+@keyframes swipeInLeft { from { opacity: .4; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes swipeInRight { from { opacity: .4; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .swipe-in-left, .swipe-in-right { animation: none; } }
 
 /* ---------- BETA: Feed ---------- */
 .feed-wrap, .rs-wrap { max-width: 720px; margin: 0 auto; }
@@ -2213,7 +2221,10 @@ const EMAILJS_CONFIG = {
 };
 
 const EMAILJS_ENABLED = EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY";
-if (EMAILJS_ENABLED) emailjs.init(EMAILJS_CONFIG.publicKey);
+// Guarded: if the EmailJS script fails to load (ad blocker, flaky network),
+// a bare emailjs.init() would throw here and stop the whole app from
+// starting — sendEmailRaw() reports the missing library instead.
+if (EMAILJS_ENABLED && typeof emailjs !== 'undefined') emailjs.init(EMAILJS_CONFIG.publicKey);
 
 // Employees added without a real email get a fake @odmorpro.local address
 // purely so Firebase Auth has something to log in with — never send mail
@@ -3086,6 +3097,80 @@ function closeMobileMenu() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('show');
 }
+
+/* ================================================================
+   SWIPE BETWEEN TABS (mobile)
+   ================================================================ */
+// Swiping left/right on the page moves to the next/previous tab of the
+// bottom bar, like a native tabbed app (on Raspored's day strip it moves
+// a week instead). Ignored where a sideways drag already means something:
+// the drag-to-select calendar, form fields, and anything inside a modal.
+// Inside a sideways-scrolling table the swipe first scrolls the table and
+// only changes tab once the table is already at that edge.
+let swipeStart = null;
+
+function isSwipeBlocked(target) {
+  if (!target || !target.closest) return true;
+  return !!target.closest('input, textarea, select, #my-cal-grid, .modal-overlay, .feed-lightbox, #cmd-palette-overlay, .notif-dropdown');
+}
+
+// Nearest ancestor that really scrolls sideways (a few px of accidental
+// overflow doesn't count).
+function sideScroller(target) {
+  for (let el = target; el && el !== document.body; el = el.parentElement) {
+    if (el.scrollWidth > el.clientWidth + 24) {
+      const ox = getComputedStyle(el).overflowX;
+      if (ox === 'auto' || ox === 'scroll') return el;
+    }
+  }
+  return null;
+}
+
+function swipeNavigate(page, dir) {
+  navigateTo(page);
+  window.scrollTo(0, 0);
+  const main = document.getElementById('main-content');
+  main.classList.remove('swipe-in-left', 'swipe-in-right');
+  void main.offsetWidth; // restart the animation
+  main.classList.add(dir === 'left' ? 'swipe-in-left' : 'swipe-in-right');
+}
+
+document.addEventListener('touchstart', e => {
+  swipeStart = null;
+  if (!currentUser || e.touches.length !== 1) return;
+  const bn = document.getElementById('bottom-nav');
+  if (!bn || getComputedStyle(bn).display === 'none') return; // desktop layout
+  if (document.getElementById('sidebar').classList.contains('open')) return;
+  if (isSwipeBlocked(e.target)) return;
+  const t = e.touches[0];
+  const scroller = sideScroller(e.target);
+  swipeStart = { x: t.clientX, y: t.clientY, time: Date.now(), onWeek: !!e.target.closest('.rs-week'),
+    scroller, scrollLeft: scroller ? scroller.scrollLeft : 0 };
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!swipeStart) return;
+  const s = swipeStart;
+  swipeStart = null;
+  const t = e.changedTouches[0];
+  if (!t) return;
+  const dx = t.clientX - s.x, dy = t.clientY - s.y;
+  if (Date.now() - s.time > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+  if (s.scroller) {
+    const el = s.scroller;
+    const atEdge = dx < 0 ? s.scrollLeft + el.clientWidth >= el.scrollWidth - 2 : s.scrollLeft <= 0;
+    if (!atEdge || Math.abs(el.scrollLeft - s.scrollLeft) > 2) return;
+  }
+  if (s.onWeek && currentPage === 'raspored') { rsShiftWeek(dx < 0 ? 1 : -1); return; }
+  const tabs = navItemsFor(currentUser).slice(0, 4).map(i => i.id); // same tabs as the bottom bar
+  const idx = tabs.indexOf(currentPage);
+  if (idx === -1) return; // a page that isn't on the bottom bar
+  const next = idx + (dx < 0 ? 1 : -1);
+  if (next < 0 || next >= tabs.length) return;
+  swipeNavigate(tabs[next], dx < 0 ? 'left' : 'right');
+}, { passive: true });
+
+document.addEventListener('touchcancel', () => { swipeStart = null; });
 
 /* ================================================================
    THEME
@@ -4778,6 +4863,7 @@ function renderHelp() {
       <div class="card-header"><div class="card-title">👤 Svakodnevna upotreba</div></div>
       <div class="card-body" style="padding:.25rem 1.5rem">
         ${helpRow('📊', 'Dashboard', 'pregled koliko vam je dana godišnjeg i slobodnih dana preostalo, i koliko zahteva čeka na odgovor.')}
+        ${helpRow('👆', 'Prevlačenje prstom', 'na telefonu prevucite prstom levo ili desno da pređete na sledeću ili prethodnu stranicu iz donje trake. Na Rasporedu, prevlačenje preko trake sa danima menja nedelju.')}
         ${helpRow('📰', 'Feed', 'objave za ceo tim — napišite nešto, dodajte sliku, lajkujte i komentarišite. Broj na dugmetu Feed pokazuje nove objave.')}
         ${helpRow('🧪', 'Raspored', 'za svaki dan vidite ko radi u kojoj laboratoriji, u 1. i 2. smeni. „Moj raspored” prikazuje samo vaše smene, a tačka ispod dana označava dane kada radite.')}
         ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
