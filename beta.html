@@ -5964,7 +5964,7 @@ function renderRaspored() {
       </div>
       <div class="rs-week">${weekHtml}</div>
       ${admin && labsList().length ? `<div class="rs-tools">
-        <button class="btn btn-secondary btn-sm" onclick="openLabsManager()">⚙️ Laboratorije</button>
+        <button class="btn btn-secondary btn-sm" onclick="openLabsManager()">⚙️ Dodaj / izmeni laboratorije</button>
         <button class="btn btn-secondary btn-sm" onclick="rsCopyPrevDay()">📋 Kopiraj prethodni dan</button>
         <button class="btn btn-secondary btn-sm" onclick="rsCopyPrevWeek()">📋 Kopiraj prošlu nedelju</button>
       </div>` : ''}
@@ -6100,7 +6100,7 @@ function renderLabsDraft() {
     <div class="rs-lab-edit"><span class="rs-lab-edit-head">Naziv</span><span class="rs-lab-edit-head">1. smena</span><span class="rs-lab-edit-head">2. smena</span><span></span><span></span></div>
     ${labsDraft.map((l, i) => `
       <div class="rs-lab-edit">
-        <input type="text" class="rs-lab-name-in" placeholder="npr. Biohemija" value="${escapeHtml(l.name)}" oninput="labsDraft[${i}].name = this.value">
+        <input type="text" class="rs-lab-name-in" placeholder="npr. Bulevar" value="${escapeHtml(l.name)}" oninput="labsDraft[${i}].name = this.value">
         <input type="text" placeholder="07:00–14:00" value="${escapeHtml(l.shift1Time)}" oninput="labsDraft[${i}].shift1Time = this.value">
         <input type="text" placeholder="14:00–21:00" value="${escapeHtml(l.shift2Time)}" oninput="labsDraft[${i}].shift2Time = this.value">
         <input type="color" value="${l.color || LAB_COLORS[i % LAB_COLORS.length]}" oninput="labsDraft[${i}].color = this.value" title="Boja">
