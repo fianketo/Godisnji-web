@@ -2257,6 +2257,35 @@ function sendLeaveEmail(emp, subject, message) {
     });
 }
 
+// Emails every admin (except the person submitting) when a new leave
+// request comes in, so they don't have to keep the app open to notice it.
+// The submitter is usually a regular employee, so failures stay in the
+// console instead of showing them an error about someone else's inbox.
+function notifyAdminsOfRequest(emp, req) {
+  if (!EMAILJS_ENABLED) return;
+  const isReal = e => !!e && e.includes('@') && !e.endsWith('@' + LOCAL_LOGIN_DOMAIN);
+  const emps = getEmployees();
+  const seen = new Set();
+  const admins = [];
+  getUsers().filter(u => u.role === 'admin' && u.id !== currentUser.id).forEach(u => {
+    const linked = u.employeeId ? emps.find(e => e.id === u.employeeId) : null;
+    const email = isReal(u.email) ? u.email : (linked && isReal(linked.email) ? linked.email : null);
+    if (!email || seen.has(email.toLowerCase())) return;
+    seen.add(email.toLowerCase());
+    admins.push({ email, name: u.name || 'Administrator' });
+  });
+  if (!admins.length) return;
+  const period = req.ongoing ? `od ${req.startDate} (u toku)` : `${req.startDate} → ${req.endDate}${req.days ? ` (${req.days} ${req.days === 1 ? 'dan' : 'dana'})` : ''}`;
+  const appUrl = location.origin + location.pathname;
+  const message = `${emp.name} je podneo/la novi zahtev: "${req.leaveType}", ${period}.` +
+    (req.note ? ` Napomena: ${req.note.trim().replace(/[.!?]?$/, '.')}` : '') +
+    ` Zahtev možete odobriti ili odbiti u aplikaciji (Zahtevi): ${appUrl}`;
+  admins.forEach(a => {
+    sendEmailRaw(a.email, a.name, `Novi zahtev: ${emp.name} — ${req.leaveType}`, message)
+      .catch(err => console.error('EmailJS (admin) slanje nije uspelo:', err));
+  });
+}
+
 function sendTestEmail() {
   const input = document.getElementById('test-email-to');
   const out = document.getElementById('test-email-result');
@@ -4754,7 +4783,7 @@ function renderHelp() {
         ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
         ${helpRow('📅', 'Moj kalendar', 'kliknite ili prevucite preko dana da odmah zatražite odsustvo za taj period.')}
         ${helpRow('👤', 'Moj profil', 'detaljan pregled iskorišćenih i rezervisanih dana, i istorija svih prethodnih zahteva.')}
-        ${helpRow('🔔', 'Obaveštenja', 'zvonce u vrhu ekrana javlja kad vam je zahtev odobren, odbijen ili izmenjen — uz email i podsetnik 7 dana pre početka odmora, ako je podešeno.')}
+        ${helpRow('🔔', 'Obaveštenja', 'zvonce u vrhu ekrana javlja kad vam je zahtev odobren, odbijen ili izmenjen — uz email i podsetnik 7 dana pre početka odmora, ako je podešeno. Administratori dobijaju email za svaki novi zahtev.')}
       </div>
     </div>
 
@@ -5147,6 +5176,7 @@ function openQuickLeave(startStr, endStr) {
       e.leave_requests = e.leave_requests || [];
       e.leave_requests.push(newReq);
     });
+    notifyAdminsOfRequest(emp, newReq);
     closeQuickLeave();
     toast('Zahtev podnet!', 'success');
     renderSidebar();
@@ -5273,6 +5303,7 @@ function renderMyRequest() {
       e2.leave_requests = e2.leave_requests || [];
       e2.leave_requests.push(newReq);
     });
+    notifyAdminsOfRequest(emp, newReq);
     toast('Zahtev podnet!', 'success');
     renderSidebar();
     renderMyRequest();
