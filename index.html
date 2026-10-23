@@ -2458,7 +2458,7 @@ function saveUsers(arr) {
   });
   cloudPush('users', stripped);
   storeUserPasswords(stripped, passwords);
-  syncRolesIndex(stripped);
+  return syncRolesIndex(stripped);
 }
 
 // Firebase stores /employees and /users keyed by record id (an object),
@@ -5001,6 +5001,7 @@ function renderSettings() {
               </td>
               <td><span class="badge badge-info">${u.role === 'admin' ? '👑 Admin' : '👤 Radnik'}</span></td>
               <td style="white-space:nowrap">
+                <button class="btn btn-secondary btn-sm" onclick="openChangeEmailModal('${u.id}')" title="Promeni email / korisničko ime">✉️ Email</button>
                 ${u.id === currentUser.id
                   ? '<span class="text-muted text-xs">(vi)</span>'
                   : u.role === 'admin'
@@ -5105,7 +5106,7 @@ function renderHelp() {
         ${helpRow('📋', 'Zahtevi', 'odobrite ili odbijte zahteve na čekanju — upozorenje se prikazuje ako se period preklapa sa nekim ko je već odsutan, a kalendar ispod pokazuje ko je sve trenutno na odmoru.')}
         ${helpRow('📁', 'Istorija', 'svaki već obrađen zahtev može naknadno da se izmeni ili obriše, npr. ako radnik promeni planove nakon odobrenja.')}
         ${helpRow('📈', 'Izveštaji', 'grafikon iskorišćenosti odmora i tabela svih radnika, sa izvozom u CSV/PDF.')}
-        ${helpRow('⚙️', 'Podešavanja', 'pregled svih korisničkih naloga i uloga, izvoz/uvoz kompletnih podataka aplikacije u JSON.')}
+        ${helpRow('⚙️', 'Podešavanja', 'pregled svih korisničkih naloga i uloga, izvoz/uvoz kompletnih podataka aplikacije u JSON. Dugme „✉️ Email” menja adresu za prijavu korisnika (stara prestaje da važi); lozinka ostaje ista ili postavite novu.')}
       </div>
     </div>` : ''}`;
 }
@@ -5115,6 +5116,108 @@ function renderHelp() {
 // original admin (plus their own personal pages if they have an employee
 // profile — see navItemsFor). You can't change your own role, so the app
 // can never be left without an admin by accident.
+/* ---------------- PROMENA EMAIL-A (admin) ---------------- */
+// The email (or generated username@odmorpro.local) is also the Firebase
+// Auth login. The browser SDK can't rename someone else's login, so this
+// creates a fresh login with the new address and the same password,
+// points the user record at it, and retires the old one (deleted via the
+// Cloud Function when it's deployed; otherwise it just stops working,
+// since no profile points at it any more).
+function displayLogin(email) {
+  return email && email.endsWith('@' + LOCAL_LOGIN_DOMAIN) ? email.slice(0, -('@' + LOCAL_LOGIN_DOMAIN).length) + ' (korisničko ime)' : (email || '—');
+}
+
+function openChangeEmailModal(userId) {
+  const u = getUsers().find(x => x.id === userId);
+  if (!u) return;
+  const knownPw = u.password || userPasswordsCache[u.id] || settingsPasswordMap[u.id];
+  openExtraModal('change-email', '✉️ Promena email adrese',
+    `<p class="text-sm" style="margin-bottom:1rem"><strong>${escapeHtml(u.name)}</strong> — trenutno: <code>${escapeHtml(displayLogin(u.email))}</code></p>
+     <div class="form-group">
+       <label for="ce-email">Nova email adresa</label>
+       <input type="text" id="ce-email" placeholder="npr. marko@gmail.com" autocomplete="off">
+       <div class="text-xs text-muted mt-1">Ovom adresom se ${u.id === currentUser.id ? 'prijavljujete' : 'radnik prijavljuje'} i na nju stižu mejlovi. Bez @ postaje korisničko ime.</div>
+     </div>
+     <div class="form-group">
+       <label for="ce-pass">${knownPw ? 'Nova lozinka (opciono)' : 'Lozinka *'}</label>
+       <input type="text" id="ce-pass" placeholder="${knownPw ? 'Ostavite prazno — lozinka ostaje ista' : 'Najmanje 6 karaktera'}" autocomplete="off">
+       ${knownPw ? '' : '<div class="text-xs text-muted mt-1">Stara lozinka ovog naloga nije poznata, pa je potrebno postaviti novu i javiti je radniku.</div>'}
+     </div>
+     <div id="ce-error" class="text-sm" style="color:var(--danger)"></div>`,
+    `<button class="btn btn-secondary" onclick="closeExtraModal('change-email')">Otkaži</button>
+     <button class="btn btn-primary" id="ce-save">Sačuvaj</button>`);
+  document.getElementById('ce-save').onclick = () => changeUserEmail(userId);
+  document.getElementById('ce-email').focus();
+}
+
+async function changeUserEmail(userId) {
+  const errEl = document.getElementById('ce-error');
+  const btn = document.getElementById('ce-save');
+  const fail = msg => { errEl.textContent = msg; btn.disabled = false; btn.textContent = 'Sačuvaj'; };
+  const input = document.getElementById('ce-email').value.trim();
+  const newPwInput = document.getElementById('ce-pass').value.trim();
+  const u = getUsers().find(x => x.id === userId);
+  if (!u) return fail('Korisnik nije pronađen.');
+  if (!input) return fail('Upišite novu email adresu.');
+  const login = toLoginEmail(input).toLowerCase();
+  if (login.includes('@') && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(login)) return fail('Email adresa nije ispravna.');
+  if (login === (u.email || '').toLowerCase()) return fail('To je već trenutna adresa.');
+  const taken = getUsers().some(x => x.id !== u.id && (x.email || '').toLowerCase() === login) ||
+    getEmployees().some(e => e.id !== u.employeeId && (e.email || '').toLowerCase() === login);
+  if (taken) return fail('Tu adresu već koristi drugi korisnik.');
+  const pw = newPwInput || u.password || userPasswordsCache[u.id] || settingsPasswordMap[u.id];
+  if (!pw || pw.length < 6) return fail('Lozinka mora imati najmanje 6 karaktera.');
+
+  btn.disabled = true; btn.textContent = 'Čuvam…';
+  const oldUid = u.uid;
+  let newUid = oldUid;
+  if (FIREBASE_ENABLED) {
+    try { newUid = await createAuthAccountFor(login, pw); }
+    catch (ex) { return fail(authErrorSr(ex)); }
+  }
+
+  // Re-read after the await — someone may have changed users meanwhile.
+  const users = getUsers();
+  const fresh = users.find(x => x.id === userId);
+  if (!fresh) return fail('Korisnik je u međuvremenu obrisan.');
+  fresh.email = login;
+  fresh.password = pw;
+  if (FIREBASE_ENABLED) fresh.uid = newUid;
+  const rolesSynced = saveUsers(users);
+  const isSelf = currentUser && currentUser.id === userId;
+
+  if (fresh.employeeId) {
+    mutateEmployee(fresh.employeeId, e => {
+      e.email = login;
+      addNotification(e, `Vaša adresa za prijavu je promenjena u ${displayLogin(login)}.`);
+    });
+  }
+  if (login.includes('@') && !login.endsWith('@' + LOCAL_LOGIN_DOMAIN) && EMAILJS_ENABLED) {
+    sendEmailRaw(login, fresh.name, 'Nova adresa za prijavu u OdmorPro',
+      `Vaša adresa za prijavu u OdmorPro je sada ${login}.${newPwInput ? ' Lozinku će vam saopštiti administrator.' : ' Lozinka je ostala ista.'} Aplikacija: ${location.origin + location.pathname}`)
+      .catch(err => console.error('EmailJS:', err));
+  }
+
+  if (FIREBASE_ENABLED) {
+    if (isSelf) {
+      // Our own login moved: make sure the role index points at the new
+      // login before switching to it, so admin rights carry over.
+      await rolesSynced;
+      try { await firebaseAuth.signInWithEmailAndPassword(login, pw); } catch (ex) { console.error(ex); }
+      // The admin-only password listener can get cut off while the login
+      // switches over; reattach it under the new login.
+      if (firebaseDB) firebaseDB.ref('user_passwords').off();
+      passwordListenerActive = false;
+    }
+    if (oldUid && oldUid !== newUid) deleteAuthAccountForUid(oldUid);
+  }
+  if (isSelf) { currentUser = Object.assign({}, fresh); delete currentUser.password; startPasswordListener(); }
+
+  closeExtraModal('change-email');
+  renderPage();
+  toast(`Adresa za ${fresh.name} je promenjena u ${displayLogin(login)}${newPwInput ? ' (sa novom lozinkom)' : ''}.`, 'success', 6000);
+}
+
 function setUserAdmin(userId, makeAdmin) {
   if (userId === currentUser.id) return;
   const users = getUsers();
