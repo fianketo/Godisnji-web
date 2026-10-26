@@ -1682,200 +1682,97 @@ textarea { resize: vertical; min-height: 80px; }
 .hidden { display: none !important; }
 
 /* ---------- Trebovanje ---------- */
-.tb-wrap { max-width: 760px; margin: 0 auto; padding-bottom: 5rem; }
-.tb-tabs { display: flex; flex-wrap: wrap; gap: .375rem; margin-bottom: 1rem; }
-.tb-tab { border: 1px solid var(--border); background: var(--surface); color: var(--text2); border-radius: 99px; padding: .5rem .875rem; font-weight: 600; font-size: .875rem; cursor: pointer; white-space: nowrap; font-family: inherit; display: inline-flex; align-items: center; gap: .375rem; }
-.tb-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-.tb-tab .badge-count { position: static; }
-.tb-section { padding: 1rem 1.125rem; margin-bottom: 1rem; }
-.tb-label { font-weight: 700; margin-bottom: .625rem; }
-.tb-chips { display: flex; flex-wrap: wrap; gap: .5rem; }
-.tb-chip { border: 2px solid var(--border); background: var(--surface2); color: var(--text); border-radius: 99px; padding: .5rem .875rem; font-weight: 600; cursor: pointer; font-family: inherit; font-size: .9rem; }
-.tb-chip.active { border-color: var(--lab-color, var(--primary)); background: var(--primary-light); }
-.tb-chip.small { padding: .3rem .7rem; font-size: .8125rem; border-width: 1px; }
-.tb-list { margin-top: .5rem; }
-.tb-cat { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin: 1rem 0 .25rem; display: flex; align-items: center; gap: .375rem; }
-.tb-cat-rename { border: none; background: none; cursor: pointer; font-size: .8rem; opacity: .6; }
-.tb-item { display: flex; align-items: center; gap: .5rem; padding: .375rem 0; border-bottom: 1px solid var(--border); }
-.tb-item.on { background: var(--primary-light); margin: 0 -.5rem; padding: .375rem .5rem; border-radius: 8px; }
-.tb-item-name { flex: 1; min-width: 0; text-align: left; border: none; background: none; color: var(--text); font-size: .95rem; cursor: pointer; padding: .375rem 0; font-family: inherit; }
-.tb-item.on .tb-item-name { font-weight: 700; }
-.tb-unit { font-size: .75rem; color: var(--text3); font-weight: 400; }
-.tb-step { display: flex; align-items: center; gap: .25rem; flex-shrink: 0; }
-.tb-step button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 1.125rem; font-weight: 700; cursor: pointer; }
-.tb-step button.plus { background: var(--primary); border-color: var(--primary); color: #fff; }
-.tb-step input { width: 64px !important; text-align: center; padding: .375rem .25rem; font-weight: 700; }
-.tb-cartbar { position: sticky; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .75rem 1rem; background: var(--dropdown-surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); z-index: 50; }
-@media (min-width: 769px) { .tb-cartbar { bottom: 1rem; } }
-.tb-clear { border: none; background: none; color: var(--text3); cursor: pointer; font-size: .8125rem; text-decoration: underline; margin-left: .5rem; }
-.tb-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-.tb-table th, .tb-table td { text-align: left; padding: .5rem .375rem; border-bottom: 1px solid var(--border); }
-.tb-table th { font-size: .75rem; color: var(--text3); text-transform: uppercase; }
-.tb-approve-in { width: 80px !important; padding: .25rem .375rem; }
-.tb-status { display: inline-flex; align-items: center; gap: .25rem; font-size: .75rem; font-weight: 700; padding: .125rem .5rem; border-radius: 99px; vertical-align: middle; }
+.tb-wrap { max-width: 720px; margin: 0 auto; padding-bottom: 6rem; }
+.tb-seg { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; gap: .25rem; padding: .25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 1rem; }
+.tb-seg-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: .125rem; padding: .5rem .25rem; border: none; border-radius: 10px; background: none; color: var(--text2); font-family: inherit; font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.tb-seg-btn.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(6,182,212,.3); }
+.tb-seg-icon { font-size: 1.125rem; line-height: 1; }
+.tb-seg-n { position: absolute; top: 4px; right: 8px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: var(--danger); color: #fff; font-size: .6875rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.tb-seg-btn.active .tb-seg-n { background: #fff; color: var(--primary-dark); }
+
+.tb-head { display: flex; align-items: center; gap: .5rem .75rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.tb-lab-label { font-size: .75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; }
+.tb-lab-select { flex: 1; min-width: 180px; font-weight: 700; font-size: 1rem; }
+.tb-lab-select.empty { border-color: var(--warning); }
+.tb-link { border: none; background: none; color: var(--primary); font-weight: 600; font-size: .8125rem; cursor: pointer; padding: .25rem 0; font-family: inherit; }
+.tb-search { margin-bottom: .5rem; }
+
+.tb-chips { display: flex; gap: .375rem; overflow-x: auto; padding-bottom: .375rem; margin-bottom: .5rem; scrollbar-width: none; }
+.tb-chips::-webkit-scrollbar { display: none; }
+.tb-chip { flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); color: var(--text2); border-radius: 99px; padding: .375rem .75rem; font-weight: 600; font-size: .8125rem; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.tb-chip.active { background: var(--text); border-color: var(--text); color: var(--bg); }
+.tb-chip-n { opacity: .6; margin-left: .125rem; }
+
+.tb-rows { overflow: hidden; }
+.tb-group { padding: .625rem 1rem .25rem; font-size: .6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); display: flex; justify-content: space-between; align-items: center; background: var(--surface2); }
+.tb-group-act { text-transform: none; letter-spacing: 0; font-weight: 600; cursor: pointer; color: var(--text3); }
+.tb-row { display: flex; align-items: center; gap: .5rem; width: 100%; min-height: 52px; padding: .25rem .5rem .25rem 1rem; border: none; border-top: 1px solid var(--border); background: none; color: var(--text); font-family: inherit; text-align: left; }
+.tb-rows > .tb-row:first-child, .tb-group + .tb-row { border-top: none; }
+.tb-row.on { background: var(--primary-light); }
+.tb-row-name { flex: 1; min-width: 0; border: none; background: none; color: inherit; font: inherit; font-size: .9375rem; text-align: left; cursor: pointer; padding: .5rem 0; display: flex; align-items: baseline; gap: .375rem; flex-wrap: wrap; }
+.tb-row-name.static { cursor: default; }
+.tb-row.on .tb-row-name { font-weight: 700; }
+.tb-unit { font-size: .75rem; color: var(--text3); font-weight: 500; }
+.tb-add { width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); color: var(--primary); font-size: 1.375rem; font-weight: 600; cursor: pointer; line-height: 1; }
+.tb-add:hover { border-color: var(--primary); }
+.tb-qty { display: flex; align-items: center; flex-shrink: 0; border: 1px solid var(--primary); border-radius: 12px; overflow: hidden; background: var(--surface); }
+.tb-qty button { width: 38px; height: 40px; border: none; background: none; color: var(--primary); font-size: 1.25rem; font-weight: 700; cursor: pointer; }
+.tb-qty input { width: 48px !important; height: 40px; border: none !important; border-radius: 0 !important; background: none !important; text-align: center; font-weight: 800; font-size: 1rem; padding: 0 !important; box-shadow: none !important; -moz-appearance: textfield; }
+.tb-qty input::-webkit-outer-spin-button, .tb-qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.tb-row-new { color: var(--primary); font-weight: 600; cursor: pointer; justify-content: flex-start; }
+.tb-empty { padding: 1.5rem 1rem; text-align: center; color: var(--text3); font-size: .875rem; }
+
+.tb-cartbar { position: fixed; left: 50%; transform: translateX(-50%); width: min(720px, calc(100% - 2rem)); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: center; gap: .75rem; padding: .5rem .5rem .5rem .75rem; background: var(--dropdown-surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-lg); z-index: 150; }
+.tb-cartbar.idle { opacity: .85; }
+@media (min-width: 769px) { .tb-cartbar { bottom: 1.25rem; left: calc(50% + var(--sidebar-w) / 2); width: min(720px, calc(100% - var(--sidebar-w) - 3rem)); } }
+.tb-cart-btn { display: flex; align-items: center; gap: .625rem; border: none; background: none; color: var(--text); font: inherit; font-size: .875rem; cursor: pointer; text-align: left; min-width: 0; }
+.tb-cart-btn:disabled { cursor: default; color: var(--text3); }
+.tb-cart-n { min-width: 32px; height: 32px; border-radius: 10px; background: var(--primary); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tb-cart-btn:disabled .tb-cart-n { background: var(--border); color: var(--text3); }
+.tb-cart-list { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.tb-cart-list .tb-row:first-child { border-top: none; }
+
+.tb-list-tools { display: flex; gap: .5rem; align-items: center; margin-bottom: .75rem; }
+.tb-list-tools select, .tb-list-tools input { flex: 1; min-width: 0; }
+.tb-order { display: flex; align-items: center; gap: .75rem; width: 100%; padding: .75rem 1rem .75rem .875rem; border: none; border-top: 1px solid var(--border); border-left: 4px solid var(--border); background: none; color: var(--text); font-family: inherit; text-align: left; cursor: pointer; }
+.tb-rows > .tb-order:first-child { border-top: none; }
+.tb-order:hover { background: var(--surface2); }
+.tb-order.st-sent { border-left-color: var(--warning); }
+.tb-order.st-approved { border-left-color: var(--primary); }
+.tb-order.st-delivered { border-left-color: var(--success); }
+.tb-order.st-rejected { border-left-color: var(--danger); }
+.tb-order-main { flex: 1; min-width: 0; }
+.tb-order-line1 { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; }
+.tb-order-date { font-size: .75rem; color: var(--text3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tb-order-line2 { font-size: .8125rem; color: var(--text2); }
+.tb-status { flex-shrink: 0; font-size: .6875rem; font-weight: 800; padding: .1875rem .5rem; border-radius: 99px; vertical-align: middle; white-space: nowrap; }
 .tb-status.sent { background: var(--warning-light); color: var(--warning); }
 .tb-status.approved { background: var(--primary-light); color: var(--primary); }
 .tb-status.delivered { background: var(--success-light); color: var(--success); }
 .tb-status.rejected { background: var(--danger-light); color: var(--danger); }
-.tb-filters { display: flex; flex-direction: column; gap: .625rem; margin-bottom: 1rem; }
-.tb-order { display: block; width: 100%; text-align: left; padding: .875rem 1.125rem; margin-bottom: .75rem; cursor: pointer; color: var(--text); font-family: inherit; }
-.tb-order:hover { border-color: var(--primary); }
-.tb-order-top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
-.tb-order-lab { font-weight: 700; }
-.tb-order-meta { font-size: .8125rem; color: var(--text2); margin-top: .125rem; }
-.tb-order-items { font-size: .8125rem; color: var(--text3); margin-top: .375rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.tb-history { margin-top: .75rem; font-size: .75rem; color: var(--text3); display: flex; flex-direction: column; gap: .125rem; }
-.tb-cat-row { display: grid; grid-template-columns: 1fr 80px 170px 40px 40px auto; gap: .375rem; align-items: center; padding: .375rem 0; border-bottom: 1px solid var(--border); }
-.tb-cat-row input[type="text"] { min-width: 0; padding: .375rem .5rem; }
-.tb-cat-row .btn { justify-content: center; padding-left: 0; padding-right: 0; }
-@media (max-width: 600px) {
-  .tb-cat-row { grid-template-columns: 76px 1fr 40px 40px; }
-  .tb-cat-row .tb-name-in { grid-column: 1 / -1; }
-  .tb-cat-row .tb-newbadge { grid-column: 1 / -1; justify-self: start; }
-}
-.tb-cat-row.hidden-item input { opacity: .45; text-decoration: line-through; }
-.tb-newbadge { font-size: .7rem; font-weight: 700; color: var(--purple); background: var(--purple-light); padding: .125rem .4rem; border-radius: 99px; }
-/* Sideways swipes switch tabs (see SWIPE BETWEEN TABS) — keep the browser
-   from also treating them as back/forward navigation. */
-html, body { overscroll-behavior-x: none; }
-.swipe-in-left { animation: swipeInLeft .22s ease; }
-.swipe-in-right { animation: swipeInRight .22s ease; }
-@keyframes swipeInLeft { from { opacity: .4; transform: translateX(40px); } to { opacity: 1; transform: none; } }
-@keyframes swipeInRight { from { opacity: .4; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .swipe-in-left, .swipe-in-right { animation: none; } }
 
-/* ---------- BETA: Feed ---------- */
-.feed-wrap, .rs-wrap { max-width: 720px; margin: 0 auto; }
-.feed-composer { padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-.feed-composer-row { display: flex; gap: .75rem; align-items: flex-start; }
-.feed-composer textarea { flex: 1; min-height: 70px; }
-.feed-composer-actions { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; }
-.feed-img-preview { position: relative; margin-top: .75rem; display: inline-block; }
-.feed-img-preview img { max-height: 160px; max-width: 100%; border-radius: var(--radius-sm); display: block; }
-.feed-img-preview button {
-  position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%;
-  border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer;
-}
-.feed-post { margin-bottom: 1rem; overflow: hidden; }
-.feed-post-head { display: flex; align-items: center; gap: .875rem; padding: 1.125rem 1.25rem .5rem; }
-.feed-post-author { font-size: 1.0625rem; font-weight: 600; line-height: 1.3; }
-.feed-post-time { font-size: .8125rem; color: var(--text2); }
-.feed-post-actions { margin-left: auto; display: flex; gap: .375rem; }
-.feed-post-tags { display: flex; gap: .375rem; padding: 0 1.25rem .375rem; }
-.feed-tag { font-size: .75rem; font-weight: 700; padding: .125rem .5rem; border-radius: 99px; background: var(--primary-light); color: var(--primary); }
-.feed-tag.important { background: var(--warning-light); color: var(--warning); }
-.feed-post.important { border-color: var(--warning); }
-.feed-admin-opts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .75rem; font-size: .8125rem; color: var(--text2); }
-.feed-admin-opts label { display: inline-flex; align-items: center; gap: .375rem; cursor: pointer; }
-.feed-post-text { padding: .25rem 1.25rem .875rem; font-size: 1rem; line-height: 1.65; white-space: pre-wrap; word-wrap: break-word; }
-.feed-post-text a { color: var(--primary); }
-.feed-post-img { display: block; width: 100%; max-height: 520px; object-fit: cover; cursor: zoom-in; background: var(--surface2); }
-.feed-post-bar { display: flex; gap: .5rem; padding: .625rem 1.25rem; border-top: 1px solid var(--border); }
-.feed-react {
-  border: none; background: transparent; color: var(--text2); cursor: pointer;
-  font-size: .875rem; font-weight: 600; padding: .375rem .625rem; border-radius: var(--radius-sm);
-}
-.feed-react:hover { background: var(--surface2); color: var(--text); }
-.feed-react.liked { color: var(--danger); }
-.feed-comments { padding: .25rem 1.25rem 1rem; border-top: 1px solid var(--border); }
-.feed-comment { display: flex; gap: .625rem; margin-top: .75rem; }
-.feed-comment-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: .5rem .75rem; flex: 1; min-width: 0; }
-.feed-comment-name { font-size: .8125rem; font-weight: 700; }
-.feed-comment-text { font-size: .9rem; white-space: pre-wrap; word-wrap: break-word; }
-.feed-comment-meta { font-size: .75rem; color: var(--text3); margin-top: .125rem; }
-.feed-comment-meta button { border: none; background: none; color: var(--text3); cursor: pointer; font-size: .75rem; padding: 0; margin-left: .5rem; }
-.feed-comment-form { display: flex; gap: .5rem; margin-top: .75rem; }
-.feed-comment-form input { flex: 1; }
-.avatar-sm { width: 30px; height: 30px; font-size: .75rem; flex-shrink: 0; }
-.feed-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 1rem; cursor: zoom-out; }
-.feed-lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+.tb-detail-meta { font-size: .8125rem; color: var(--text2); margin-bottom: .75rem; }
+.tb-note-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .5rem .75rem; font-size: .875rem; margin-bottom: .75rem; }
+.tb-note-box.danger { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+.tb-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tb-table th, .tb-table td { text-align: left; padding: .5rem .375rem; border-bottom: 1px solid var(--border); }
+.tb-table th { font-size: .6875rem; color: var(--text3); text-transform: uppercase; letter-spacing: .4px; }
+.tb-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tb-table td.changed { color: var(--warning); font-weight: 700; }
+.tb-approve-in { width: 72px !important; padding: .3rem .4rem !important; text-align: right; font-weight: 700; }
+.tb-history { margin-top: .75rem; font-size: .75rem; color: var(--text3); display: flex; flex-wrap: wrap; gap: .25rem .75rem; }
 
-.rs-day .rs-mark.warn { background: var(--danger); }
-.rs-shift-warn { background: var(--danger-light); }
-.rs-warn { font-size: .8125rem; font-weight: 700; color: var(--danger); }
-.ms-list { display: flex; flex-direction: column; }
-.ms-row { display: flex; align-items: center; gap: .875rem; padding: .625rem 1.25rem; border: none; border-top: 1px solid var(--border); background: none; color: var(--text); text-align: left; cursor: pointer; font-family: inherit; font-size: .875rem; }
-.ms-row:first-child { border-top: none; }
-.ms-row:hover { background: var(--surface2); }
-.ms-row.today { background: var(--primary-light); }
-.ms-day { width: 86px; flex-shrink: 0; display: flex; flex-direction: column; line-height: 1.25; }
-.ms-day-label { font-weight: 700; text-transform: capitalize; }
-.ms-date { font-size: .75rem; color: var(--text2); font-variant-numeric: tabular-nums; }
-.ms-what { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
-.ms-shift { border-left: 3px solid var(--lab-color); padding-left: .5rem; }
-.ms-off { color: var(--text3); }
+.tb-prep-wrap { padding: 0; margin-bottom: .75rem; }
+.tb-prep th:first-child, .tb-prep td:first-child { padding-left: 1rem; }
+.tb-prep th:last-child, .tb-prep td:last-child { padding-right: 1rem; }
+.tb-prep-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
 
-/* ---------- BETA: Raspored po laboratorijama ---------- */
-.rs-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; flex-wrap: wrap; }
-.rs-mine-toggle {
-  display: inline-flex; align-items: center; gap: .5rem; border: none; background: none; cursor: pointer;
-  color: var(--primary); font-weight: 700; font-size: .8125rem; letter-spacing: .5px; text-transform: uppercase;
-}
-.rs-mine-toggle .dot { width: 18px; height: 18px; border-radius: 50%; border: 4px solid var(--primary); transition: all var(--transition); }
-.rs-mine-toggle.on .dot { background: var(--primary); box-shadow: inset 0 0 0 3px var(--surface); }
-.rs-month-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .25rem; }
-.rs-month { color: var(--success); font-weight: 800; letter-spacing: .5px; text-transform: uppercase; font-size: 1rem; }
-.rs-week-nav { display: flex; gap: .375rem; }
-.rs-week { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 2px solid var(--border); margin-bottom: 1.25rem; }
-.rs-day {
-  border: none; background: none; cursor: pointer; padding: .5rem 0 .625rem; color: var(--text2);
-  display: flex; flex-direction: column; align-items: center; position: relative; font-family: inherit;
-}
-.rs-day-name { font-size: .8125rem; font-weight: 600; }
-.rs-day-num { font-size: 1.25rem; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; }
-.rs-day.weekend { color: var(--text3); }
-.rs-day.today .rs-day-num { color: var(--primary); }
-.rs-day.active { color: var(--text); }
-.rs-day.active::after { content: ''; position: absolute; left: 18%; right: 18%; bottom: -2px; height: 4px; border-radius: 2px; background: var(--success); }
-.rs-day .rs-mark { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
-.rs-day .rs-mark.empty { background: transparent; }
-.rs-tools { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.rs-lab { margin-bottom: 1rem; overflow: hidden; border-left: 5px solid var(--lab-color, var(--primary)); }
-.rs-lab-head { display: flex; align-items: center; gap: .625rem; padding: .875rem 1.125rem .5rem; }
-.rs-lab-name { font-size: 1.0625rem; font-weight: 700; }
-.rs-lab-count { margin-left: auto; font-size: .75rem; color: var(--text3); font-weight: 600; }
-.rs-shift { display: flex; gap: .875rem; padding: .625rem 1.125rem; border-top: 1px dashed var(--border); align-items: flex-start; }
-.rs-shift-label { width: 100px; flex-shrink: 0; }
-.rs-shift-name { font-weight: 700; font-size: .875rem; }
-.rs-shift-time { font-size: .72rem; color: var(--text2); white-space: nowrap; }
-.rs-people { display: flex; flex-wrap: wrap; gap: .375rem; flex: 1; min-height: 30px; align-items: center; }
-.rs-pill {
-  display: inline-flex; align-items: center; gap: .375rem; padding: .25rem .625rem .25rem .25rem;
-  border-radius: 99px; font-size: .8125rem; font-weight: 600; line-height: 1.3;
-}
-.rs-pill .avatar { width: 22px; height: 22px; font-size: .625rem; }
-.rs-pill.me { outline: 2px solid var(--primary); outline-offset: 1px; }
-.rs-pill.on-leave { opacity: .75; text-decoration: line-through; }
-.rs-pill-x { border: none; background: none; cursor: pointer; color: inherit; opacity: .6; font-size: .875rem; padding: 0 0 0 .125rem; }
-.rs-pill-x:hover { opacity: 1; }
-.rs-add { border: 1px dashed var(--border); background: none; color: var(--text2); border-radius: 99px; padding: .25rem .75rem; font-size: .8125rem; font-weight: 600; cursor: pointer; }
-.rs-add:hover { border-color: var(--primary); color: var(--primary); }
-.rs-empty-shift { font-size: .8125rem; color: var(--text3); }
-.rs-pick-list { max-height: 50vh; overflow-y: auto; margin-top: .75rem; }
-.rs-pick {
-  display: flex; align-items: center; gap: .75rem; padding: .5rem .25rem; border-bottom: 1px solid var(--border);
-  cursor: pointer; font-size: .9rem;
-}
-.rs-pick input { width: 18px; height: 18px; flex-shrink: 0; }
-.rs-pick-sub { font-size: .75rem; color: var(--text2); }
-.rs-pick-sub.warn { color: var(--warning); }
-.rs-time-cell { display: flex; align-items: center; gap: .25rem; min-width: 0; }
-.rs-time-cell label { display: inline-flex; align-items: center; gap: .125rem; font-size: .75rem; color: var(--text2); cursor: pointer; flex-shrink: 0; }
-.rs-time-cell input[type="text"] { min-width: 0; }
-.rs-time-cell.off input[type="text"] { opacity: .4; text-decoration: line-through; }
-.rs-lab-edit { display: flex; flex-direction: column; gap: .5rem; padding-bottom: .75rem; margin-bottom: .75rem; border-bottom: 1px solid var(--border); }
-.rs-lab-edit-top { display: flex; gap: .5rem; align-items: center; }
-.rs-lab-edit-top .rs-lab-name-in { flex: 1; min-width: 0; }
-.rs-lab-edit-times { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-.rs-time-cell { flex-direction: column; align-items: stretch !important; }
-.rs-lab-edit input[type="color"] { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: none; }
-.rs-lab-edit-head { font-size: .75rem; color: var(--text3); font-weight: 600; }
-@media (max-width: 600px) {
-  .rs-lab-edit-head { display: none; }
-  .rs-shift-label { width: 92px; }
-  .rs-shift { gap: .5rem; padding: .625rem .875rem; }
-  .rs-day-num { font-size: 1.125rem; }
-}
+.tb-cat-row { cursor: pointer; }
+.tb-cat-row:hover { background: var(--surface2); }
+.tb-cat-row.is-hidden .tb-row-name { opacity: .5; text-decoration: line-through; }
+.tb-edit { font-size: .8125rem; color: var(--text3); padding-right: .5rem; white-space: nowrap; }
+.tb-newbadge { font-size: .6875rem; font-weight: 700; color: var(--purple); background: var(--purple-light); padding: .0625rem .375rem; border-radius: 99px; }
+.tb-check { display: flex; align-items: center; gap: .5rem; font-size: .875rem; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -6997,10 +6894,10 @@ function rsReportPrint() {
 // history: { key: { status, at, by } } }. Item name/unit are copied into
 // the order so later catalog edits don't rewrite past requisitions.
 const TREB_STATUS = {
-  sent: { label: 'Poslato', icon: '📤', cls: 'sent' },
+  sent: { label: 'Na čekanju', icon: '⏳', cls: 'sent' },
   approved: { label: 'Odobreno', icon: '✅', cls: 'approved' },
   delivered: { label: 'Isporučeno', icon: '📦', cls: 'delivered' },
-  rejected: { label: 'Odbijeno', icon: '❌', cls: 'rejected' }
+  rejected: { label: 'Odbijeno', icon: '✖', cls: 'rejected' }
 };
 const TREB_UNITS = ['kom', 'pak', 'kutija', 'boca', 'rolna', 'kesa', 'set'];
 
@@ -7017,12 +6914,14 @@ const TREB_SEED = [
   ['Kancelarija i ostalo', ['Plavi tanki markeri', 'Kesice za Papu', 'Vizit kartice', 'Štoperica (nova)', 'Baterije za štopericu']]
 ];
 
-let trebTab = 'new';
+let trebTab = 'new';      // new | list | prep | catalog
 let trebLab = null;
 let trebQuery = '';
+let trebCat = null;       // null = auto (Često if the lab has history, else Sve)
 let trebNote = '';
-let trebFilter = { status: '', lab: '' };
-let trebCart = null; // { itemId: qty }
+let trebListStatus = null; // null = default per role
+let trebListLab = '';
+let trebCart = null;      // { itemId: qty }
 
 function trebDraftKey() { return 'trebDraft_' + (currentUser ? currentUser.id : ''); }
 function trebLoadDraft() {
@@ -7044,10 +6943,12 @@ function trebItems(includeHidden) {
     .filter(i => includeHidden || !i.hidden)
     .sort((a, b) => (a.category || '').localeCompare(b.category || '') || a.name.localeCompare(b.name));
 }
-function trebCategories() {
-  const cats = new Set(TREB_SEED.map(c => c[0]));
-  trebItems(true).forEach(i => { if (i.category) cats.add(i.category); });
-  return [...cats];
+function trebCategories(includeEmpty) {
+  const cats = TREB_SEED.map(c => c[0]);
+  trebItems(true).forEach(i => { const c = i.category || 'Ostalo'; if (!cats.includes(c)) cats.push(c); });
+  if (includeEmpty) return cats;
+  const visible = trebItems(false);
+  return cats.filter(c => visible.some(i => (i.category || 'Ostalo') === c));
 }
 function trebOrders() {
   const all = extraGet('treb_orders');
@@ -7061,6 +6962,14 @@ function trebVisibleOrders() {
 function trebPendingCount() {
   return isAdmin() ? trebOrders().filter(o => o.status === 'sent').length : 0;
 }
+// Items this lab orders most often, most frequent first.
+function trebFrequent(labId) {
+  const counts = {};
+  trebOrders().filter(o => o.labId === labId).slice(0, 30).forEach(o => Object.keys(o.items || {}).forEach(id => { counts[id] = (counts[id] || 0) + 1; }));
+  const catalog = extraGet('treb_items');
+  return Object.keys(counts).filter(id => catalog[id] && !catalog[id].hidden).sort((a, b) => counts[b] - counts[a]);
+}
+function trebCartCount() { return Object.keys(trebCart || {}).filter(id => trebCart[id] > 0).length; }
 
 // Fills an empty catalog with the starter list. Deterministic ids, so two
 // people opening Trebovanje at once can't create duplicates.
@@ -7079,35 +6988,37 @@ function trebSeedIfEmpty() {
 
 function trebStatusPill(status) {
   const s = TREB_STATUS[status] || TREB_STATUS.sent;
-  return `<span class="tb-status ${s.cls}">${s.icon} ${s.label}</span>`;
+  return `<span class="tb-status ${s.cls}">${s.label}</span>`;
 }
-function trebDate(iso) {
-  return new Date(iso).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+function trebDate(iso, withTime = true) {
+  return new Date(iso).toLocaleString('sr-Latn-RS', withTime
+    ? { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }
+    : { day: 'numeric', month: 'numeric', year: 'numeric' });
 }
+function trebLabName(id) { const l = labsList().find(x => x.id === id); return l ? l.name : ''; }
 
-function trebSetTab(t) { trebTab = t; renderPage(); window.scrollTo(0, 0); }
+function trebSetTab(t) { trebTab = t; trebQuery = ''; renderPage(); window.scrollTo(0, 0); }
 
 function renderTrebovanje() {
   const main = document.getElementById('main-content');
   trebLoadDraft();
   trebSeedIfEmpty();
   const pending = trebPendingCount();
-  const tabs = `<div class="tb-tabs">
-    <button class="tb-tab ${trebTab === 'new' ? 'active' : ''}" onclick="trebSetTab('new')">📝 Novo trebovanje</button>
-    <button class="tb-tab ${trebTab === 'list' ? 'active' : ''}" onclick="trebSetTab('list')">📋 ${isAdmin() ? 'Sva trebovanja' : 'Moja trebovanja'}${pending ? ` <span class="badge-count">${pending}</span>` : ''}</button>
-    ${isAdmin() ? `<button class="tb-tab ${trebTab === 'catalog' ? 'active' : ''}" onclick="trebSetTab('catalog')">🗂️ Katalog</button>` : ''}
-  </div>`;
-  let body = '';
+  const prepCount = isAdmin() ? trebOrders().filter(o => o.status === 'approved').length : 0;
+  if (!isAdmin() && (trebTab === 'prep' || trebTab === 'catalog')) trebTab = 'new';
+  const seg = [
+    ['new', '📝', 'Novo', trebCartCount()],
+    ['list', '📋', isAdmin() ? 'Trebovanja' : 'Moja', pending],
+    ...(isAdmin() ? [['prep', '📦', 'Priprema', prepCount], ['catalog', '🗂️', 'Katalog', 0]] : [])
+  ].map(([id, icon, label, n]) => `<button class="tb-seg-btn ${trebTab === id ? 'active' : ''}" onclick="trebSetTab('${id}')">
+      <span class="tb-seg-icon">${icon}</span><span>${label}</span>${n ? `<span class="tb-seg-n">${n}</span>` : ''}
+    </button>`).join('');
+  let body;
   if (trebTab === 'list') body = trebListHtml();
-  else if (trebTab === 'catalog' && isAdmin()) body = trebCatalogHtml();
+  else if (trebTab === 'prep') body = trebPrepHtml();
+  else if (trebTab === 'catalog') body = trebCatalogHtml();
   else body = trebNewHtml();
-  main.innerHTML = `<div class="tb-wrap">
-    <div class="page-header"><div>
-      <div class="page-title">Trebovanje</div>
-      <div class="page-subtitle">Potrošni materijal po laboratorijama</div>
-    </div></div>
-    ${tabs}${body}
-  </div>`;
+  main.innerHTML = `<div class="tb-wrap"><div class="tb-seg">${seg}</div>${body}</div>`;
 }
 
 /* ---------- Novo trebovanje ---------- */
@@ -7115,52 +7026,62 @@ function trebNewHtml() {
   const labs = labsList();
   if (trebLab && !labs.some(l => l.id === trebLab)) trebLab = null;
   if (!trebLab && labs.length === 1) trebLab = labs[0].id;
+  const freq = trebLab ? trebFrequent(trebLab) : [];
+  const cats = trebCategories();
+  const activeCat = trebQuery.trim() ? 'all' : (trebCat || (freq.length ? 'freq' : 'all'));
   const q = trebQuery.trim().toLowerCase();
-  const items = trebItems(false).filter(i => !q || i.name.toLowerCase().includes(q) || (i.category || '').toLowerCase().includes(q));
-  const byCat = {};
-  items.forEach(i => { (byCat[i.category || 'Ostalo'] = byCat[i.category || 'Ostalo'] || []).push(i); });
-  const count = Object.keys(trebCart).filter(id => trebCart[id] > 0).length;
-  const lastForLab = trebLab && trebOrders().find(o => o.labId === trebLab);
+  let items = trebItems(false);
+  if (q) items = items.filter(i => i.name.toLowerCase().includes(q));
+  else if (activeCat === 'freq') { const byId = {}; items.forEach(i => { byId[i.id] = i; }); items = freq.map(id => byId[id]).filter(Boolean); }
+  else if (activeCat !== 'all') items = items.filter(i => (i.category || 'Ostalo') === activeCat);
+  const count = trebCartCount();
+  const last = trebLab && trebOrders().find(o => o.labId === trebLab);
 
-  const labChips = labs.length ? labs.map(l => `<button class="tb-chip ${trebLab === l.id ? 'active' : ''}" style="--lab-color:${escapeHtml(l.color || 'var(--primary)')}" onclick="trebLab='${l.id}'; trebSaveDraft(); renderPage()">🧪 ${escapeHtml(l.name)}</button>`).join('')
-    : `<span class="text-sm text-muted">Nema laboratorija — admin ih dodaje na stranici Raspored.</span>`;
+  const chips = [
+    ...(freq.length ? [['freq', '⭐ Često']] : []),
+    ['all', 'Sve'],
+    ...cats.map(c => [c, c])
+  ].map(([id, label]) => `<button class="tb-chip ${activeCat === id ? 'active' : ''}" data-cat="${escapeHtml(id)}" onclick="trebCat = this.dataset.cat; trebQuery = ''; renderPage()">${escapeHtml(label)}</button>`).join('');
 
-  const catHtml = Object.keys(byCat).map(cat => `
-    <div class="tb-cat">${escapeHtml(cat)}</div>
-    ${byCat[cat].map(i => {
-      const qty = trebCart[i.id] || 0;
-      return `<div class="tb-item ${qty ? 'on' : ''}">
-        <button class="tb-item-name" onclick="trebAdd('${i.id}', 1)">${escapeHtml(i.name)} <span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span></button>
-        <div class="tb-step">
-          ${qty ? `<button onclick="trebAdd('${i.id}', -1)" aria-label="Manje">−</button>
-          <input type="number" min="0" inputmode="numeric" id="tbq-${i.id}" value="${qty}" onchange="trebSetQty('${i.id}', this.value)">` : ''}
-          <button class="plus" onclick="trebAdd('${i.id}', 1)" aria-label="Više">+</button>
-        </div>
+  let lastCat = null;
+  const rows = items.map(i => {
+    const qty = trebCart[i.id] || 0;
+    const showCat = activeCat === 'all' && !q && i.category !== lastCat;
+    lastCat = i.category;
+    return `${showCat ? `<div class="tb-group">${escapeHtml(i.category || 'Ostalo')}</div>` : ''}
+      <div class="tb-row ${qty ? 'on' : ''}">
+        <button class="tb-row-name" onclick="trebAdd('${i.id}', 1)">${escapeHtml(i.name)}<span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span></button>
+        ${qty ? `<div class="tb-qty">
+            <button onclick="trebAdd('${i.id}', -1)" aria-label="Manje">−</button>
+            <input type="number" min="0" inputmode="numeric" id="tbq-${i.id}" value="${qty}" onchange="trebSetQty('${i.id}', this.value)" onfocus="this.select()">
+            <button onclick="trebAdd('${i.id}', 1)" aria-label="Više">+</button>
+          </div>` : `<button class="tb-add" onclick="trebAdd('${i.id}', 1)" aria-label="Dodaj">+</button>`}
       </div>`;
-    }).join('')}`).join('');
+  }).join('');
 
   return `
-    <div class="card tb-section">
-      <div class="tb-label">1. Za koju laboratoriju?</div>
-      <div class="tb-chips">${labChips}</div>
+    <div class="tb-head">
+      <label class="tb-lab-label" for="tb-lab">Laboratorija</label>
+      <select id="tb-lab" class="tb-lab-select ${trebLab ? '' : 'empty'}" onchange="trebLab = this.value || null; trebCat = null; trebSaveDraft(); renderPage()">
+        <option value="">— izaberite —</option>
+        ${labs.map(l => `<option value="${l.id}" ${trebLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
+      </select>
+      ${last ? `<button class="tb-link" onclick="trebRepeatLast()">🔁 Ponovi poslednje (${trebDate(last.createdAt, false)})</button>` : ''}
     </div>
-    <div class="card tb-section">
-      <div class="tb-label" style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap">
-        <span>2. Šta je potrebno?</span>
-        ${lastForLab ? `<button class="btn btn-secondary btn-sm" onclick="trebRepeatLast()">🔁 Ponovi poslednje (${new Date(lastForLab.createdAt).toLocaleDateString('sr-Latn-RS')})</button>` : ''}
-      </div>
-      <input type="text" id="tb-q" placeholder="🔍 Pretraži artikle…" value="${escapeHtml(trebQuery)}" oninput="trebQuery = this.value; renderPage()">
-      <div class="tb-list">${catHtml || '<div class="text-sm text-muted" style="padding:1rem 0">Nema artikala za ovu pretragu.</div>'}</div>
-      <button class="btn btn-secondary btn-sm mt-3" onclick="openTrebNewItem()">➕ Artikal koji nije na listi</button>
+    <div class="tb-search">
+      <input type="text" id="tb-q" placeholder="🔍 Pretraga artikala" value="${escapeHtml(trebQuery)}" oninput="trebQuery = this.value; renderPage()" autocomplete="off">
     </div>
-    <div class="card tb-section">
-      <div class="tb-label">3. Napomena (opciono)</div>
-      <textarea id="tb-note" placeholder="npr. hitno do četvrtka" oninput="trebNote = this.value; trebSaveDraft()">${escapeHtml(trebNote)}</textarea>
+    <div class="tb-chips">${chips}</div>
+    <div class="card tb-rows">
+      ${rows || `<div class="tb-empty">${q ? `Nema „${escapeHtml(trebQuery.trim())}” u katalogu.` : 'Nema artikala.'}</div>`}
+      <button class="tb-row tb-row-new" onclick="openTrebNewItem()">➕ ${q ? `Dodaj „${escapeHtml(trebQuery.trim())}” kao novi artikal` : 'Artikal koji nije na listi'}</button>
     </div>
-    <div class="tb-cartbar">
-      <div><strong>${count}</strong> ${count === 1 ? 'artikal' : 'artikala'}${trebLab ? ' · ' + escapeHtml((labs.find(l => l.id === trebLab) || {}).name || '') : ''}
-        ${count ? `<button class="tb-clear" onclick="trebClear()">Očisti</button>` : ''}</div>
-      <button class="btn btn-primary" onclick="openTrebReview()" ${count && trebLab ? '' : 'disabled'}>Pregledaj i pošalji →</button>
+    <div class="tb-cartbar ${count ? '' : 'idle'}">
+      <button class="tb-cart-btn" onclick="openTrebCart()" ${count ? '' : 'disabled'}>
+        <span class="tb-cart-n">${count}</span>
+        <span>${count ? `${count === 1 ? 'artikal' : 'artikala'}${trebLab ? ' · ' + escapeHtml(trebLabName(trebLab)) : ''}` : 'Dodajte artikle sa +'}</span>
+      </button>
+      <button class="btn btn-primary" onclick="openTrebCart()" ${count ? '' : 'disabled'}>Dalje →</button>
     </div>`;
 }
 
@@ -7168,18 +7089,14 @@ function trebAdd(id, delta) {
   trebCart[id] = Math.max(0, (trebCart[id] || 0) + delta);
   if (!trebCart[id]) delete trebCart[id];
   trebSaveDraft();
+  if (document.getElementById('tb-cart')) renderTrebCartBody();
   renderPage();
 }
 function trebSetQty(id, val) {
   const n = Math.max(0, Math.floor(Number(val) || 0));
   if (n) trebCart[id] = n; else delete trebCart[id];
   trebSaveDraft();
-  renderPage();
-}
-function trebClear() {
-  trebCart = {};
-  trebNote = '';
-  trebSaveDraft();
+  if (document.getElementById('tb-cart')) renderTrebCartBody();
   renderPage();
 }
 function trebRepeatLast() {
@@ -7190,28 +7107,28 @@ function trebRepeatLast() {
   Object.keys(last.items || {}).forEach(id => {
     if (!catalog[id] || catalog[id].hidden) return;
     const it = last.items[id];
-    trebCart[id] = it.approvedQty != null ? it.approvedQty : it.qty;
-    if (!trebCart[id]) delete trebCart[id]; else added++;
+    const q = it.approvedQty != null ? it.approvedQty : it.qty;
+    if (q > 0) { trebCart[id] = q; added++; }
   });
   trebSaveDraft();
   renderPage();
-  toast(`Preuzeto ${added} artikala iz poslednjeg trebovanja — proverite količine.`, 'info');
+  toast(`Preuzeto ${added} artikala iz poslednjeg trebovanja.`, 'info');
 }
 
 function openTrebNewItem() {
-  const cats = trebCategories();
-  openExtraModal('tb-new-item', '➕ Novi artikal',
-    `<div class="form-group"><label for="tbn-name">Naziv *</label><input type="text" id="tbn-name" placeholder="npr. Rukavice M" value="${escapeHtml(trebQuery)}"></div>
+  const cats = trebCategories(true);
+  openExtraModal('tb-new-item', 'Novi artikal',
+    `<div class="form-group"><label for="tbn-name">Naziv</label><input type="text" id="tbn-name" placeholder="npr. Rukavice M" value="${escapeHtml(trebQuery.trim())}"></div>
      <div class="form-row">
        <div class="form-group"><label for="tbn-unit">Jedinica</label><input type="text" id="tbn-unit" list="tb-units" value="kom"></div>
-       <div class="form-group"><label for="tbn-cat">Kategorija</label><input type="text" id="tbn-cat" list="tb-cats" placeholder="izaberite ili upišite"></div>
+       <div class="form-group"><label for="tbn-cat">Kategorija</label><input type="text" id="tbn-cat" list="tb-cats" value="${trebCat && trebCat !== 'all' && trebCat !== 'freq' ? escapeHtml(trebCat) : ''}" placeholder="izaberite ili upišite"></div>
      </div>
      <datalist id="tb-units">${TREB_UNITS.map(u => `<option value="${u}">`).join('')}</datalist>
      <datalist id="tb-cats">${cats.map(c => `<option value="${escapeHtml(c)}">`).join('')}</datalist>
-     <p class="text-xs text-muted">Artikal ostaje u katalogu za sve. Admin ga kasnije može preimenovati ili srediti.</p>
+     <p class="text-xs text-muted">Artikal ostaje u katalogu za sve.</p>
      <div id="tbn-err" class="text-sm" style="color:var(--danger)"></div>`,
     `<button class="btn btn-secondary" onclick="closeExtraModal('tb-new-item')">Otkaži</button>
-     <button class="btn btn-primary" onclick="saveTrebNewItem()">Dodaj</button>`);
+     <button class="btn btn-primary" onclick="saveTrebNewItem()">Dodaj u trebovanje</button>`);
   document.getElementById('tbn-name').focus();
 }
 
@@ -7225,6 +7142,7 @@ function saveTrebNewItem() {
   if (existing) {
     if (existing.hidden) { err.textContent = 'Taj artikal postoji, ali ga je admin sakrio iz liste.'; return; }
     closeExtraModal('tb-new-item');
+    trebQuery = '';
     trebAdd(existing.id, 1);
     toast('Artikal već postoji — dodat je u trebovanje.', 'info');
     return;
@@ -7237,18 +7155,48 @@ function saveTrebNewItem() {
   toast(`„${name}” je dodat u katalog i u trebovanje.`, 'success');
 }
 
-function openTrebReview() {
+/* Cart sheet: review quantities, note, send — all in one place. */
+function openTrebCart() {
+  if (!trebCartCount()) return;
+  openExtraModal('tb-cart', '🛒 Trebovanje', '<div id="tb-cart-body"></div>',
+    `<button class="btn btn-secondary" onclick="closeExtraModal('tb-cart')">Nazad</button>
+     <button class="btn btn-primary" id="tb-send" onclick="submitTreb()">Pošalji</button>`);
+  renderTrebCartBody();
+}
+
+function renderTrebCartBody() {
+  const box = document.getElementById('tb-cart-body');
+  if (!box) return;
   const catalog = extraGet('treb_items');
-  const lab = labsList().find(l => l.id === trebLab);
+  const labs = labsList();
   const ids = Object.keys(trebCart).filter(id => trebCart[id] > 0 && catalog[id]);
-  if (!lab || !ids.length) return;
-  openExtraModal('tb-review', `📤 Trebovanje — ${escapeHtml(lab.name)}`,
-    `<table class="tb-table"><thead><tr><th>Artikal</th><th>Količina</th></tr></thead><tbody>
-      ${ids.map(id => `<tr><td>${escapeHtml(catalog[id].name)}</td><td><strong>${trebCart[id]}</strong> ${escapeHtml(catalog[id].unit || 'kom')}</td></tr>`).join('')}
-    </tbody></table>
-    ${trebNote.trim() ? `<p class="text-sm mt-3"><strong>Napomena:</strong> ${escapeHtml(trebNote.trim())}</p>` : ''}`,
-    `<button class="btn btn-secondary" onclick="closeExtraModal('tb-review')">Nazad</button>
-     <button class="btn btn-primary" onclick="submitTreb()">Pošalji trebovanje</button>`);
+  if (!ids.length) { closeExtraModal('tb-cart'); return; }
+  box.innerHTML = `
+    <div class="form-group">
+      <label for="tb-cart-lab">Laboratorija</label>
+      <select id="tb-cart-lab" onchange="trebLab = this.value || null; trebSaveDraft(); renderPage(); renderTrebCartBody()">
+        <option value="">— izaberite —</option>
+        ${labs.map(l => `<option value="${l.id}" ${trebLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="tb-cart-list">
+      ${ids.map(id => `<div class="tb-row on">
+        <span class="tb-row-name static">${escapeHtml(catalog[id].name)}<span class="tb-unit">${escapeHtml(catalog[id].unit || 'kom')}</span></span>
+        <div class="tb-qty">
+          <button onclick="trebAdd('${id}', -1)" aria-label="Manje">−</button>
+          <input type="number" min="0" inputmode="numeric" value="${trebCart[id]}" onchange="trebSetQty('${id}', this.value)" onfocus="this.select()">
+          <button onclick="trebAdd('${id}', 1)" aria-label="Više">+</button>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="form-group mt-3" style="margin-bottom:0">
+      <label for="tb-note">Napomena</label>
+      <textarea id="tb-note" placeholder="opciono, npr. hitno do četvrtka" oninput="trebNote = this.value; trebSaveDraft()" style="min-height:60px">${escapeHtml(trebNote)}</textarea>
+    </div>
+    ${trebLab ? '' : '<p class="text-sm mt-2" style="color:var(--danger)">Izaberite laboratoriju.</p>'}
+    <button class="tb-link mt-2" onclick="trebCart = {}; trebNote = ''; trebSaveDraft(); closeExtraModal('tb-cart'); renderPage()">Isprazni trebovanje</button>`;
+  const send = document.getElementById('tb-send');
+  if (send) send.disabled = !trebLab;
 }
 
 function submitTreb() {
@@ -7258,7 +7206,8 @@ function submitTreb() {
   Object.keys(trebCart).forEach(id => {
     if (trebCart[id] > 0 && catalog[id]) items[id] = { name: catalog[id].name, unit: catalog[id].unit || 'kom', qty: trebCart[id] };
   });
-  if (!lab || !Object.keys(items).length) return;
+  if (!lab) { toast('Izaberite laboratoriju.', 'error'); return; }
+  if (!Object.keys(items).length) return;
   const id = newExtraId('t', 'treb_orders');
   const now = new Date().toISOString();
   const order = {
@@ -7268,12 +7217,13 @@ function submitTreb() {
     history: { h0: { status: 'sent', at: now, by: currentUser.name || '' } }
   };
   extraSet('treb_orders/' + id, order);
-  closeExtraModal('tb-review');
+  closeExtraModal('tb-cart');
   trebNotifyAdmins(order);
   trebCart = {};
   trebNote = '';
   trebSaveDraft();
   trebTab = 'list';
+  trebListStatus = isAdmin() ? 'sent' : '';
   renderPage();
   toast('Trebovanje je poslato.', 'success');
 }
@@ -7299,37 +7249,36 @@ function trebNotifyAdmins(order) {
 /* ---------- Lista trebovanja ---------- */
 function trebListHtml() {
   const labs = labsList();
-  let orders = trebVisibleOrders();
-  if (trebFilter.status) orders = orders.filter(o => o.status === trebFilter.status);
-  if (trebFilter.lab) orders = orders.filter(o => o.labId === trebFilter.lab);
-  const statusChips = [['', 'Sva'], ...Object.keys(TREB_STATUS).map(k => [k, TREB_STATUS[k].icon + ' ' + TREB_STATUS[k].label])]
-    .map(([k, label]) => `<button class="tb-chip small ${trebFilter.status === k ? 'active' : ''}" onclick="trebFilter.status='${k}'; renderPage()">${label}</button>`).join('');
+  const all = trebVisibleOrders();
+  const status = trebListStatus != null ? trebListStatus : (isAdmin() && all.some(o => o.status === 'sent') ? 'sent' : '');
+  let orders = all;
+  if (status) orders = orders.filter(o => o.status === status);
+  if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
+  const cnt = s => all.filter(o => o.status === s).length;
+  const filters = [['', 'Sva', all.length], ['sent', 'Na čekanju', cnt('sent')], ['approved', 'Odobreno', cnt('approved')], ['delivered', 'Isporučeno', cnt('delivered')], ['rejected', 'Odbijeno', cnt('rejected')]]
+    .filter(([k, , n]) => !k || n || status === k)
+    .map(([k, label, n]) => `<button class="tb-chip ${status === k ? 'active' : ''}" onclick="trebListStatus='${k}'; renderPage()">${label} <span class="tb-chip-n">${n}</span></button>`).join('');
   return `
-    <div class="tb-filters">
-      <div class="tb-chips">${statusChips}</div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
-        <select id="tb-filter-lab" onchange="trebFilter.lab = this.value; renderPage()" style="max-width:220px">
-          <option value="">Sve laboratorije</option>
-          ${labs.map(l => `<option value="${l.id}" ${trebFilter.lab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
-        </select>
-        ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="trebExportCsv()">⬇️ Excel (CSV)</button>` : ''}
-      </div>
+    <div class="tb-chips">${filters}</div>
+    <div class="tb-list-tools">
+      <select id="tb-filter-lab" onchange="trebListLab = this.value; renderPage()">
+        <option value="">Sve laboratorije</option>
+        ${labs.map(l => `<option value="${l.id}" ${trebListLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
+      </select>
+      ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="trebExportCsv()">⬇️ Excel</button>` : ''}
     </div>
-    ${orders.length ? orders.map(o => {
-      const n = Object.keys(o.items || {}).length;
-      return `<button class="card tb-order" onclick="openTrebDetail('${o.id}')">
-        <div class="tb-order-top">
-          <span class="tb-order-lab">🧪 ${escapeHtml(o.labName || '')}</span>
+    <div class="card tb-rows">
+      ${orders.length ? orders.map(o => {
+        const n = Object.keys(o.items || {}).length;
+        return `<button class="tb-order st-${o.status}" onclick="openTrebDetail('${o.id}')">
+          <div class="tb-order-main">
+            <div class="tb-order-line1"><strong>${escapeHtml(o.labName || '')}</strong><span class="tb-order-date">${trebDate(o.createdAt)}</span></div>
+            <div class="tb-order-line2">${escapeHtml(o.createdByName || '')} · ${n} ${n === 1 ? 'artikal' : 'artikala'}${o.note ? ' · 📝' : ''}</div>
+          </div>
           ${trebStatusPill(o.status)}
-        </div>
-        <div class="tb-order-meta">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)} · ${n} ${n === 1 ? 'artikal' : 'artikala'}</div>
-        <div class="tb-order-items">${escapeHtml(trebItemsText(o))}</div>
-      </button>`;
-    }).join('') : `<div class="card"><div class="empty-state">
-      <div class="empty-state-icon">📦</div>
-      <div class="empty-state-title">Nema trebovanja</div>
-      <div class="empty-state-sub">${trebFilter.status || trebFilter.lab ? 'Nijedno trebovanje ne odgovara filteru.' : 'Napravite prvo na kartici „Novo trebovanje”.'}</div>
-    </div></div>`}`;
+        </button>`;
+      }).join('') : `<div class="tb-empty">${status || trebListLab ? 'Nema trebovanja za ovaj filter.' : 'Još nema trebovanja.'}</div>`}
+    </div>`;
 }
 
 function openTrebDetail(id) {
@@ -7340,28 +7289,29 @@ function openTrebDetail(id) {
   const editable = admin && o.status === 'sent';
   const ids = Object.keys(o.items || {});
   const hist = Object.values(o.history || {}).sort((a, b) => (a.at || '').localeCompare(b.at || ''));
-  openExtraModal('tb-detail', `🧪 ${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
-    `<p class="text-sm text-muted" style="margin-bottom:.75rem">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)}</p>
-     <table class="tb-table"><thead><tr><th>Artikal</th><th>Traženo</th><th>${editable ? 'Odobriti' : 'Odobreno'}</th></tr></thead><tbody>
-      ${ids.map(iid => { const it = o.items[iid]; return `<tr>
-        <td>${escapeHtml(it.name)}</td>
-        <td>${it.qty} ${escapeHtml(it.unit || 'kom')}</td>
-        <td>${editable ? `<input type="number" min="0" class="tb-approve-in" data-item="${iid}" value="${it.qty}">` : (it.approvedQty != null ? it.approvedQty : (o.status === 'sent' || o.status === 'rejected' ? '—' : it.qty))}</td>
+  const showApproved = o.status === 'approved' || o.status === 'delivered';
+  openExtraModal('tb-detail', `${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
+    `<div class="tb-detail-meta">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)}</div>
+     ${o.note ? `<div class="tb-note-box">📝 ${escapeHtml(o.note)}</div>` : ''}
+     ${o.rejectReason ? `<div class="tb-note-box danger">Razlog odbijanja: ${escapeHtml(o.rejectReason)}</div>` : ''}
+     <table class="tb-table"><thead><tr><th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}</tr></thead><tbody>
+      ${ids.map(iid => { const it = o.items[iid]; const ap = it.approvedQty != null ? it.approvedQty : it.qty; return `<tr>
+        <td>${escapeHtml(it.name)} <span class="tb-unit">${escapeHtml(it.unit || 'kom')}</span></td>
+        <td class="num">${it.qty}</td>
+        ${editable ? `<td class="num"><input type="number" min="0" inputmode="numeric" class="tb-approve-in" data-item="${iid}" value="${it.qty}" onfocus="this.select()"></td>` : showApproved ? `<td class="num ${ap !== it.qty ? 'changed' : ''}">${ap}</td>` : ''}
       </tr>`; }).join('')}
      </tbody></table>
-     ${o.note ? `<p class="text-sm mt-3"><strong>Napomena:</strong> ${escapeHtml(o.note)}</p>` : ''}
-     ${o.rejectReason ? `<p class="text-sm mt-2" style="color:var(--danger)"><strong>Razlog odbijanja:</strong> ${escapeHtml(o.rejectReason)}</p>` : ''}
-     <div class="tb-history">${hist.map(h => `<div>${(TREB_STATUS[h.status] || {}).icon || ''} ${(TREB_STATUS[h.status] || {}).label || h.status} · ${trebDate(h.at)}${h.by ? ' · ' + escapeHtml(h.by) : ''}</div>`).join('')}</div>
-     ${editable ? `<div class="form-group mt-3" id="tb-reject-wrap" style="display:none"><label for="tb-reject-reason">Razlog odbijanja</label><textarea id="tb-reject-reason" placeholder="npr. ima još na stanju"></textarea></div>` : ''}`,
-    `<button class="btn btn-secondary" onclick="trebPrint('${id}')">🖨️ Štampaj</button>
+     ${editable ? `<div class="form-group mt-3" id="tb-reject-wrap" style="display:none;margin-bottom:0"><label for="tb-reject-reason">Razlog odbijanja</label><textarea id="tb-reject-reason" placeholder="npr. ima još na stanju" style="min-height:60px"></textarea></div>` : ''}
+     <div class="tb-history">${hist.map(h => `<span>${(TREB_STATUS[h.status] || {}).label || h.status} ${trebDate(h.at)}${h.by ? ' · ' + escapeHtml(h.by) : ''}</span>`).join('')}</div>`,
+    `<button class="btn btn-secondary" onclick="trebPrint('${id}')" title="Štampaj">🖨️</button>
+     ${admin && o.status !== 'sent' ? `<button class="btn btn-secondary" onclick="trebDelete('${id}')" title="Obriši">🗑️</button>` : ''}
      ${mine && o.status === 'sent' && !admin ? `<button class="btn btn-danger" onclick="trebCancel('${id}')">Otkaži</button>` : ''}
      ${editable ? `<button class="btn btn-danger" onclick="trebReject('${id}')">Odbij</button>
                    <button class="btn btn-success" onclick="trebApprove('${id}')">Odobri</button>` : ''}
-     ${admin && o.status === 'approved' ? `<button class="btn btn-primary" onclick="trebSetStatus('${id}', 'delivered')">📦 Isporučeno</button>` : ''}
-     ${admin && o.status !== 'sent' ? `<button class="btn btn-secondary" onclick="trebDelete('${id}')" title="Obriši trebovanje">🗑️</button>` : ''}`);
+     ${admin && o.status === 'approved' ? `<button class="btn btn-primary" onclick="trebSetStatus('${id}', 'delivered')">Isporučeno</button>` : ''}`);
 }
 
-function trebSetStatus(id, status, extra) {
+function trebSetStatus(id, status, extra, quiet) {
   const o = extraGet('treb_orders')[id];
   if (!o) return;
   const now = new Date().toISOString();
@@ -7375,13 +7325,14 @@ function trebSetStatus(id, status, extra) {
   const emp = fresh && fresh.empId ? getEmployees().find(e => e.id === fresh.empId) : null;
   if (emp) {
     const label = TREB_STATUS[status].label.toLowerCase();
-    const msg = `📦 Trebovanje za ${fresh.labName} (${new Date(fresh.createdAt).toLocaleDateString('sr-Latn-RS')}) je ${label}.` +
+    const msg = `📦 Trebovanje za ${fresh.labName} (${trebDate(fresh.createdAt, false)}) je ${label}.` +
       (status === 'approved' ? ` Odobreno: ${trebItemsText(fresh)}.` : '') +
       (status === 'rejected' && fresh.rejectReason ? ` Razlog: ${fresh.rejectReason}` : '');
     mutateEmployee(emp.id, e => addNotification(e, msg));
-    sendLeaveEmail(emp, `Trebovanje ${label}: ${fresh.labName}`, msg);
+    if (quiet) { if (hasRealEmail(emp) && EMAILJS_ENABLED) sendEmailRaw(emp.email, emp.name, `Trebovanje ${label}: ${fresh.labName}`, msg).catch(err => console.error(err)); }
+    else sendLeaveEmail(emp, `Trebovanje ${label}: ${fresh.labName}`, msg);
   }
-  toast(`Trebovanje: ${TREB_STATUS[status].label}`, 'success');
+  if (!quiet) toast(`Trebovanje: ${TREB_STATUS[status].label}`, 'success');
 }
 
 function trebApprove(id) {
@@ -7417,13 +7368,18 @@ function trebDelete(id) {
   closeExtraModal('tb-detail');
 }
 
+function trebPrintTable(o) {
+  return `<table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th></tr></thead><tbody>
+    ${Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
 function trebPrint(id) {
   const o = extraGet('treb_orders')[id];
   if (!o) return;
-  const rows = Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td></tr>`).join('');
   printHtml(`Trebovanje — ${o.labName}`, `
     <p><b>Laboratorija:</b> ${escapeHtml(o.labName || '')} &nbsp; <b>Datum:</b> ${trebDate(o.createdAt)} &nbsp; <b>Trebovao/la:</b> ${escapeHtml(o.createdByName || '')} &nbsp; <b>Status:</b> ${(TREB_STATUS[o.status] || {}).label || ''}</p>
-    <table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th></tr></thead><tbody>${rows}</tbody></table>
+    ${trebPrintTable(o)}
     ${o.note ? `<p><b>Napomena:</b> ${escapeHtml(o.note)}</p>` : ''}
     <table style="margin-top:40px;border:none"><tr>
       <td style="border:none;width:50%">Trebovao: ______________________</td>
@@ -7433,12 +7389,13 @@ function trebPrint(id) {
 
 function trebExportCsv() {
   let orders = trebVisibleOrders();
-  if (trebFilter.status) orders = orders.filter(o => o.status === trebFilter.status);
-  if (trebFilter.lab) orders = orders.filter(o => o.labId === trebFilter.lab);
+  const status = trebListStatus || '';
+  if (status) orders = orders.filter(o => o.status === status);
+  if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
   const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
   const lines = [['Datum', 'Laboratorija', 'Trebovao/la', 'Status', 'Artikal', 'Jedinica', 'Traženo', 'Odobreno'].map(cell).join(';')];
   orders.forEach(o => Object.values(o.items || {}).forEach(it => lines.push([
-    new Date(o.createdAt).toLocaleDateString('sr-Latn-RS'), o.labName, o.createdByName, (TREB_STATUS[o.status] || {}).label || o.status,
+    trebDate(o.createdAt, false), o.labName, o.createdByName, (TREB_STATUS[o.status] || {}).label || o.status,
     it.name, it.unit || 'kom', it.qty, it.approvedQty != null ? it.approvedQty : ''
   ].map(cell).join(';'))));
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
@@ -7451,52 +7408,131 @@ function trebExportCsv() {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-/* ---------- Katalog (admin) ---------- */
-function trebCatalogHtml() {
-  const items = trebItems(true);
-  const cats = trebCategories();
-  const byCat = {};
-  items.forEach(i => { (byCat[i.category || 'Ostalo'] = byCat[i.category || 'Ostalo'] || []).push(i); });
-  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
-  return `
-    <div class="card tb-section">
-      <div class="tb-label">Dodaj više artikala odjednom</div>
-      <textarea id="tb-bulk" placeholder="Jedan artikal po redu"></textarea>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
-        <input type="text" id="tb-bulk-cat" list="tb-cats-all" placeholder="Kategorija" style="flex:1;min-width:160px">
-        <button class="btn btn-primary btn-sm" onclick="trebBulkAdd()">➕ Dodaj</button>
-      </div>
-      <datalist id="tb-cats-all">${cats.map(c => `<option value="${escapeHtml(c)}">`).join('')}</datalist>
-      <datalist id="tb-units-all">${TREB_UNITS.map(u => `<option value="${u}">`).join('')}</datalist>
-    </div>
-    <p class="text-xs text-muted" style="margin:0 0 .75rem">Izmene se čuvaju čim napustite polje. 👁️ sakriva artikal iz liste za trebovanje (stara trebovanja ostaju ista). Ukupno: ${items.length}.</p>
-    ${Object.keys(byCat).map(cat => `
-      <div class="tb-cat">${escapeHtml(cat)} <span class="text-muted">(${byCat[cat].length})</span>
-        <button class="tb-cat-rename" onclick="trebRenameCategory(this.dataset.cat)" data-cat="${escapeHtml(cat)}" title="Preimenuj kategoriju">✏️</button></div>
-      ${byCat[cat].map(i => `<div class="tb-cat-row ${i.hidden ? 'hidden-item' : ''}">
-        <input type="text" class="tb-name-in" value="${escapeHtml(i.name)}" onchange="trebEditItem('${i.id}', 'name', this.value)" aria-label="Naziv">
-        <input type="text" value="${escapeHtml(i.unit || 'kom')}" list="tb-units-all" onchange="trebEditItem('${i.id}', 'unit', this.value)" aria-label="Jedinica" class="tb-unit-in">
-        <input type="text" value="${escapeHtml(i.category || '')}" list="tb-cats-all" onchange="trebEditItem('${i.id}', 'category', this.value)" aria-label="Kategorija" class="tb-cat-in">
-        <button class="btn btn-secondary btn-sm" onclick="trebEditItem('${i.id}', 'hidden', ${i.hidden ? 'null' : 'true'})" title="${i.hidden ? 'Prikaži u listi' : 'Sakrij iz liste'}">${i.hidden ? '🙈' : '👁️'}</button>
-        <button class="btn btn-secondary btn-sm" onclick="trebDeleteItem('${i.id}')" title="Obriši">🗑️</button>
-        ${i.createdAt > weekAgo && !i.id.startsWith('seed') ? `<span class="tb-newbadge" title="Dodao/la ${escapeHtml(i.createdByName || '')}">🆕 ${escapeHtml((i.createdByName || '').split(' ')[0])}</span>` : ''}
-      </div>`).join('')}`).join('')}`;
+/* ---------- Priprema (admin): what to pack for approved requisitions ---------- */
+function trebPrepData() {
+  const orders = trebOrders().filter(o => o.status === 'approved');
+  const labs = [];
+  const items = {};
+  orders.forEach(o => {
+    if (!labs.some(l => l.id === o.labId)) labs.push({ id: o.labId, name: o.labName, orders: [] });
+    labs.find(l => l.id === o.labId).orders.push(o.id);
+    Object.keys(o.items || {}).forEach(iid => {
+      const it = o.items[iid];
+      const q = it.approvedQty != null ? it.approvedQty : it.qty;
+      if (!q) return;
+      const key = it.name + '|' + (it.unit || 'kom');
+      const row = items[key] = items[key] || { name: it.name, unit: it.unit || 'kom', total: 0, byLab: {} };
+      row.total += q;
+      row.byLab[o.labId] = (row.byLab[o.labId] || 0) + q;
+    });
+  });
+  return { orders, labs, rows: Object.values(items).sort((a, b) => a.name.localeCompare(b.name)) };
 }
 
-function trebEditItem(id, field, value) {
-  if (!extraGet('treb_items')[id]) return;
-  if (field === 'name' || field === 'unit' || field === 'category') {
-    value = String(value || '').trim();
-    if (field === 'name' && !value) { toast('Naziv ne može biti prazan.', 'error'); renderPage(); return; }
-    if (!value) value = field === 'unit' ? 'kom' : 'Ostalo';
+function trebPrepHtml() {
+  const { orders, labs, rows } = trebPrepData();
+  if (!orders.length) {
+    return `<div class="card"><div class="empty-state">
+      <div class="empty-state-icon">📦</div>
+      <div class="empty-state-title">Nema ništa za pripremu</div>
+      <div class="empty-state-sub">Ovde se sabira sve što je odobreno, a još nije isporučeno.</div>
+    </div></div>`;
   }
-  extraSet(`treb_items/${id}/${field}`, value);
+  return `
+    <p class="text-sm text-muted" style="margin-bottom:.75rem">Zbir odobrenih trebovanja koja još nisu isporučena (${orders.length}). Spakujte po kolonama, pa označite laboratoriju kao isporučenu.</p>
+    <div class="card tb-prep-wrap">
+      <div class="table-wrap"><table class="tb-table tb-prep">
+        <thead><tr><th>Artikal</th><th class="num">Ukupno</th>${labs.map(l => `<th class="num">${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `<tr><td>${escapeHtml(r.name)} <span class="tb-unit">${escapeHtml(r.unit)}</span></td><td class="num"><strong>${r.total}</strong></td>${labs.map(l => `<td class="num">${r.byLab[l.id] || ''}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+    <div class="tb-prep-actions">
+      <button class="btn btn-secondary btn-sm" onclick="trebPrintPrep()">🖨️ Štampaj pripremu</button>
+      ${labs.map(l => `<button class="btn btn-primary btn-sm" onclick="trebDeliverLab('${l.id}')">📦 ${escapeHtml(l.name)} isporučeno (${l.orders.length})</button>`).join('')}
+    </div>`;
+}
+
+function trebDeliverLab(labId) {
+  const ids = trebOrders().filter(o => o.status === 'approved' && o.labId === labId).map(o => o.id);
+  if (!ids.length || !confirm(`Označiti ${ids.length} trebovanje/a kao isporučeno?`)) return;
+  ids.forEach(id => trebSetStatus(id, 'delivered', null, true));
+  toast(`Isporučeno: ${ids.length}`, 'success');
+}
+
+function trebPrintPrep() {
+  const { labs, rows } = trebPrepData();
+  printHtml(`Priprema trebovanja — ${trebDate(new Date().toISOString(), false)}`, `<table>
+    <thead><tr><th>Artikal</th><th>Jed.</th><th>Ukupno</th>${labs.map(l => `<th>${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.unit)}</td><td class="num"><b>${r.total}</b></td>${labs.map(l => `<td class="num">${r.byLab[l.id] || ''}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`);
+}
+
+/* ---------- Katalog (admin) ---------- */
+let trebCatalogQuery = '';
+function trebCatalogHtml() {
+  const q = trebCatalogQuery.trim().toLowerCase();
+  const all = trebItems(true).filter(i => !q || i.name.toLowerCase().includes(q));
+  const visible = all.filter(i => !i.hidden);
+  const hidden = all.filter(i => i.hidden);
+  const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
+  const row = i => `<button class="tb-row tb-cat-row ${i.hidden ? 'is-hidden' : ''}" onclick="openTrebEditItem('${i.id}')">
+      <span class="tb-row-name static">${escapeHtml(i.name)}<span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span>
+        ${i.createdAt > weekAgo && !i.id.startsWith('seed') ? `<span class="tb-newbadge">🆕 ${escapeHtml((i.createdByName || '').split(' ')[0])}</span>` : ''}</span>
+      <span class="tb-edit">Izmeni ›</span>
+    </button>`;
+  let lastCat = null;
+  const groups = visible.map(i => {
+    const head = i.category !== lastCat ? `<div class="tb-group">${escapeHtml(i.category || 'Ostalo')}
+      <span class="tb-group-act" onclick="event.stopPropagation(); trebRenameCategory(this.dataset.cat)" data-cat="${escapeHtml(i.category || 'Ostalo')}">✏️ preimenuj</span></div>` : '';
+    lastCat = i.category;
+    return head + row(i);
+  }).join('');
+  return `
+    <div class="tb-list-tools">
+      <input type="text" id="tb-cat-q" placeholder="🔍 Pretraga kataloga" value="${escapeHtml(trebCatalogQuery)}" oninput="trebCatalogQuery = this.value; renderPage()" autocomplete="off">
+      <button class="btn btn-primary btn-sm" onclick="openTrebBulkAdd()">➕ Dodaj</button>
+    </div>
+    <p class="text-xs text-muted" style="margin:0 0 .5rem">${visible.length} artikala u listi${hidden.length ? `, ${hidden.length} sakriveno` : ''}. Kliknite artikal da ga izmenite.</p>
+    <div class="card tb-rows">${groups || '<div class="tb-empty">Nema artikala.</div>'}</div>
+    ${hidden.length ? `<div class="tb-group" style="margin-top:1rem">Sakriveni artikli</div><div class="card tb-rows">${hidden.map(row).join('')}</div>` : ''}`;
+}
+
+function openTrebEditItem(id) {
+  const i = extraGet('treb_items')[id];
+  if (!i) return;
+  const cats = trebCategories(true);
+  openExtraModal('tb-edit-item', 'Izmena artikla',
+    `<div class="form-group"><label for="tbe-name">Naziv</label><input type="text" id="tbe-name" value="${escapeHtml(i.name)}"></div>
+     <div class="form-row">
+       <div class="form-group"><label for="tbe-unit">Jedinica</label><input type="text" id="tbe-unit" list="tbe-units" value="${escapeHtml(i.unit || 'kom')}"></div>
+       <div class="form-group"><label for="tbe-cat">Kategorija</label><input type="text" id="tbe-cat" list="tbe-cats" value="${escapeHtml(i.category || '')}"></div>
+     </div>
+     <datalist id="tbe-units">${TREB_UNITS.map(u => `<option value="${u}">`).join('')}</datalist>
+     <datalist id="tbe-cats">${cats.map(c => `<option value="${escapeHtml(c)}">`).join('')}</datalist>
+     <label class="tb-check"><input type="checkbox" id="tbe-hidden" ${i.hidden ? 'checked' : ''}> Sakrij iz liste za trebovanje</label>
+     ${i.createdByName ? `<p class="text-xs text-muted mt-2">Dodao/la: ${escapeHtml(i.createdByName)}, ${trebDate(i.createdAt, false)}</p>` : ''}`,
+    `<button class="btn btn-secondary" onclick="trebDeleteItem('${id}')" title="Obriši">🗑️ Obriši</button>
+     <button class="btn btn-primary" onclick="saveTrebEditItem('${id}')">Sačuvaj</button>`);
+}
+
+function saveTrebEditItem(id) {
+  const name = document.getElementById('tbe-name').value.trim();
+  if (!name) { toast('Naziv ne može biti prazan.', 'error'); return; }
+  extraUpdate({
+    [`treb_items/${id}/name`]: name,
+    [`treb_items/${id}/unit`]: document.getElementById('tbe-unit').value.trim() || 'kom',
+    [`treb_items/${id}/category`]: document.getElementById('tbe-cat').value.trim() || 'Ostalo',
+    [`treb_items/${id}/hidden`]: document.getElementById('tbe-hidden').checked ? true : null
+  });
+  closeExtraModal('tb-edit-item');
+  toast('Sačuvano.', 'success');
 }
 
 function trebDeleteItem(id) {
   const it = extraGet('treb_items')[id];
   if (!it || !confirm(`Obrisati „${it.name}” iz kataloga? Stara trebovanja ostaju ista.`)) return;
   extraSet('treb_items/' + id, null);
+  closeExtraModal('tb-edit-item');
 }
 
 function trebRenameCategory(oldName) {
@@ -7507,9 +7543,25 @@ function trebRenameCategory(oldName) {
   extraUpdate(updates);
 }
 
+function openTrebBulkAdd() {
+  const cats = trebCategories(true);
+  openExtraModal('tb-bulk-modal', 'Dodaj artikle',
+    `<div class="form-group"><label for="tb-bulk">Artikli — jedan po redu</label><textarea id="tb-bulk" style="min-height:140px" placeholder="Rukavice M&#10;Maske FFP2"></textarea></div>
+     <div class="form-row">
+       <div class="form-group"><label for="tb-bulk-cat">Kategorija</label><input type="text" id="tb-bulk-cat" list="tb-bulk-cats"></div>
+       <div class="form-group"><label for="tb-bulk-unit">Jedinica</label><input type="text" id="tb-bulk-unit" list="tb-bulk-units" value="kom"></div>
+     </div>
+     <datalist id="tb-bulk-cats">${cats.map(c => `<option value="${escapeHtml(c)}">`).join('')}</datalist>
+     <datalist id="tb-bulk-units">${TREB_UNITS.map(u => `<option value="${u}">`).join('')}</datalist>`,
+    `<button class="btn btn-secondary" onclick="closeExtraModal('tb-bulk-modal')">Otkaži</button>
+     <button class="btn btn-primary" onclick="trebBulkAdd()">Dodaj</button>`);
+  document.getElementById('tb-bulk').focus();
+}
+
 function trebBulkAdd() {
   const lines = document.getElementById('tb-bulk').value.split('\n').map(l => l.trim()).filter(Boolean);
   const category = document.getElementById('tb-bulk-cat').value.trim() || 'Ostalo';
+  const unit = document.getElementById('tb-bulk-unit').value.trim() || 'kom';
   if (!lines.length) { toast('Upišite bar jedan artikal.', 'warning'); return; }
   const existing = new Set(trebItems(true).map(i => i.name.toLowerCase()));
   const updates = {};
@@ -7518,9 +7570,10 @@ function trebBulkAdd() {
   lines.forEach(name => {
     if (existing.has(name.toLowerCase())) { skipped++; return; }
     existing.add(name.toLowerCase());
-    updates['treb_items/' + newExtraId('i', 'treb_items')] = { name, unit: 'kom', category, createdByUserId: currentUser.id, createdByName: currentUser.name || '', createdAt: now };
+    updates['treb_items/' + newExtraId('i', 'treb_items')] = { name, unit, category, createdByUserId: currentUser.id, createdByName: currentUser.name || '', createdAt: now };
     added++;
   });
+  closeExtraModal('tb-bulk-modal');
   if (added) extraUpdate(updates);
   toast(`Dodato: ${added}${skipped ? `, preskočeno (već postoji): ${skipped}` : ''}`, 'success');
 }
@@ -7865,6 +7918,9 @@ async function startApp() {
   currentPage = 'dashboard';
   rasporedDate = null;
   rasporedMine = false;
+  // Trebovanje view state is per person — don't carry it into the next login.
+  trebTab = 'new'; trebCart = null; trebLab = null; trebNote = ''; trebQuery = ''; trebCat = null;
+  trebListStatus = null; trebListLab = ''; trebCatalogQuery = '';
   initTheme();
   if (firebaseDB) await refreshCloudBaseline();
   applyElapsedLeaveDeductions();
