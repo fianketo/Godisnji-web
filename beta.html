@@ -2705,7 +2705,7 @@ const DATABASE_RULES = (() => {
   const signedIn = 'auth != null';
   const adminWrite = { '.read': signedIn, '.write': `${signedIn} && ${admin}` };
   const trebOrder = "root.child('treb_orders').child($orderId)";
-  const trebMine = `${trebOrder}.child('createdByUserId').val() === ${me}`;
+  const trebPacker = `root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(${me}).val() === true`;
   const trebOpen = `(${trebOrder}.child('status').val() === 'approved' || ${trebOrder}.child('status').val() === 'delivered')`;
   return {
     rules: {
@@ -2730,15 +2730,15 @@ const DATABASE_RULES = (() => {
         '.write': `${signedIn} && ${admin}`,
         '$orderId': {
           '.write': `${signedIn} && ((!data.exists() && newData.child('createdByUserId').val() === ${me} && newData.child('status').val() === 'sent') || (data.exists() && !newData.exists() && data.child('createdByUserId').val() === ${me} && data.child('status').val() === 'sent'))`,
-          // The requester ticks off what arrived (receipt checklist) once the
-          // requisition is approved, and may close it as delivered.
-          status: { '.write': `${signedIn} && data.parent().child('createdByUserId').val() === ${me} && data.val() === 'approved' && newData.val() === 'delivered'` },
-          history: { '$hId': { '.write': `${signedIn} && !data.exists() && ${trebMine} && ${trebOpen}` } },
-          receivedAt: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
-          receivedBy: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
+          // Packers (people chosen in „✉️ Ko prima trebovanja”) tick off what
+          // they packed once a requisition is approved, and close it as delivered.
+          status: { '.write': `${signedIn} && ${trebPacker} && data.val() === 'approved' && newData.val() === 'delivered'` },
+          history: { '$hId': { '.write': `${signedIn} && !data.exists() && ${trebPacker} && ${trebOpen}` } },
+          packedAt: { '.write': `${signedIn} && ${trebPacker} && ${trebOpen}` },
+          packedBy: { '.write': `${signedIn} && ${trebPacker} && ${trebOpen}` },
           items: { '$itemId': {
-            received: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
-            receivedQty: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` }
+            packed: { '.write': `${signedIn} && ${trebPacker} && ${trebOpen}` },
+            packedQty: { '.write': `${signedIn} && ${trebPacker} && ${trebOpen}` }
           } }
         }
       },
@@ -5107,7 +5107,7 @@ function renderHelp() {
       <div class="card-body" style="padding:.25rem 1.5rem">
         ${helpRow('📊', 'Dashboard', 'pregled koliko vam je dana godišnjeg i slobodnih dana preostalo, i koliko zahteva čeka na odgovor.')}
         ${helpRow('👆', 'Prevlačenje prstom', 'na telefonu prevucite prstom levo ili desno da pređete na sledeću ili prethodnu stranicu iz donje trake. Na Rasporedu, prevlačenje preko trake sa danima menja nedelju.')}
-        ${helpRow('📦', 'Trebovanje', 'izaberite laboratoriju, pa + / − pored artikala koji su potrebni; dole je zbir — „Pregledaj i pošalji”. Artikal kojeg nema na listi dodajte dugmetom „➕ Artikal koji nije na listi” (ostaje u katalogu). „🔁 Ponovi poslednje” preuzima prethodno trebovanje te laboratorije. Status pratite u „Moja trebovanja”. Kad trebovanje bude odobreno, u „📥 Za prijem” otvorite ga i čekirajte šta je stiglo (upišite stvarno primljenu količinu); kad je sve označeno, trebovanje se samo zatvara kao isporučeno.')}
+        ${helpRow('📦', 'Trebovanje', 'izaberite laboratoriju, pa + / − pored artikala koji su potrebni; dole je zbir — „Pregledaj i pošalji”. Artikal kojeg nema na listi dodajte dugmetom „➕ Artikal koji nije na listi” (ostaje u katalogu). „🔁 Ponovi poslednje” preuzima prethodno trebovanje te laboratorije. Status pratite u „Moja trebovanja”; vidi se i koliko je čega spakovano. Ako vas je admin odredio da primate trebovanja, imate i karticu „📦 Pakovanje” i ček-listu: u „Trebovanja → Za pakovanje” otvorite trebovanje, čekirajte spakovane artikle (upišite količinu ako je manja), pa „Isporučeno”.')}
         ${helpRow('📰', 'Feed', 'objave za ceo tim — napišite nešto, dodajte sliku, lajkujte i komentarišite. Broj na dugmetu Feed pokazuje nove objave.')}
         ${helpRow('🧪', 'Raspored', 'za svaki dan vidite ko radi u kojoj laboratoriji, u 1. i 2. smeni. „Moj raspored” prikazuje samo vaše smene, a tačka ispod dana označava dane kada radite. Na Dashboard-u kartica „Moje smene” pokazuje vaše smene za narednih 7 dana.')}
         ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
@@ -5130,7 +5130,7 @@ function renderHelp() {
       <div class="card-header"><div class="card-title">🛠️ Administracija</div></div>
       <div class="card-body" style="padding:.25rem 1.5rem">
         ${helpRow('🧪', 'Raspored', '„Dodaj / izmeni laboratorije” za nazive i vremena smena; „+ Dodaj” stavlja radnike u 1. ili 2. smenu. Ako je radnik tog dana već negde raspoređen, biće premešten i dobija obaveštenje. Raspored se može kopirati sa prethodnog dana ili iz prošle nedelje. Smena bez ljudi (ili gde su svi na odsustvu) je označena crveno, a crvena tačka ispod dana upozorava na takav dan. „📣 Obavesti radnike” šalje svakom njegove smene za nedelju; „🖨️ Štampaj nedelju” i „📊 Mesečni pregled” (sa izvozom u Excel) su na istom mestu.')}
-        ${helpRow('📦', 'Trebovanje za admina', 'u „Sva trebovanja” otvorite trebovanje, po potrebi izmenite količine i Odobrite ili Odbijte (uz razlog), pa označite 📦 Isporučeno; radnik dobija obaveštenje. Ima štampu i izvoz u Excel. Kartica „Katalog” služi da sredite listu artikala: preimenovanje, jedinica, kategorija, 👁️ sakrivanje i brisanje; 🆕 označava artikle koje su radnici nedavno dodali. Dugme ✉️ u „Trebovanja” bira ko dobija mejl za svako novo trebovanje.')}
+        ${helpRow('📦', 'Trebovanje za admina', 'u „Sva trebovanja” otvorite trebovanje, po potrebi izmenite količine i Odobrite ili Odbijte (uz razlog), pa označite 📦 Isporučeno; radnik dobija obaveštenje. Ima štampu i izvoz u Excel. Kartica „Katalog” služi da sredite listu artikala: preimenovanje, jedinica, kategorija, 👁️ sakrivanje i brisanje; 🆕 označava artikle koje su radnici nedavno dodali. Dugme ✉️ u „Trebovanja” bira ko prima trebovanja: oni dobijaju mejl za svako novo i pakuju ih uz ček-listu.')}
         ${helpRow('📌', 'Feed za admina', '📌 zakači objavu na vrh; „⭐ Važna objava” šalje obaveštenje svim radnicima, po želji i mejlom.')}
         ${helpRow('➕', 'Dodaj radnika', 'unesite ime, lozinku i (opciono) email — bez email-a, radnik dobija korisničko ime za prijavu automatski.')}
         ${helpRow('👥', 'Radnici', 'pregled svih radnika, sa opcijom da izmenite podatke (sektor, pozicija, dani odmora) ili obrišete radnika.')}
@@ -7032,11 +7032,21 @@ function trebOrders() {
     .map(id => Object.assign({}, all[id], { id }))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
+// Packers: the people an admin picked in „✉️ Ko prima trebovanja” — they
+// get the email for each new requisition and can see and pack all of them.
+function isTrebPacker() {
+  if (!currentUser) return false;
+  const st = extraGet('treb_settings');
+  return !!(st && st.notifyMode === 'custom' && st.notifyUserIds && st.notifyUserIds[currentUser.id]);
+}
+function trebCanSeeAll() { return isAdmin() || isTrebPacker(); }
 function trebVisibleOrders() {
-  return trebOrders().filter(o => isAdmin() || o.createdByUserId === currentUser.id);
+  return trebOrders().filter(o => trebCanSeeAll() || o.createdByUserId === currentUser.id);
 }
 function trebPendingCount() {
-  return isAdmin() ? trebOrders().filter(o => o.status === 'sent').length : 0;
+  if (isAdmin()) return trebOrders().filter(o => o.status === 'sent').length;
+  if (isTrebPacker()) return trebOrders().filter(o => o.status === 'approved').length;
+  return 0;
 }
 // Items this lab orders most often, most frequent first.
 function trebFrequent(labId) {
@@ -7080,12 +7090,14 @@ function renderTrebovanje() {
   trebLoadDraft();
   trebSeedIfEmpty();
   const pending = trebPendingCount();
-  const prepCount = isAdmin() ? trebOrders().filter(o => o.status === 'approved').length : 0;
-  if (!isAdmin() && (trebTab === 'prep' || trebTab === 'catalog')) trebTab = 'new';
+  const prepCount = trebCanSeeAll() ? trebOrders().filter(o => o.status === 'approved').length : 0;
+  if (!trebCanSeeAll() && trebTab === 'prep') trebTab = 'new';
+  if (!isAdmin() && trebTab === 'catalog') trebTab = 'new';
   const seg = [
     ['new', '📝', 'Novo', trebCartCount()],
-    ['list', '📋', isAdmin() ? 'Trebovanja' : 'Moja', pending],
-    ...(isAdmin() ? [['prep', '📦', 'Priprema', prepCount], ['catalog', '🗂️', 'Katalog', 0]] : [])
+    ['list', '📋', trebCanSeeAll() ? 'Trebovanja' : 'Moja', isAdmin() ? pending : 0],
+    ...(trebCanSeeAll() ? [['prep', '📦', 'Pakovanje', prepCount]] : []),
+    ...(isAdmin() ? [['catalog', '🗂️', 'Katalog', 0]] : [])
   ].map(([id, icon, label, n]) => `<button class="tb-seg-btn ${trebTab === id ? 'active' : ''}" onclick="trebSetTab('${id}')">
       <span class="tb-seg-icon">${icon}</span><span>${label}</span>${n ? `<span class="tb-seg-n">${n}</span>` : ''}
     </button>`).join('');
@@ -7363,8 +7375,8 @@ function trebNotifyAdmins(order) {
 function openTrebNotifySettings() {
   const ids = new Set(trebNotifyUserIds());
   const users = getUsers().slice().sort((a, b) => (b.role === 'admin') - (a.role === 'admin') || (a.name || '').localeCompare(b.name || ''));
-  openExtraModal('tb-notify', '✉️ Ko prima mejl za novo trebovanje',
-    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Označeni dobijaju mejl svaki put kad neko pošalje trebovanje. Onaj ko šalje ne dobija mejl sam sebi.</p>
+  openExtraModal('tb-notify', '✉️ Ko prima trebovanja',
+    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Označeni dobijaju mejl za svako novo trebovanje i vide sva trebovanja sa <strong>ček-listom za pakovanje</strong> (karticu „Pakovanje”). Onaj ko šalje ne dobija mejl sam sebi.</p>
      <div class="tb-cart-list">${users.map(u => {
        const email = trebRealEmail(u);
        return `<label class="tb-row tb-notify-row ${email ? '' : 'disabled'}">
@@ -7383,7 +7395,7 @@ function saveTrebNotifySettings() {
   extraSet('treb_settings', { notifyMode: 'custom', notifyUserIds: map });
   closeExtraModal('tb-notify');
   const n = Object.keys(map).length;
-  toast(n ? `Mejl za novo trebovanje dobija: ${n} ${n === 1 ? 'osoba' : 'osoba'}.` : 'Niko neće dobijati mejl za novo trebovanje.', n ? 'success' : 'warning');
+  toast(n ? `Trebovanja prima i pakuje: ${n} ${n === 1 ? 'osoba' : 'osoba'}.` : 'Niko neće dobijati mejl za novo trebovanje.', n ? 'success' : 'warning');
 }
 
 /* ---------- Lista trebovanja ---------- */
@@ -7392,12 +7404,13 @@ function trebListHtml() {
   const all = trebVisibleOrders();
   const status = trebListStatus != null ? trebListStatus
     : isAdmin() ? (all.some(o => o.status === 'sent') ? 'sent' : '')
-    : (all.some(o => o.status === 'approved') ? 'approved' : '');
+    : isTrebPacker() ? (all.some(o => o.status === 'approved') ? 'approved' : '')
+    : '';
   let orders = all;
   if (status) orders = orders.filter(o => o.status === status);
   if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
   const cnt = s => all.filter(o => o.status === s).length;
-  const filters = [['', 'Sva', all.length], ['sent', 'Na čekanju', cnt('sent')], ['approved', isAdmin() ? 'Odobreno' : '📥 Za prijem', cnt('approved')], ['delivered', 'Isporučeno', cnt('delivered')], ['rejected', 'Odbijeno', cnt('rejected')]]
+  const filters = [['', 'Sva', all.length], ['sent', 'Na čekanju', cnt('sent')], ['approved', trebCanSeeAll() ? '📦 Za pakovanje' : 'Odobreno', cnt('approved')], ['delivered', 'Isporučeno', cnt('delivered')], ['rejected', 'Odbijeno', cnt('rejected')]]
     .filter(([k, , n]) => !k || n || status === k)
     .map(([k, label, n]) => `<button class="tb-chip ${status === k ? 'active' : ''}" onclick="trebListStatus='${k}'; renderPage()">${label} <span class="tb-chip-n">${n}</span></button>`).join('');
   return `
@@ -7407,7 +7420,7 @@ function trebListHtml() {
         <option value="">Sve laboratorije</option>
         ${labs.map(l => `<option value="${l.id}" ${trebListLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
       </select>
-      ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="openTrebNotifySettings()" title="Ko prima mejl za novo trebovanje">✉️</button>
+      ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="openTrebNotifySettings()" title="Ko prima trebovanja (mejl + pakovanje)">✉️</button>
         <button class="btn btn-secondary btn-sm" onclick="trebExportCsv()">⬇️ Excel</button>` : ''}
     </div>
     <div class="card tb-rows">
@@ -7416,7 +7429,7 @@ function trebListHtml() {
         return `<button class="tb-order st-${o.status}" onclick="openTrebDetail('${o.id}')">
           <div class="tb-order-main">
             <div class="tb-order-line1"><strong>${escapeHtml(o.labName || '')}</strong><span class="tb-order-date">${trebDate(o.createdAt)}</span></div>
-            <div class="tb-order-line2">${escapeHtml(o.createdByName || '')} · ${n} ${n === 1 ? 'artikal' : 'artikala'}${o.note ? ' · 📝' : ''}${o.status === 'approved' ? ` · 📥 primljeno ${trebReceiveProgress(o).done}/${trebReceiveProgress(o).total}` : ''}</div>
+            <div class="tb-order-line2">${escapeHtml(o.createdByName || '')} · ${n} ${n === 1 ? 'artikal' : 'artikala'}${o.note ? ' · 📝' : ''}${o.status === 'approved' ? ` · 📦 spakovano ${trebPackProgress(o).done}/${trebPackProgress(o).total}` : ''}</div>
           </div>
           ${trebStatusPill(o.status)}
         </button>`;
@@ -7433,31 +7446,31 @@ function openTrebDetail(id) {
   const ids = Object.keys(o.items || {});
   const hist = Object.values(o.history || {}).sort((a, b) => (a.at || '').localeCompare(b.at || ''));
   const showApproved = o.status === 'approved' || o.status === 'delivered';
-  const receiving = showApproved;
-  const canReceive = receiving && (mine || admin);
-  const prog = trebReceiveProgress(o);
+  const packing = showApproved;
+  const canPack = packing && trebCanSeeAll();
+  const prog = trebPackProgress(o);
   openExtraModal('tb-detail', `${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
     `<div class="tb-detail-meta">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)}</div>
      ${o.note ? `<div class="tb-note-box">📝 ${escapeHtml(o.note)}</div>` : ''}
      ${o.rejectReason ? `<div class="tb-note-box danger">Razlog odbijanja: ${escapeHtml(o.rejectReason)}</div>` : ''}
-     ${receiving ? `<div class="tb-recv-head">
-         <span>📥 Prijem: <strong>${prog.done}/${prog.total}</strong></span>
+     ${packing ? `<div class="tb-recv-head">
+         <span>📦 Spakovano: <strong>${prog.done}/${prog.total}</strong></span>
          <div class="tb-recv-bar"><span style="width:${prog.total ? Math.round(prog.done / prog.total * 100) : 0}%"></span></div>
        </div>` : ''}
-     <table class="tb-table"><thead><tr>${receiving ? '<th class="tb-recv-cb"></th>' : ''}<th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}${receiving ? '<th class="num">Primljeno</th>' : ''}</tr></thead><tbody>
+     <table class="tb-table"><thead><tr>${packing ? '<th class="tb-recv-cb"></th>' : ''}<th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}${packing ? '<th class="num">Spakovano</th>' : ''}</tr></thead><tbody>
       ${ids.map(iid => { const it = o.items[iid]; const ap = it.approvedQty != null ? it.approvedQty : it.qty;
-        const rq = it.receivedQty != null ? it.receivedQty : (it.received ? ap : '');
-        return `<tr class="${receiving && it.received ? 'tb-recv-done' : ''} ${receiving && !ap ? 'tb-recv-zero' : ''}">
-        ${receiving ? `<td class="tb-recv-cb">${ap ? `<input type="checkbox" ${it.received ? 'checked' : ''} ${canReceive ? '' : 'disabled'} onchange="trebMarkReceived('${id}', '${iid}', this.checked)" aria-label="Primljeno">` : ''}</td>` : ''}
+        const rq = it.packedQty != null ? it.packedQty : (it.packed ? ap : '');
+        return `<tr class="${packing && it.packed ? 'tb-recv-done' : ''} ${packing && !ap ? 'tb-recv-zero' : ''}">
+        ${packing ? `<td class="tb-recv-cb">${ap ? `<input type="checkbox" ${it.packed ? 'checked' : ''} ${canPack ? '' : 'disabled'} onchange="trebMarkPacked('${id}', '${iid}', this.checked)" aria-label="Spakovano">` : ''}</td>` : ''}
         <td>${escapeHtml(it.name)} <span class="tb-unit">${escapeHtml(it.unit || 'kom')}</span></td>
         <td class="num">${it.qty}</td>
         ${editable ? `<td class="num"><input type="number" min="0" inputmode="numeric" class="tb-approve-in" data-item="${iid}" value="${it.qty}" onfocus="this.select()"></td>` : showApproved ? `<td class="num ${ap !== it.qty ? 'changed' : ''}">${ap}</td>` : ''}
-        ${receiving ? `<td class="num">${!ap ? '—' : canReceive
-          ? `<input type="number" min="0" inputmode="numeric" class="tb-approve-in ${rq !== '' && rq < ap ? 'short' : ''}" value="${rq}" placeholder="${ap}" onfocus="this.select()" onchange="trebSetReceivedQty('${id}', '${iid}', this.value)">`
+        ${packing ? `<td class="num">${!ap ? '—' : canPack
+          ? `<input type="number" min="0" inputmode="numeric" class="tb-approve-in ${rq !== '' && rq < ap ? 'short' : ''}" value="${rq}" placeholder="${ap}" onfocus="this.select()" onchange="trebSetPackedQty('${id}', '${iid}', this.value)">`
           : `<span class="${rq !== '' && rq < ap ? 'tb-short' : ''}">${rq === '' ? '—' : rq}</span>`}</td>` : ''}
       </tr>`; }).join('')}
      </tbody></table>
-     ${receiving && prog.short.length ? `<div class="tb-note-box warn mt-2">⚠️ Primljeno manje: ${prog.short.map(x => escapeHtml(x)).join(', ')}</div>` : ''}
+     ${packing && prog.short.length ? `<div class="tb-note-box warn mt-2">⚠️ Spakovano manje od odobrenog: ${prog.short.map(x => escapeHtml(x)).join(', ')}</div>` : ''}
      ${editable ? `<div class="form-group mt-3" id="tb-reject-wrap" style="display:none;margin-bottom:0"><label for="tb-reject-reason">Razlog odbijanja</label><textarea id="tb-reject-reason" placeholder="npr. ima još na stanju" style="min-height:60px"></textarea></div>` : ''}
      <div class="tb-history">${hist.map(h => `<span>${(TREB_STATUS[h.status] || {}).label || h.status} ${trebDate(h.at)}${h.by ? ' · ' + escapeHtml(h.by) : ''}</span>`).join('')}</div>`,
     `<button class="btn btn-secondary" onclick="trebPrint('${id}')" title="Štampaj">🖨️</button>
@@ -7465,77 +7478,70 @@ function openTrebDetail(id) {
      ${mine && o.status === 'sent' && !admin ? `<button class="btn btn-danger" onclick="trebCancel('${id}')">Otkaži</button>` : ''}
      ${editable ? `<button class="btn btn-danger" onclick="trebReject('${id}')">Odbij</button>
                    <button class="btn btn-success" onclick="trebApprove('${id}')">Odobri</button>` : ''}
-     ${o.status === 'approved' && canReceive && prog.done < prog.total ? `<button class="btn btn-success" onclick="trebReceiveAll('${id}')">✅ Sve primljeno</button>` : ''}
-     ${admin && o.status === 'approved' ? `<button class="btn btn-primary" onclick="trebSetStatus('${id}', 'delivered')">Isporučeno</button>` : ''}`);
+     ${o.status === 'approved' && canPack && prog.done < prog.total ? `<button class="btn btn-success" onclick="trebPackAll('${id}')">✅ Sve spakovano</button>` : ''}
+     ${o.status === 'approved' && canPack && prog.done === prog.total ? `<button class="btn btn-primary" onclick="trebSetStatus('${id}', 'delivered')">Isporučeno</button>` : ''}
+     ${admin && o.status === 'approved' && prog.done < prog.total ? `<button class="btn btn-secondary" onclick="trebSetStatus('${id}', 'delivered')" title="Zatvori bez ček-liste">Isporučeno</button>` : ''}`);
 }
 
-/* ---------- Prijem (receipt checklist) ---------- */
-// Items with an approved quantity of 0 don't need receiving.
-function trebReceiveProgress(o) {
+/* ---------- Pakovanje (packing checklist) ---------- */
+// Items with an approved quantity of 0 don't need packing.
+function trebPackProgress(o) {
   let total = 0, done = 0;
   const short = [];
   Object.values(o.items || {}).forEach(it => {
     const ap = it.approvedQty != null ? it.approvedQty : it.qty;
     if (!ap) return;
     total++;
-    if (it.received) {
+    if (it.packed) {
       done++;
-      if (it.receivedQty != null && it.receivedQty < ap) short.push(`${it.name} (${it.receivedQty}/${ap})`);
+      if (it.packedQty != null && it.packedQty < ap) short.push(`${it.name} (${it.packedQty}/${ap})`);
     }
   });
   return { total, done, short };
 }
 
-function trebMarkReceived(id, itemId, on) {
+function trebMarkPacked(id, itemId, on) {
   const o = extraGet('treb_orders')[id];
   if (!o || !o.items || !o.items[itemId]) return;
   const it = o.items[itemId];
   const ap = it.approvedQty != null ? it.approvedQty : it.qty;
-  const updates = { [`treb_orders/${id}/items/${itemId}/received`]: on ? true : null };
-  if (on && it.receivedQty == null) updates[`treb_orders/${id}/items/${itemId}/receivedQty`] = ap;
-  if (!on) updates[`treb_orders/${id}/items/${itemId}/receivedQty`] = null;
-  trebSaveReceipt(id, updates);
+  const updates = { [`treb_orders/${id}/items/${itemId}/packed`]: on ? true : null };
+  if (on && it.packedQty == null) updates[`treb_orders/${id}/items/${itemId}/packedQty`] = ap;
+  if (!on) updates[`treb_orders/${id}/items/${itemId}/packedQty`] = null;
+  trebSavePacking(id, updates);
 }
 
-function trebSetReceivedQty(id, itemId, val) {
+function trebSetPackedQty(id, itemId, val) {
   const n = Math.max(0, Math.floor(Number(val) || 0));
-  trebSaveReceipt(id, {
-    [`treb_orders/${id}/items/${itemId}/receivedQty`]: val === '' ? null : n,
-    [`treb_orders/${id}/items/${itemId}/received`]: val === '' ? null : true
+  trebSavePacking(id, {
+    [`treb_orders/${id}/items/${itemId}/packedQty`]: val === '' ? null : n,
+    [`treb_orders/${id}/items/${itemId}/packed`]: val === '' ? null : true
   });
 }
 
-function trebReceiveAll(id) {
+function trebPackAll(id) {
   const o = extraGet('treb_orders')[id];
   if (!o) return;
   const updates = {};
   Object.keys(o.items || {}).forEach(iid => {
     const it = o.items[iid];
     const ap = it.approvedQty != null ? it.approvedQty : it.qty;
-    if (!ap || it.received) return;
-    updates[`treb_orders/${id}/items/${iid}/received`] = true;
-    updates[`treb_orders/${id}/items/${iid}/receivedQty`] = ap;
+    if (!ap || it.packed) return;
+    updates[`treb_orders/${id}/items/${iid}/packed`] = true;
+    updates[`treb_orders/${id}/items/${iid}/packedQty`] = ap;
   });
-  trebSaveReceipt(id, updates);
+  trebSavePacking(id, updates);
 }
 
-// Saves checklist changes; once everything is ticked off an approved
-// requisition closes itself as delivered.
-function trebSaveReceipt(id, updates) {
-  const before = extraGet('treb_orders')[id];
-  const wasApproved = before && before.status === 'approved';
+// Saves checklist changes; when everything is packed the packer gets a
+// clear „Isporučeno” button (they may still be fixing a quantity, so the
+// requisition isn't closed behind their back).
+function trebSavePacking(id, updates) {
+  const wasDone = trebPackProgress(extraGet('treb_orders')[id] || {});
   extraUpdate(updates);
-  const o = extraGet('treb_orders')[id];
-  const prog = trebReceiveProgress(o);
-  if (wasApproved && prog.total && prog.done === prog.total) {
-    const now = new Date().toISOString();
-    extraUpdate({
-      [`treb_orders/${id}/status`]: 'delivered',
-      [`treb_orders/${id}/receivedAt`]: now,
-      [`treb_orders/${id}/receivedBy`]: currentUser.name || '',
-      [`treb_orders/${id}/history/${newExtraId('h', 'treb_orders')}`]: { status: 'delivered', at: now, by: currentUser.name || '' }
-    });
-    toast(prog.short.length ? 'Sve označeno — trebovanje je zatvoreno (neki artikli su stigli u manjoj količini).' : 'Sve primljeno — trebovanje je zatvoreno.', 'success', 5000);
+  const prog = trebPackProgress(extraGet('treb_orders')[id] || {});
+  if (prog.total && prog.done === prog.total && wasDone.done < wasDone.total) {
+    toast('Sve je spakovano — kliknite „Isporučeno” kad pošiljka ode.', 'success', 5000);
   }
   openTrebDetail(id);
 }
@@ -7547,7 +7553,7 @@ function trebSetStatus(id, status, extra, quiet) {
   const updates = Object.assign({
     [`treb_orders/${id}/status`]: status,
     [`treb_orders/${id}/history/${newExtraId('h', 'treb_orders')}`]: { status, at: now, by: currentUser.name || '' }
-  }, extra || {});
+  }, status === 'delivered' ? { [`treb_orders/${id}/packedAt`]: now, [`treb_orders/${id}/packedBy`]: currentUser.name || '' } : {}, extra || {});
   extraUpdate(updates);
   closeExtraModal('tb-detail');
   const fresh = extraGet('treb_orders')[id];
@@ -7557,7 +7563,9 @@ function trebSetStatus(id, status, extra, quiet) {
     const msg = `📦 Trebovanje za ${fresh.labName} (${trebDate(fresh.createdAt, false)}) je ${label}.` +
       (status === 'approved' ? ` Odobreno: ${trebItemsText(fresh)}.` : '') +
       (status === 'rejected' && fresh.rejectReason ? ` Razlog: ${fresh.rejectReason}` : '');
-    mutateEmployee(emp.id, e => addNotification(e, msg));
+    // Bell notification lives on the employee record, which only admins may
+    // write; a packer's status change reaches the requester by email only.
+    if (isAdmin() || emp.id === currentUser.employeeId) mutateEmployee(emp.id, e => addNotification(e, msg));
     if (quiet) { if (hasRealEmail(emp) && EMAILJS_ENABLED) sendEmailRaw(emp.email, emp.name, `Trebovanje ${label}: ${fresh.labName}`, msg).catch(err => console.error(err)); }
     else sendLeaveEmail(emp, `Trebovanje ${label}: ${fresh.labName}`, msg);
   }
@@ -7598,8 +7606,8 @@ function trebDelete(id) {
 }
 
 function trebPrintTable(o) {
-  return `<table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th><th>Primljeno</th></tr></thead><tbody>
-    ${Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td><td class="num">${it.receivedQty != null ? it.receivedQty : ''}</td></tr>`).join('')}
+  return `<table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th><th>Spakovano</th></tr></thead><tbody>
+    ${Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td><td class="num">${it.packedQty != null ? it.packedQty : ''}</td></tr>`).join('')}
   </tbody></table>`;
 }
 
@@ -7622,10 +7630,10 @@ function trebExportCsv() {
   if (status) orders = orders.filter(o => o.status === status);
   if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
   const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-  const lines = [['Datum', 'Laboratorija', 'Trebovao/la', 'Status', 'Artikal', 'Jedinica', 'Traženo', 'Odobreno', 'Primljeno'].map(cell).join(';')];
+  const lines = [['Datum', 'Laboratorija', 'Trebovao/la', 'Status', 'Artikal', 'Jedinica', 'Traženo', 'Odobreno', 'Spakovano'].map(cell).join(';')];
   orders.forEach(o => Object.values(o.items || {}).forEach(it => lines.push([
     trebDate(o.createdAt, false), o.labName, o.createdByName, (TREB_STATUS[o.status] || {}).label || o.status,
-    it.name, it.unit || 'kom', it.qty, it.approvedQty != null ? it.approvedQty : '', it.receivedQty != null ? it.receivedQty : ''
+    it.name, it.unit || 'kom', it.qty, it.approvedQty != null ? it.approvedQty : '', it.packedQty != null ? it.packedQty : ''
   ].map(cell).join(';'))));
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
@@ -7663,12 +7671,12 @@ function trebPrepHtml() {
   if (!orders.length) {
     return `<div class="card"><div class="empty-state">
       <div class="empty-state-icon">📦</div>
-      <div class="empty-state-title">Nema ništa za pripremu</div>
+      <div class="empty-state-title">Nema ništa za pakovanje</div>
       <div class="empty-state-sub">Ovde se sabira sve što je odobreno, a još nije isporučeno.</div>
     </div></div>`;
   }
   return `
-    <p class="text-sm text-muted" style="margin-bottom:.75rem">Zbir odobrenih trebovanja koja još nisu isporučena (${orders.length}). Spakujte po kolonama, pa označite laboratoriju kao isporučenu.</p>
+    <p class="text-sm text-muted" style="margin-bottom:.75rem">Šta treba spakovati: zbir odobrenih trebovanja koja još nisu isporučena (${orders.length}). Za ček-listu po artiklima otvorite trebovanje u „Trebovanja → 📦 Za pakovanje”; dugme ispod označava celu laboratoriju kao spakovanu i isporučenu.</p>
     <div class="card tb-prep-wrap">
       <div class="table-wrap"><table class="tb-table tb-prep">
         <thead><tr><th>Artikal</th><th class="num">Ukupno</th>${labs.map(l => `<th class="num">${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
@@ -7676,7 +7684,7 @@ function trebPrepHtml() {
       </table></div>
     </div>
     <div class="tb-prep-actions">
-      <button class="btn btn-secondary btn-sm" onclick="trebPrintPrep()">🖨️ Štampaj pripremu</button>
+      <button class="btn btn-secondary btn-sm" onclick="trebPrintPrep()">🖨️ Štampaj spisak</button>
       ${labs.map(l => `<button class="btn btn-primary btn-sm" onclick="trebDeliverLab('${l.id}')">📦 ${escapeHtml(l.name)} isporučeno (${l.orders.length})</button>`).join('')}
     </div>`;
 }
@@ -7684,13 +7692,24 @@ function trebPrepHtml() {
 function trebDeliverLab(labId) {
   const ids = trebOrders().filter(o => o.status === 'approved' && o.labId === labId).map(o => o.id);
   if (!ids.length || !confirm(`Označiti ${ids.length} trebovanje/a kao isporučeno?`)) return;
-  ids.forEach(id => trebSetStatus(id, 'delivered', null, true));
+  ids.forEach(id => {
+    const o = extraGet('treb_orders')[id];
+    const extra = {};
+    Object.keys(o.items || {}).forEach(iid => {
+      const it = o.items[iid];
+      const ap = it.approvedQty != null ? it.approvedQty : it.qty;
+      if (!ap || it.packed) return;
+      extra[`treb_orders/${id}/items/${iid}/packed`] = true;
+      extra[`treb_orders/${id}/items/${iid}/packedQty`] = ap;
+    });
+    trebSetStatus(id, 'delivered', extra, true);
+  });
   toast(`Isporučeno: ${ids.length}`, 'success');
 }
 
 function trebPrintPrep() {
   const { labs, rows } = trebPrepData();
-  printHtml(`Priprema trebovanja — ${trebDate(new Date().toISOString(), false)}`, `<table>
+  printHtml(`Pakovanje trebovanja — ${trebDate(new Date().toISOString(), false)}`, `<table>
     <thead><tr><th>Artikal</th><th>Jed.</th><th>Ukupno</th>${labs.map(l => `<th>${escapeHtml(l.name)}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r => `<tr><td>${escapeHtml(r.name)}</td><td>${escapeHtml(r.unit)}</td><td class="num"><b>${r.total}</b></td>${labs.map(l => `<td class="num">${r.byLab[l.id] || ''}</td>`).join('')}</tr>`).join('')}</tbody>
   </table>`);
