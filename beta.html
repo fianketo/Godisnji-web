@@ -1682,6 +1682,20 @@ textarea { resize: vertical; min-height: 80px; }
 .hidden { display: none !important; }
 
 /* ---------- Trebovanje ---------- */
+.tb-recv-head { display: flex; align-items: center; gap: .75rem; margin-bottom: .5rem; font-size: .875rem; }
+.tb-recv-bar { flex: 1; height: 8px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.tb-recv-bar span { display: block; height: 100%; background: var(--success); border-radius: 99px; transition: width .2s; }
+.tb-recv-cb { width: 34px; }
+.tb-recv-cb input { width: 22px; height: 22px; accent-color: var(--success); cursor: pointer; }
+.tb-table tr.tb-recv-done td { color: var(--text3); }
+.tb-table tr.tb-recv-done td:nth-child(2) { text-decoration: line-through; }
+.tb-table tr.tb-recv-zero td { color: var(--text3); }
+.tb-approve-in.short, .tb-short { color: var(--warning); }
+.tb-note-box.warn { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
+.tb-notify-row { cursor: pointer; }
+.tb-notify-row input { width: 20px; height: 20px; flex-shrink: 0; }
+.tb-notify-row.disabled { opacity: .5; cursor: default; }
+
 
 .tb-lab-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .5rem; margin-bottom: .75rem; }
 .tb-lab-tile { border: 2px solid var(--border); background: var(--surface); color: var(--text); border-radius: 14px; padding: .875rem .5rem; font: inherit; font-weight: 800; font-size: .9375rem; cursor: pointer; border-top: 6px solid var(--lab-color); }
@@ -2690,6 +2704,9 @@ const DATABASE_RULES = (() => {
   const me = "root.child('roles').child(auth.uid).child('userId').val()";
   const signedIn = 'auth != null';
   const adminWrite = { '.read': signedIn, '.write': `${signedIn} && ${admin}` };
+  const trebOrder = "root.child('treb_orders').child($orderId)";
+  const trebMine = `${trebOrder}.child('createdByUserId').val() === ${me}`;
+  const trebOpen = `(${trebOrder}.child('status').val() === 'approved' || ${trebOrder}.child('status').val() === 'delivered')`;
   return {
     rules: {
       roles: { '.read': signedIn, '.write': `${signedIn} && (${admin} || ${bootstrap})` },
@@ -2711,8 +2728,21 @@ const DATABASE_RULES = (() => {
       treb_orders: {
         '.read': signedIn,
         '.write': `${signedIn} && ${admin}`,
-        '$orderId': { '.write': `${signedIn} && ((!data.exists() && newData.child('createdByUserId').val() === ${me} && newData.child('status').val() === 'sent') || (data.exists() && !newData.exists() && data.child('createdByUserId').val() === ${me} && data.child('status').val() === 'sent'))` }
+        '$orderId': {
+          '.write': `${signedIn} && ((!data.exists() && newData.child('createdByUserId').val() === ${me} && newData.child('status').val() === 'sent') || (data.exists() && !newData.exists() && data.child('createdByUserId').val() === ${me} && data.child('status').val() === 'sent'))`,
+          // The requester ticks off what arrived (receipt checklist) once the
+          // requisition is approved, and may close it as delivered.
+          status: { '.write': `${signedIn} && data.parent().child('createdByUserId').val() === ${me} && data.val() === 'approved' && newData.val() === 'delivered'` },
+          history: { '$hId': { '.write': `${signedIn} && !data.exists() && ${trebMine} && ${trebOpen}` } },
+          receivedAt: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
+          receivedBy: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
+          items: { '$itemId': {
+            received: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` },
+            receivedQty: { '.write': `${signedIn} && ${trebMine} && ${trebOpen}` }
+          } }
+        }
       },
+      treb_settings: adminWrite,
       feed: {
         '.read': signedIn,
         '.write': `${signedIn} && ${admin}`,
@@ -5077,7 +5107,7 @@ function renderHelp() {
       <div class="card-body" style="padding:.25rem 1.5rem">
         ${helpRow('📊', 'Dashboard', 'pregled koliko vam je dana godišnjeg i slobodnih dana preostalo, i koliko zahteva čeka na odgovor.')}
         ${helpRow('👆', 'Prevlačenje prstom', 'na telefonu prevucite prstom levo ili desno da pređete na sledeću ili prethodnu stranicu iz donje trake. Na Rasporedu, prevlačenje preko trake sa danima menja nedelju.')}
-        ${helpRow('📦', 'Trebovanje', 'izaberite laboratoriju, pa + / − pored artikala koji su potrebni; dole je zbir — „Pregledaj i pošalji”. Artikal kojeg nema na listi dodajte dugmetom „➕ Artikal koji nije na listi” (ostaje u katalogu). „🔁 Ponovi poslednje” preuzima prethodno trebovanje te laboratorije. Status pratite u „Moja trebovanja”.')}
+        ${helpRow('📦', 'Trebovanje', 'izaberite laboratoriju, pa + / − pored artikala koji su potrebni; dole je zbir — „Pregledaj i pošalji”. Artikal kojeg nema na listi dodajte dugmetom „➕ Artikal koji nije na listi” (ostaje u katalogu). „🔁 Ponovi poslednje” preuzima prethodno trebovanje te laboratorije. Status pratite u „Moja trebovanja”. Kad trebovanje bude odobreno, u „📥 Za prijem” otvorite ga i čekirajte šta je stiglo (upišite stvarno primljenu količinu); kad je sve označeno, trebovanje se samo zatvara kao isporučeno.')}
         ${helpRow('📰', 'Feed', 'objave za ceo tim — napišite nešto, dodajte sliku, lajkujte i komentarišite. Broj na dugmetu Feed pokazuje nove objave.')}
         ${helpRow('🧪', 'Raspored', 'za svaki dan vidite ko radi u kojoj laboratoriji, u 1. i 2. smeni. „Moj raspored” prikazuje samo vaše smene, a tačka ispod dana označava dane kada radite. Na Dashboard-u kartica „Moje smene” pokazuje vaše smene za narednih 7 dana.')}
         ${helpRow('📝', 'Podnesi zahtev', 'izaberete tip odsustva, datume, i pošaljete — ide direktno administratoru na odobrenje.')}
@@ -5100,7 +5130,7 @@ function renderHelp() {
       <div class="card-header"><div class="card-title">🛠️ Administracija</div></div>
       <div class="card-body" style="padding:.25rem 1.5rem">
         ${helpRow('🧪', 'Raspored', '„Dodaj / izmeni laboratorije” za nazive i vremena smena; „+ Dodaj” stavlja radnike u 1. ili 2. smenu. Ako je radnik tog dana već negde raspoređen, biće premešten i dobija obaveštenje. Raspored se može kopirati sa prethodnog dana ili iz prošle nedelje. Smena bez ljudi (ili gde su svi na odsustvu) je označena crveno, a crvena tačka ispod dana upozorava na takav dan. „📣 Obavesti radnike” šalje svakom njegove smene za nedelju; „🖨️ Štampaj nedelju” i „📊 Mesečni pregled” (sa izvozom u Excel) su na istom mestu.')}
-        ${helpRow('📦', 'Trebovanje za admina', 'u „Sva trebovanja” otvorite trebovanje, po potrebi izmenite količine i Odobrite ili Odbijte (uz razlog), pa označite 📦 Isporučeno; radnik dobija obaveštenje. Ima štampu i izvoz u Excel. Kartica „Katalog” služi da sredite listu artikala: preimenovanje, jedinica, kategorija, 👁️ sakrivanje i brisanje; 🆕 označava artikle koje su radnici nedavno dodali.')}
+        ${helpRow('📦', 'Trebovanje za admina', 'u „Sva trebovanja” otvorite trebovanje, po potrebi izmenite količine i Odobrite ili Odbijte (uz razlog), pa označite 📦 Isporučeno; radnik dobija obaveštenje. Ima štampu i izvoz u Excel. Kartica „Katalog” služi da sredite listu artikala: preimenovanje, jedinica, kategorija, 👁️ sakrivanje i brisanje; 🆕 označava artikle koje su radnici nedavno dodali. Dugme ✉️ u „Trebovanja” bira ko dobija mejl za svako novo trebovanje.')}
         ${helpRow('📌', 'Feed za admina', '📌 zakači objavu na vrh; „⭐ Važna objava” šalje obaveštenje svim radnicima, po želji i mejlom.')}
         ${helpRow('➕', 'Dodaj radnika', 'unesite ime, lozinku i (opciono) email — bez email-a, radnik dobija korisničko ime za prijavu automatski.')}
         ${helpRow('👥', 'Radnici', 'pregled svih radnika, sa opcijom da izmenite podatke (sektor, pozicija, dani odmora) ili obrišete radnika.')}
@@ -6027,6 +6057,7 @@ function startExtraListeners() {
   firebaseDB.ref('lab_schedule_meta').on('value', onValue('lab_schedule_meta'));
   firebaseDB.ref('treb_items').on('value', onValue('treb_items'));
   firebaseDB.ref('treb_orders').on('value', onValue('treb_orders'));
+  firebaseDB.ref('treb_settings').on('value', onValue('treb_settings'));
 }
 
 function newExtraId(prefix, key) {
@@ -7300,30 +7331,73 @@ function trebItemsText(order) {
   return Object.values(order.items || {}).map(i => `${i.name} ${i.approvedQty != null ? i.approvedQty : i.qty} ${i.unit || 'kom'}`).join(', ');
 }
 
+// Who gets an email for a new requisition. Until an admin chooses in
+// „✉️ Ko prima mejl”, that's every admin (the original behaviour).
+function trebRealEmail(u) {
+  const isReal = e => !!e && e.includes('@') && !e.endsWith('@' + LOCAL_LOGIN_DOMAIN);
+  if (isReal(u.email)) return u.email;
+  const emp = u.employeeId ? getEmployees().find(e => e.id === u.employeeId) : null;
+  return emp && isReal(emp.email) ? emp.email : null;
+}
+function trebNotifyUserIds() {
+  const st = extraGet('treb_settings');
+  if (st && st.notifyMode === 'custom') return Object.keys(st.notifyUserIds || {});
+  return getUsers().filter(u => u.role === 'admin').map(u => u.id);
+}
+
 function trebNotifyAdmins(order) {
   if (!EMAILJS_ENABLED) return;
-  const isReal = e => !!e && e.includes('@') && !e.endsWith('@' + LOCAL_LOGIN_DOMAIN);
+  const ids = new Set(trebNotifyUserIds());
   const seen = new Set();
-  getUsers().filter(u => u.role === 'admin' && u.id !== currentUser.id && isReal(u.email)).forEach(u => {
-    if (seen.has(u.email.toLowerCase())) return;
-    seen.add(u.email.toLowerCase());
-    sendEmailRaw(u.email, u.name || 'Administrator', `Novo trebovanje: ${order.labName}`,
+  getUsers().filter(u => ids.has(u.id) && u.id !== currentUser.id).forEach(u => {
+    const email = trebRealEmail(u);
+    if (!email || seen.has(email.toLowerCase())) return;
+    seen.add(email.toLowerCase());
+    sendEmailRaw(email, u.name || '', `Novo trebovanje: ${order.labName}`,
       `${order.createdByName} je poslao/la trebovanje za ${order.labName}: ${trebItemsText(order)}.` +
-      (order.note ? ` Napomena: ${order.note}.` : '') + ` Pregled i odobravanje: ${location.origin + location.pathname}`)
+      (order.note ? ` Napomena: ${order.note}.` : '') + ` Pregled: ${location.origin + location.pathname}`)
       .catch(err => console.error('EmailJS (trebovanje):', err));
   });
+}
+
+function openTrebNotifySettings() {
+  const ids = new Set(trebNotifyUserIds());
+  const users = getUsers().slice().sort((a, b) => (b.role === 'admin') - (a.role === 'admin') || (a.name || '').localeCompare(b.name || ''));
+  openExtraModal('tb-notify', '✉️ Ko prima mejl za novo trebovanje',
+    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Označeni dobijaju mejl svaki put kad neko pošalje trebovanje. Onaj ko šalje ne dobija mejl sam sebi.</p>
+     <div class="tb-cart-list">${users.map(u => {
+       const email = trebRealEmail(u);
+       return `<label class="tb-row tb-notify-row ${email ? '' : 'disabled'}">
+         <input type="checkbox" class="tb-notify-cb" value="${escapeHtml(u.id)}" ${ids.has(u.id) && email ? 'checked' : ''} ${email ? '' : 'disabled'}>
+         <span class="tb-row-name static">${escapeHtml(u.name || '')}${u.role === 'admin' ? ' <span class="tb-unit">admin</span>' : ''}
+           <span class="tb-unit" style="width:100%">${email ? escapeHtml(email) : 'nema email adresu'}</span></span>
+       </label>`;
+     }).join('')}</div>`,
+    `<button class="btn btn-secondary" onclick="closeExtraModal('tb-notify')">Otkaži</button>
+     <button class="btn btn-primary" onclick="saveTrebNotifySettings()">Sačuvaj</button>`);
+}
+
+function saveTrebNotifySettings() {
+  const map = {};
+  document.querySelectorAll('#tb-notify .tb-notify-cb:checked').forEach(cb => { if (SAFE_ID.test(cb.value)) map[cb.value] = true; });
+  extraSet('treb_settings', { notifyMode: 'custom', notifyUserIds: map });
+  closeExtraModal('tb-notify');
+  const n = Object.keys(map).length;
+  toast(n ? `Mejl za novo trebovanje dobija: ${n} ${n === 1 ? 'osoba' : 'osoba'}.` : 'Niko neće dobijati mejl za novo trebovanje.', n ? 'success' : 'warning');
 }
 
 /* ---------- Lista trebovanja ---------- */
 function trebListHtml() {
   const labs = labsList();
   const all = trebVisibleOrders();
-  const status = trebListStatus != null ? trebListStatus : (isAdmin() && all.some(o => o.status === 'sent') ? 'sent' : '');
+  const status = trebListStatus != null ? trebListStatus
+    : isAdmin() ? (all.some(o => o.status === 'sent') ? 'sent' : '')
+    : (all.some(o => o.status === 'approved') ? 'approved' : '');
   let orders = all;
   if (status) orders = orders.filter(o => o.status === status);
   if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
   const cnt = s => all.filter(o => o.status === s).length;
-  const filters = [['', 'Sva', all.length], ['sent', 'Na čekanju', cnt('sent')], ['approved', 'Odobreno', cnt('approved')], ['delivered', 'Isporučeno', cnt('delivered')], ['rejected', 'Odbijeno', cnt('rejected')]]
+  const filters = [['', 'Sva', all.length], ['sent', 'Na čekanju', cnt('sent')], ['approved', isAdmin() ? 'Odobreno' : '📥 Za prijem', cnt('approved')], ['delivered', 'Isporučeno', cnt('delivered')], ['rejected', 'Odbijeno', cnt('rejected')]]
     .filter(([k, , n]) => !k || n || status === k)
     .map(([k, label, n]) => `<button class="tb-chip ${status === k ? 'active' : ''}" onclick="trebListStatus='${k}'; renderPage()">${label} <span class="tb-chip-n">${n}</span></button>`).join('');
   return `
@@ -7333,7 +7407,8 @@ function trebListHtml() {
         <option value="">Sve laboratorije</option>
         ${labs.map(l => `<option value="${l.id}" ${trebListLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
       </select>
-      ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="trebExportCsv()">⬇️ Excel</button>` : ''}
+      ${isAdmin() ? `<button class="btn btn-secondary btn-sm" onclick="openTrebNotifySettings()" title="Ko prima mejl za novo trebovanje">✉️</button>
+        <button class="btn btn-secondary btn-sm" onclick="trebExportCsv()">⬇️ Excel</button>` : ''}
     </div>
     <div class="card tb-rows">
       ${orders.length ? orders.map(o => {
@@ -7341,7 +7416,7 @@ function trebListHtml() {
         return `<button class="tb-order st-${o.status}" onclick="openTrebDetail('${o.id}')">
           <div class="tb-order-main">
             <div class="tb-order-line1"><strong>${escapeHtml(o.labName || '')}</strong><span class="tb-order-date">${trebDate(o.createdAt)}</span></div>
-            <div class="tb-order-line2">${escapeHtml(o.createdByName || '')} · ${n} ${n === 1 ? 'artikal' : 'artikala'}${o.note ? ' · 📝' : ''}</div>
+            <div class="tb-order-line2">${escapeHtml(o.createdByName || '')} · ${n} ${n === 1 ? 'artikal' : 'artikala'}${o.note ? ' · 📝' : ''}${o.status === 'approved' ? ` · 📥 primljeno ${trebReceiveProgress(o).done}/${trebReceiveProgress(o).total}` : ''}</div>
           </div>
           ${trebStatusPill(o.status)}
         </button>`;
@@ -7358,17 +7433,31 @@ function openTrebDetail(id) {
   const ids = Object.keys(o.items || {});
   const hist = Object.values(o.history || {}).sort((a, b) => (a.at || '').localeCompare(b.at || ''));
   const showApproved = o.status === 'approved' || o.status === 'delivered';
+  const receiving = showApproved;
+  const canReceive = receiving && (mine || admin);
+  const prog = trebReceiveProgress(o);
   openExtraModal('tb-detail', `${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
     `<div class="tb-detail-meta">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)}</div>
      ${o.note ? `<div class="tb-note-box">📝 ${escapeHtml(o.note)}</div>` : ''}
      ${o.rejectReason ? `<div class="tb-note-box danger">Razlog odbijanja: ${escapeHtml(o.rejectReason)}</div>` : ''}
-     <table class="tb-table"><thead><tr><th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}</tr></thead><tbody>
-      ${ids.map(iid => { const it = o.items[iid]; const ap = it.approvedQty != null ? it.approvedQty : it.qty; return `<tr>
+     ${receiving ? `<div class="tb-recv-head">
+         <span>📥 Prijem: <strong>${prog.done}/${prog.total}</strong></span>
+         <div class="tb-recv-bar"><span style="width:${prog.total ? Math.round(prog.done / prog.total * 100) : 0}%"></span></div>
+       </div>` : ''}
+     <table class="tb-table"><thead><tr>${receiving ? '<th class="tb-recv-cb"></th>' : ''}<th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}${receiving ? '<th class="num">Primljeno</th>' : ''}</tr></thead><tbody>
+      ${ids.map(iid => { const it = o.items[iid]; const ap = it.approvedQty != null ? it.approvedQty : it.qty;
+        const rq = it.receivedQty != null ? it.receivedQty : (it.received ? ap : '');
+        return `<tr class="${receiving && it.received ? 'tb-recv-done' : ''} ${receiving && !ap ? 'tb-recv-zero' : ''}">
+        ${receiving ? `<td class="tb-recv-cb">${ap ? `<input type="checkbox" ${it.received ? 'checked' : ''} ${canReceive ? '' : 'disabled'} onchange="trebMarkReceived('${id}', '${iid}', this.checked)" aria-label="Primljeno">` : ''}</td>` : ''}
         <td>${escapeHtml(it.name)} <span class="tb-unit">${escapeHtml(it.unit || 'kom')}</span></td>
         <td class="num">${it.qty}</td>
         ${editable ? `<td class="num"><input type="number" min="0" inputmode="numeric" class="tb-approve-in" data-item="${iid}" value="${it.qty}" onfocus="this.select()"></td>` : showApproved ? `<td class="num ${ap !== it.qty ? 'changed' : ''}">${ap}</td>` : ''}
+        ${receiving ? `<td class="num">${!ap ? '—' : canReceive
+          ? `<input type="number" min="0" inputmode="numeric" class="tb-approve-in ${rq !== '' && rq < ap ? 'short' : ''}" value="${rq}" placeholder="${ap}" onfocus="this.select()" onchange="trebSetReceivedQty('${id}', '${iid}', this.value)">`
+          : `<span class="${rq !== '' && rq < ap ? 'tb-short' : ''}">${rq === '' ? '—' : rq}</span>`}</td>` : ''}
       </tr>`; }).join('')}
      </tbody></table>
+     ${receiving && prog.short.length ? `<div class="tb-note-box warn mt-2">⚠️ Primljeno manje: ${prog.short.map(x => escapeHtml(x)).join(', ')}</div>` : ''}
      ${editable ? `<div class="form-group mt-3" id="tb-reject-wrap" style="display:none;margin-bottom:0"><label for="tb-reject-reason">Razlog odbijanja</label><textarea id="tb-reject-reason" placeholder="npr. ima još na stanju" style="min-height:60px"></textarea></div>` : ''}
      <div class="tb-history">${hist.map(h => `<span>${(TREB_STATUS[h.status] || {}).label || h.status} ${trebDate(h.at)}${h.by ? ' · ' + escapeHtml(h.by) : ''}</span>`).join('')}</div>`,
     `<button class="btn btn-secondary" onclick="trebPrint('${id}')" title="Štampaj">🖨️</button>
@@ -7376,7 +7465,79 @@ function openTrebDetail(id) {
      ${mine && o.status === 'sent' && !admin ? `<button class="btn btn-danger" onclick="trebCancel('${id}')">Otkaži</button>` : ''}
      ${editable ? `<button class="btn btn-danger" onclick="trebReject('${id}')">Odbij</button>
                    <button class="btn btn-success" onclick="trebApprove('${id}')">Odobri</button>` : ''}
+     ${o.status === 'approved' && canReceive && prog.done < prog.total ? `<button class="btn btn-success" onclick="trebReceiveAll('${id}')">✅ Sve primljeno</button>` : ''}
      ${admin && o.status === 'approved' ? `<button class="btn btn-primary" onclick="trebSetStatus('${id}', 'delivered')">Isporučeno</button>` : ''}`);
+}
+
+/* ---------- Prijem (receipt checklist) ---------- */
+// Items with an approved quantity of 0 don't need receiving.
+function trebReceiveProgress(o) {
+  let total = 0, done = 0;
+  const short = [];
+  Object.values(o.items || {}).forEach(it => {
+    const ap = it.approvedQty != null ? it.approvedQty : it.qty;
+    if (!ap) return;
+    total++;
+    if (it.received) {
+      done++;
+      if (it.receivedQty != null && it.receivedQty < ap) short.push(`${it.name} (${it.receivedQty}/${ap})`);
+    }
+  });
+  return { total, done, short };
+}
+
+function trebMarkReceived(id, itemId, on) {
+  const o = extraGet('treb_orders')[id];
+  if (!o || !o.items || !o.items[itemId]) return;
+  const it = o.items[itemId];
+  const ap = it.approvedQty != null ? it.approvedQty : it.qty;
+  const updates = { [`treb_orders/${id}/items/${itemId}/received`]: on ? true : null };
+  if (on && it.receivedQty == null) updates[`treb_orders/${id}/items/${itemId}/receivedQty`] = ap;
+  if (!on) updates[`treb_orders/${id}/items/${itemId}/receivedQty`] = null;
+  trebSaveReceipt(id, updates);
+}
+
+function trebSetReceivedQty(id, itemId, val) {
+  const n = Math.max(0, Math.floor(Number(val) || 0));
+  trebSaveReceipt(id, {
+    [`treb_orders/${id}/items/${itemId}/receivedQty`]: val === '' ? null : n,
+    [`treb_orders/${id}/items/${itemId}/received`]: val === '' ? null : true
+  });
+}
+
+function trebReceiveAll(id) {
+  const o = extraGet('treb_orders')[id];
+  if (!o) return;
+  const updates = {};
+  Object.keys(o.items || {}).forEach(iid => {
+    const it = o.items[iid];
+    const ap = it.approvedQty != null ? it.approvedQty : it.qty;
+    if (!ap || it.received) return;
+    updates[`treb_orders/${id}/items/${iid}/received`] = true;
+    updates[`treb_orders/${id}/items/${iid}/receivedQty`] = ap;
+  });
+  trebSaveReceipt(id, updates);
+}
+
+// Saves checklist changes; once everything is ticked off an approved
+// requisition closes itself as delivered.
+function trebSaveReceipt(id, updates) {
+  const before = extraGet('treb_orders')[id];
+  const wasApproved = before && before.status === 'approved';
+  extraUpdate(updates);
+  const o = extraGet('treb_orders')[id];
+  const prog = trebReceiveProgress(o);
+  if (wasApproved && prog.total && prog.done === prog.total) {
+    const now = new Date().toISOString();
+    extraUpdate({
+      [`treb_orders/${id}/status`]: 'delivered',
+      [`treb_orders/${id}/receivedAt`]: now,
+      [`treb_orders/${id}/receivedBy`]: currentUser.name || '',
+      [`treb_orders/${id}/history/${newExtraId('h', 'treb_orders')}`]: { status: 'delivered', at: now, by: currentUser.name || '' }
+    });
+    toast(prog.short.length ? 'Sve označeno — trebovanje je zatvoreno (neki artikli su stigli u manjoj količini).' : 'Sve primljeno — trebovanje je zatvoreno.', 'success', 5000);
+  }
+  openTrebDetail(id);
 }
 
 function trebSetStatus(id, status, extra, quiet) {
@@ -7437,8 +7598,8 @@ function trebDelete(id) {
 }
 
 function trebPrintTable(o) {
-  return `<table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th></tr></thead><tbody>
-    ${Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td></tr>`).join('')}
+  return `<table><thead><tr><th>#</th><th>Artikal</th><th>Jed.</th><th>Traženo</th><th>Odobreno</th><th>Primljeno</th></tr></thead><tbody>
+    ${Object.values(o.items || {}).map((it, i) => `<tr><td class="num">${i + 1}</td><td>${escapeHtml(it.name)}</td><td>${escapeHtml(it.unit || 'kom')}</td><td class="num">${it.qty}</td><td class="num">${it.approvedQty != null ? it.approvedQty : ''}</td><td class="num">${it.receivedQty != null ? it.receivedQty : ''}</td></tr>`).join('')}
   </tbody></table>`;
 }
 
@@ -7461,10 +7622,10 @@ function trebExportCsv() {
   if (status) orders = orders.filter(o => o.status === status);
   if (trebListLab) orders = orders.filter(o => o.labId === trebListLab);
   const cell = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-  const lines = [['Datum', 'Laboratorija', 'Trebovao/la', 'Status', 'Artikal', 'Jedinica', 'Traženo', 'Odobreno'].map(cell).join(';')];
+  const lines = [['Datum', 'Laboratorija', 'Trebovao/la', 'Status', 'Artikal', 'Jedinica', 'Traženo', 'Odobreno', 'Primljeno'].map(cell).join(';')];
   orders.forEach(o => Object.values(o.items || {}).forEach(it => lines.push([
     trebDate(o.createdAt, false), o.labName, o.createdByName, (TREB_STATUS[o.status] || {}).label || o.status,
-    it.name, it.unit || 'kom', it.qty, it.approvedQty != null ? it.approvedQty : ''
+    it.name, it.unit || 'kom', it.qty, it.approvedQty != null ? it.approvedQty : '', it.receivedQty != null ? it.receivedQty : ''
   ].map(cell).join(';'))));
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
