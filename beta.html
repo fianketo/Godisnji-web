@@ -1682,6 +1682,41 @@ textarea { resize: vertical; min-height: 80px; }
 .hidden { display: none !important; }
 
 /* ---------- Trebovanje ---------- */
+.tb-viewbar { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; margin: -.25rem 0 .75rem; font-size: .75rem; color: var(--text3); }
+.tb-viewseg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.tb-viewseg button { border: none; background: var(--surface); color: var(--text2); font: inherit; font-size: .75rem; font-weight: 600; padding: .3rem .6rem; cursor: pointer; }
+.tb-viewseg button + button { border-left: 1px solid var(--border); }
+.tb-viewseg button.active { background: var(--primary); color: #fff; }
+
+.tb-lab-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .5rem; margin-bottom: .75rem; }
+.tb-lab-tile { border: 2px solid var(--border); background: var(--surface); color: var(--text); border-radius: 14px; padding: .875rem .5rem; font: inherit; font-weight: 800; font-size: .9375rem; cursor: pointer; border-top: 6px solid var(--lab-color); }
+.tb-lab-tile.active { border-color: var(--lab-color); background: var(--lab-color); color: #fff; }
+.tb-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+@media (min-width: 560px) { .tb-tiles { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .tb-tiles { grid-template-columns: repeat(4, 1fr); } }
+.tb-tile-group { grid-column: 1 / -1; font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); margin-top: .5rem; }
+.tb-tile { position: relative; display: flex; flex-direction: column; border: 1px solid var(--border); background: var(--surface); border-radius: 14px; overflow: hidden; min-height: 108px; }
+.tb-tile.on { border: 2px solid var(--primary); background: var(--primary-light); }
+.tb-tile-main { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding: .75rem; border: none; background: none; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.tb-tile-icon { font-size: 1.375rem; line-height: 1; }
+.tb-tile-name { font-weight: 700; font-size: .875rem; line-height: 1.3; }
+.tb-tile-qty { position: absolute; top: .5rem; right: .5rem; min-width: 30px; height: 30px; padding: 0 .4rem; border-radius: 99px; background: var(--primary); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.tb-tile-step { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--primary); }
+.tb-tile-step button { height: 36px; border: none; background: none; color: var(--primary); font-size: 1.125rem; font-weight: 700; cursor: pointer; }
+.tb-tile-step button + button { border-left: 1px solid var(--border); }
+.tb-tile-new { border-style: dashed; cursor: pointer; align-items: flex-start; justify-content: center; padding: .75rem; gap: .25rem; color: var(--primary); font: inherit; }
+
+.tb-form-card { padding: 0; overflow: hidden; }
+.tb-form { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tb-form th { position: sticky; top: 0; background: var(--surface2); text-align: left; font-size: .6875rem; text-transform: uppercase; letter-spacing: .4px; color: var(--text3); padding: .5rem .75rem; }
+.tb-form td { padding: .25rem .75rem; border-top: 1px solid var(--border); }
+.tb-form td label { display: block; padding: .5rem 0; cursor: pointer; }
+.tb-form tr.on td { background: var(--primary-light); font-weight: 700; }
+.tb-form-group td { background: var(--surface2); font-size: .6875rem; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--text3); padding: .5rem .75rem; }
+.tb-form-unit { width: 56px; color: var(--text3); font-size: .75rem; }
+.tb-form-qty { width: 92px; text-align: right; }
+.tb-form-in { width: 80px !important; text-align: right; font-weight: 800; padding: .375rem .5rem !important; }
+
 .tb-wrap { max-width: 720px; margin: 0 auto; padding-bottom: 6rem; }
 .tb-seg { display: grid; grid-auto-columns: 1fr; grid-auto-flow: column; gap: .25rem; padding: .25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 1rem; }
 .tb-seg-btn { position: relative; display: flex; flex-direction: column; align-items: center; gap: .125rem; padding: .5rem .25rem; border: none; border-radius: 10px; background: none; color: var(--text2); font-family: inherit; font-size: .8125rem; font-weight: 600; cursor: pointer; }
@@ -6923,6 +6958,28 @@ let trebListStatus = null; // null = default per role
 let trebListLab = '';
 let trebCart = null;      // { itemId: qty }
 
+// Three ways to fill a requisition (the owner is comparing them):
+// 'list' (rows with +/−), 'tiles' (tap tiles, POS-style), 'form' (one
+// table of number fields, like the lab's Excel sheet). Remembered per device.
+const TREB_VIEWS = [['list', '☰', 'Lista'], ['tiles', '▦', 'Pločice'], ['form', '▤', 'Formular']];
+function trebView() {
+  try { const v = localStorage.getItem('trebView'); if (TREB_VIEWS.some(x => x[0] === v)) return v; } catch (ex) { /* blocked */ }
+  return 'list';
+}
+function trebSetView(v) {
+  try { localStorage.setItem('trebView', v); } catch (ex) { /* blocked */ }
+  renderPage();
+}
+function trebCatIcon(cat) {
+  const c = (cat || '').toLowerCase();
+  if (/epruv|posud|bočic|bocic/.test(c)) return '🧪';
+  if (/igl|krv|vađ|vadj/.test(c)) return '💉';
+  if (/test|reag/.test(c)) return '🧫';
+  if (/zašt|zast|higij|ruk/.test(c)) return '🧤';
+  if (/kancel|ostal/.test(c)) return '📎';
+  return '📦';
+}
+
 function trebDraftKey() { return 'trebDraft_' + (currentUser ? currentUser.id : ''); }
 function trebLoadDraft() {
   if (trebCart) return;
@@ -7034,7 +7091,6 @@ function trebNewHtml() {
   if (q) items = items.filter(i => i.name.toLowerCase().includes(q));
   else if (activeCat === 'freq') { const byId = {}; items.forEach(i => { byId[i.id] = i; }); items = freq.map(id => byId[id]).filter(Boolean); }
   else if (activeCat !== 'all') items = items.filter(i => (i.category || 'Ostalo') === activeCat);
-  const count = trebCartCount();
   const last = trebLab && trebOrders().find(o => o.labId === trebLab);
 
   const chips = [
@@ -7043,46 +7099,124 @@ function trebNewHtml() {
     ...cats.map(c => [c, c])
   ].map(([id, label]) => `<button class="tb-chip ${activeCat === id ? 'active' : ''}" data-cat="${escapeHtml(id)}" onclick="trebCat = this.dataset.cat; trebQuery = ''; renderPage()">${escapeHtml(label)}</button>`).join('');
 
+  const view = trebView();
   let lastCat = null;
-  const rows = items.map(i => {
-    const qty = trebCart[i.id] || 0;
-    const showCat = activeCat === 'all' && !q && i.category !== lastCat;
+  const groupHead = i => {
+    const show = activeCat === 'all' && !q && i.category !== lastCat;
     lastCat = i.category;
-    return `${showCat ? `<div class="tb-group">${escapeHtml(i.category || 'Ostalo')}</div>` : ''}
-      <div class="tb-row ${qty ? 'on' : ''}">
-        <button class="tb-row-name" onclick="trebAdd('${i.id}', 1)">${escapeHtml(i.name)}<span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span></button>
-        ${qty ? `<div class="tb-qty">
-            <button onclick="trebAdd('${i.id}', -1)" aria-label="Manje">−</button>
-            <input type="number" min="0" inputmode="numeric" id="tbq-${i.id}" value="${qty}" onchange="trebSetQty('${i.id}', this.value)" onfocus="this.select()">
-            <button onclick="trebAdd('${i.id}', 1)" aria-label="Više">+</button>
-          </div>` : `<button class="tb-add" onclick="trebAdd('${i.id}', 1)" aria-label="Dodaj">+</button>`}
+    return show;
+  };
+  let itemsHtml;
+  if (view === 'tiles') {
+    const tiles = items.map(i => {
+      const qty = trebCart[i.id] || 0;
+      const head = groupHead(i) ? `<div class="tb-tile-group">${trebCatIcon(i.category)} ${escapeHtml(i.category || 'Ostalo')}</div>` : '';
+      return `${head}<div class="tb-tile ${qty ? 'on' : ''}">
+        <button class="tb-tile-main" onclick="trebAdd('${i.id}', 1)">
+          <span class="tb-tile-icon">${trebCatIcon(i.category)}</span>
+          <span class="tb-tile-name">${escapeHtml(i.name)}</span>
+          <span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span>
+          ${qty ? `<span class="tb-tile-qty">${qty}</span>` : ''}
+        </button>
+        ${qty ? `<div class="tb-tile-step"><button onclick="trebAdd('${i.id}', -1)" aria-label="Manje">−</button><button onclick="trebSetQtyPrompt('${i.id}')" aria-label="Upiši količinu">✎</button><button onclick="trebAdd('${i.id}', 1)" aria-label="Više">+</button></div>` : ''}
       </div>`;
-  }).join('');
+    }).join('');
+    itemsHtml = `<div class="tb-tiles">${tiles || `<div class="tb-empty">${q ? `Nema „${escapeHtml(trebQuery.trim())}” u katalogu.` : 'Nema artikala.'}</div>`}
+      <button class="tb-tile tb-tile-new" onclick="openTrebNewItem()"><span class="tb-tile-icon">➕</span><span class="tb-tile-name">${q ? `Dodaj „${escapeHtml(trebQuery.trim())}”` : 'Novi artikal'}</span></button>
+    </div>`;
+  } else if (view === 'form') {
+    const rows = items.map(i => {
+      const qty = trebCart[i.id] || 0;
+      const head = groupHead(i) ? `<tr class="tb-form-group"><td colspan="3">${trebCatIcon(i.category)} ${escapeHtml(i.category || 'Ostalo')}</td></tr>` : '';
+      return `${head}<tr class="${qty ? 'on' : ''}" id="tbr-${i.id}">
+        <td><label for="tbf-${i.id}">${escapeHtml(i.name)}</label></td>
+        <td class="tb-form-unit">${escapeHtml(i.unit || 'kom')}</td>
+        <td class="tb-form-qty"><input type="number" min="0" inputmode="numeric" class="tb-form-in" id="tbf-${i.id}" value="${qty || ''}" placeholder="0"
+          oninput="trebFormInput('${i.id}', this)" onkeydown="trebFormKey(event, this)" onfocus="this.select()"></td>
+      </tr>`;
+    }).join('');
+    itemsHtml = `<div class="card tb-form-card">
+      <table class="tb-form"><thead><tr><th>Artikal</th><th>Jed.</th><th class="tb-form-qty">Količina</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="3" class="tb-empty">${q ? `Nema „${escapeHtml(trebQuery.trim())}” u katalogu.` : 'Nema artikala.'}</td></tr>`}</tbody></table>
+      <button class="tb-row tb-row-new" onclick="openTrebNewItem()">➕ ${q ? `Dodaj „${escapeHtml(trebQuery.trim())}” kao novi artikal` : 'Artikal koji nije na listi'}</button>
+    </div>`;
+  } else {
+    const rows = items.map(i => {
+      const qty = trebCart[i.id] || 0;
+      return `${groupHead(i) ? `<div class="tb-group">${escapeHtml(i.category || 'Ostalo')}</div>` : ''}
+        <div class="tb-row ${qty ? 'on' : ''}">
+          <button class="tb-row-name" onclick="trebAdd('${i.id}', 1)">${escapeHtml(i.name)}<span class="tb-unit">${escapeHtml(i.unit || 'kom')}</span></button>
+          ${qty ? `<div class="tb-qty">
+              <button onclick="trebAdd('${i.id}', -1)" aria-label="Manje">−</button>
+              <input type="number" min="0" inputmode="numeric" id="tbq-${i.id}" value="${qty}" onchange="trebSetQty('${i.id}', this.value)" onfocus="this.select()">
+              <button onclick="trebAdd('${i.id}', 1)" aria-label="Više">+</button>
+            </div>` : `<button class="tb-add" onclick="trebAdd('${i.id}', 1)" aria-label="Dodaj">+</button>`}
+        </div>`;
+    }).join('');
+    itemsHtml = `<div class="card tb-rows">
+      ${rows || `<div class="tb-empty">${q ? `Nema „${escapeHtml(trebQuery.trim())}” u katalogu.` : 'Nema artikala.'}</div>`}
+      <button class="tb-row tb-row-new" onclick="openTrebNewItem()">➕ ${q ? `Dodaj „${escapeHtml(trebQuery.trim())}” kao novi artikal` : 'Artikal koji nije na listi'}</button>
+    </div>`;
+  }
 
-  return `
-    <div class="tb-head">
+  const labPicker = view === 'tiles' && labs.length
+    ? `<div class="tb-lab-tiles">${labs.map(l => `<button class="tb-lab-tile ${trebLab === l.id ? 'active' : ''}" style="--lab-color:${escapeHtml(l.color || 'var(--primary)')}" onclick="trebLab='${l.id}'; trebCat = null; trebSaveDraft(); renderPage()">${escapeHtml(l.name)}</button>`).join('')}</div>`
+    : `<div class="tb-head">
       <label class="tb-lab-label" for="tb-lab">Laboratorija</label>
       <select id="tb-lab" class="tb-lab-select ${trebLab ? '' : 'empty'}" onchange="trebLab = this.value || null; trebCat = null; trebSaveDraft(); renderPage()">
         <option value="">— izaberite —</option>
         ${labs.map(l => `<option value="${l.id}" ${trebLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
       </select>
-      ${last ? `<button class="tb-link" onclick="trebRepeatLast()">🔁 Ponovi poslednje (${trebDate(last.createdAt, false)})</button>` : ''}
+    </div>`;
+
+  return `
+    <div class="tb-viewbar">
+      <span>Izgled:</span>
+      <div class="tb-viewseg">${TREB_VIEWS.map(([id, icon, label]) => `<button class="${view === id ? 'active' : ''}" onclick="trebSetView('${id}')">${icon} ${label}</button>`).join('')}</div>
     </div>
+    ${labPicker}
+    ${last ? `<button class="tb-link" style="margin:-.25rem 0 .5rem" onclick="trebRepeatLast()">🔁 Ponovi poslednje (${trebDate(last.createdAt, false)})</button>` : ''}
     <div class="tb-search">
       <input type="text" id="tb-q" placeholder="🔍 Pretraga artikala" value="${escapeHtml(trebQuery)}" oninput="trebQuery = this.value; renderPage()" autocomplete="off">
     </div>
     <div class="tb-chips">${chips}</div>
-    <div class="card tb-rows">
-      ${rows || `<div class="tb-empty">${q ? `Nema „${escapeHtml(trebQuery.trim())}” u katalogu.` : 'Nema artikala.'}</div>`}
-      <button class="tb-row tb-row-new" onclick="openTrebNewItem()">➕ ${q ? `Dodaj „${escapeHtml(trebQuery.trim())}” kao novi artikal` : 'Artikal koji nije na listi'}</button>
-    </div>
-    <div class="tb-cartbar ${count ? '' : 'idle'}">
+    ${itemsHtml}
+    ${trebCartBarHtml()}`;
+}
+
+function trebCartBarHtml() {
+  const count = trebCartCount();
+  return `<div class="tb-cartbar ${count ? '' : 'idle'}" id="tb-cartbar">
       <button class="tb-cart-btn" onclick="openTrebCart()" ${count ? '' : 'disabled'}>
         <span class="tb-cart-n">${count}</span>
-        <span>${count ? `${count === 1 ? 'artikal' : 'artikala'}${trebLab ? ' · ' + escapeHtml(trebLabName(trebLab)) : ''}` : 'Dodajte artikle sa +'}</span>
+        <span>${count ? `${count === 1 ? 'artikal' : 'artikala'}${trebLab ? ' · ' + escapeHtml(trebLabName(trebLab)) : ''}` : 'Izaberite artikle'}</span>
       </button>
       <button class="btn btn-primary" onclick="openTrebCart()" ${count ? '' : 'disabled'}>Dalje →</button>
     </div>`;
+}
+
+// Formular view: typing a number updates the cart without re-rendering the
+// page, so the cursor stays put; Enter jumps to the next field.
+function trebFormInput(id, input) {
+  const n = Math.max(0, Math.floor(Number(input.value) || 0));
+  if (n) trebCart[id] = n; else delete trebCart[id];
+  trebSaveDraft();
+  const row = document.getElementById('tbr-' + id);
+  if (row) row.classList.toggle('on', !!n);
+  const bar = document.getElementById('tb-cartbar');
+  if (bar) bar.outerHTML = trebCartBarHtml();
+}
+function trebFormKey(e, input) {
+  if (e.key !== 'Enter' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+  e.preventDefault();
+  const all = [...document.querySelectorAll('.tb-form-in')];
+  const next = all[all.indexOf(input) + (e.key === 'ArrowUp' ? -1 : 1)];
+  if (next) next.focus();
+}
+function trebSetQtyPrompt(id) {
+  const it = extraGet('treb_items')[id];
+  const v = prompt(`Količina — ${it ? it.name : ''}:`, trebCart[id] || 1);
+  if (v != null) trebSetQty(id, v);
 }
 
 function trebAdd(id, delta) {
