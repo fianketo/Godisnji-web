@@ -51,6 +51,8 @@
   --transition: .2s ease;
   --glass-blur: none;
   --dropdown-surface: #ffffff;
+  --packed-bg: #dbeafe;
+  --packed-text: #1e3a8a;
   color-scheme: light;
 }
 
@@ -75,6 +77,8 @@
      unlike --surface, this needs to be solid, or headings behind it
      ghost through the glass effect. */
   --dropdown-surface: #131c30;
+  --packed-bg: rgba(96,165,250,.22);
+  --packed-text: #dbeafe;
   color-scheme: dark;
 }
 
@@ -1687,8 +1691,10 @@ textarea { resize: vertical; min-height: 80px; }
 .tb-recv-bar span { display: block; height: 100%; background: var(--success); border-radius: 99px; transition: width .2s; }
 .tb-recv-cb { width: 34px; }
 .tb-recv-cb input { width: 22px; height: 22px; accent-color: var(--success); cursor: pointer; }
-.tb-table tr.tb-recv-done td { color: var(--text3); }
-.tb-table tr.tb-recv-done td:nth-child(2) { text-decoration: line-through; }
+.tb-table tr.tb-recv-done td { background: var(--packed-bg); color: var(--packed-text); }
+.tb-table tr.tb-recv-done td:first-child { border-radius: 8px 0 0 8px; }
+.tb-table tr.tb-recv-done td:last-child { border-radius: 0 8px 8px 0; }
+.tb-table tr.tb-recv-done td:nth-child(2) { font-weight: 700; }
 .tb-table tr.tb-recv-zero td { color: var(--text3); }
 .tb-approve-in.short, .tb-short { color: var(--warning); }
 .tb-note-box.warn { border-color: var(--warning); color: var(--warning); background: var(--warning-light); }
