@@ -1686,6 +1686,26 @@ textarea { resize: vertical; min-height: 80px; }
 .hidden { display: none !important; }
 
 /* ---------- Trebovanje ---------- */
+.tb-mobile-sub { display: none; font-size: .75rem; color: var(--text2); font-weight: 400; }
+@media (max-width: 480px) {
+  .tb-table.tb-packing .tb-col-qty { display: none; }
+  .tb-table.tb-packing .tb-mobile-sub { display: block; }
+  .tb-table.tb-packing td, .tb-table.tb-packing th { padding-left: .25rem; padding-right: .25rem; }
+  .tb-table.tb-packing .tb-approve-in { width: 64px !important; }
+}
+
+/* Detail dialog: header and buttons stay put, only the list scrolls. */
+.tb-detail-ov .modal { display: flex; flex-direction: column; overflow: hidden; max-height: 92vh; max-height: 92dvh; }
+.tb-detail-ov .modal-header, .tb-detail-ov .modal-footer { flex-shrink: 0; }
+.tb-detail-ov .modal-body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; }
+.tb-detail-ov .modal-footer { flex-wrap: wrap; }
+@media (max-width: 480px) {
+  .tb-detail-ov .modal { max-height: calc(100vh - 8px); max-height: calc(100dvh - 8px); }
+  .tb-detail-ov .modal-header { padding: .875rem 1rem; }
+  .tb-detail-ov .modal-body { padding: .75rem 1rem 1rem; }
+  .tb-detail-ov .modal-footer { padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom, 0px)); }
+}
+
 .tb-recv-head { display: flex; align-items: center; gap: .75rem; margin-bottom: .5rem; font-size: .875rem; }
 .tb-recv-bar { flex: 1; height: 8px; border-radius: 99px; background: var(--border); overflow: hidden; }
 .tb-recv-bar span { display: block; height: 100%; background: var(--success); border-radius: 99px; transition: width .2s; }
@@ -1813,6 +1833,148 @@ textarea { resize: vertical; min-height: 80px; }
 .tb-edit { font-size: .8125rem; color: var(--text3); padding-right: .5rem; white-space: nowrap; }
 .tb-newbadge { font-size: .6875rem; font-weight: 700; color: var(--purple); background: var(--purple-light); padding: .0625rem .375rem; border-radius: 99px; }
 .tb-check { display: flex; align-items: center; gap: .5rem; font-size: .875rem; cursor: pointer; }
+
+/* Sideways swipes switch tabs (see SWIPE BETWEEN TABS) — keep the browser
+   from also treating them as back/forward navigation. */
+html, body { overscroll-behavior-x: none; }
+.swipe-in-left { animation: swipeInLeft .22s ease; }
+.swipe-in-right { animation: swipeInRight .22s ease; }
+@keyframes swipeInLeft { from { opacity: .4; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes swipeInRight { from { opacity: .4; transform: translateX(-40px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .swipe-in-left, .swipe-in-right { animation: none; } }
+
+/* ---------- BETA: Feed ---------- */
+.feed-wrap, .rs-wrap { max-width: 720px; margin: 0 auto; }
+.feed-composer { padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+.feed-composer-row { display: flex; gap: .75rem; align-items: flex-start; }
+.feed-composer textarea { flex: 1; min-height: 70px; }
+.feed-composer-actions { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; }
+.feed-img-preview { position: relative; margin-top: .75rem; display: inline-block; }
+.feed-img-preview img { max-height: 160px; max-width: 100%; border-radius: var(--radius-sm); display: block; }
+.feed-img-preview button {
+  position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer;
+}
+.feed-post { margin-bottom: 1rem; overflow: hidden; }
+.feed-post-head { display: flex; align-items: center; gap: .875rem; padding: 1.125rem 1.25rem .5rem; }
+.feed-post-author { font-size: 1.0625rem; font-weight: 600; line-height: 1.3; }
+.feed-post-time { font-size: .8125rem; color: var(--text2); }
+.feed-post-actions { margin-left: auto; display: flex; gap: .375rem; }
+.feed-post-tags { display: flex; gap: .375rem; padding: 0 1.25rem .375rem; }
+.feed-tag { font-size: .75rem; font-weight: 700; padding: .125rem .5rem; border-radius: 99px; background: var(--primary-light); color: var(--primary); }
+.feed-tag.important { background: var(--warning-light); color: var(--warning); }
+.feed-post.important { border-color: var(--warning); }
+.feed-admin-opts { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; margin-top: .75rem; font-size: .8125rem; color: var(--text2); }
+.feed-admin-opts label { display: inline-flex; align-items: center; gap: .375rem; cursor: pointer; }
+.feed-post-text { padding: .25rem 1.25rem .875rem; font-size: 1rem; line-height: 1.65; white-space: pre-wrap; word-wrap: break-word; }
+.feed-post-text a { color: var(--primary); }
+.feed-post-img { display: block; width: 100%; max-height: 520px; object-fit: cover; cursor: zoom-in; background: var(--surface2); }
+.feed-post-bar { display: flex; gap: .5rem; padding: .625rem 1.25rem; border-top: 1px solid var(--border); }
+.feed-react {
+  border: none; background: transparent; color: var(--text2); cursor: pointer;
+  font-size: .875rem; font-weight: 600; padding: .375rem .625rem; border-radius: var(--radius-sm);
+}
+.feed-react:hover { background: var(--surface2); color: var(--text); }
+.feed-react.liked { color: var(--danger); }
+.feed-comments { padding: .25rem 1.25rem 1rem; border-top: 1px solid var(--border); }
+.feed-comment { display: flex; gap: .625rem; margin-top: .75rem; }
+.feed-comment-bubble { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: .5rem .75rem; flex: 1; min-width: 0; }
+.feed-comment-name { font-size: .8125rem; font-weight: 700; }
+.feed-comment-text { font-size: .9rem; white-space: pre-wrap; word-wrap: break-word; }
+.feed-comment-meta { font-size: .75rem; color: var(--text3); margin-top: .125rem; }
+.feed-comment-meta button { border: none; background: none; color: var(--text3); cursor: pointer; font-size: .75rem; padding: 0; margin-left: .5rem; }
+.feed-comment-form { display: flex; gap: .5rem; margin-top: .75rem; }
+.feed-comment-form input { flex: 1; }
+.avatar-sm { width: 30px; height: 30px; font-size: .75rem; flex-shrink: 0; }
+.feed-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.9); z-index: 1100; display: flex; align-items: center; justify-content: center; padding: 1rem; cursor: zoom-out; }
+.feed-lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+
+.rs-day .rs-mark.warn { background: var(--danger); }
+.rs-shift-warn { background: var(--danger-light); }
+.rs-warn { font-size: .8125rem; font-weight: 700; color: var(--danger); }
+.ms-list { display: flex; flex-direction: column; }
+.ms-row { display: flex; align-items: center; gap: .875rem; padding: .625rem 1.25rem; border: none; border-top: 1px solid var(--border); background: none; color: var(--text); text-align: left; cursor: pointer; font-family: inherit; font-size: .875rem; }
+.ms-row:first-child { border-top: none; }
+.ms-row:hover { background: var(--surface2); }
+.ms-row.today { background: var(--primary-light); }
+.ms-day { width: 86px; flex-shrink: 0; display: flex; flex-direction: column; line-height: 1.25; }
+.ms-day-label { font-weight: 700; text-transform: capitalize; }
+.ms-date { font-size: .75rem; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ms-what { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.ms-shift { border-left: 3px solid var(--lab-color); padding-left: .5rem; }
+.ms-off { color: var(--text3); }
+
+/* ---------- BETA: Raspored po laboratorijama ---------- */
+.rs-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; flex-wrap: wrap; }
+.rs-mine-toggle {
+  display: inline-flex; align-items: center; gap: .5rem; border: none; background: none; cursor: pointer;
+  color: var(--primary); font-weight: 700; font-size: .8125rem; letter-spacing: .5px; text-transform: uppercase;
+}
+.rs-mine-toggle .dot { width: 18px; height: 18px; border-radius: 50%; border: 4px solid var(--primary); transition: all var(--transition); }
+.rs-mine-toggle.on .dot { background: var(--primary); box-shadow: inset 0 0 0 3px var(--surface); }
+.rs-month-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .25rem; }
+.rs-month { color: var(--success); font-weight: 800; letter-spacing: .5px; text-transform: uppercase; font-size: 1rem; }
+.rs-week-nav { display: flex; gap: .375rem; }
+.rs-week { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 2px solid var(--border); margin-bottom: 1.25rem; }
+.rs-day {
+  border: none; background: none; cursor: pointer; padding: .5rem 0 .625rem; color: var(--text2);
+  display: flex; flex-direction: column; align-items: center; position: relative; font-family: inherit;
+}
+.rs-day-name { font-size: .8125rem; font-weight: 600; }
+.rs-day-num { font-size: 1.25rem; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.rs-day.weekend { color: var(--text3); }
+.rs-day.today .rs-day-num { color: var(--primary); }
+.rs-day.active { color: var(--text); }
+.rs-day.active::after { content: ''; position: absolute; left: 18%; right: 18%; bottom: -2px; height: 4px; border-radius: 2px; background: var(--success); }
+.rs-day .rs-mark { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 3px; }
+.rs-day .rs-mark.empty { background: transparent; }
+.rs-tools { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.rs-lab { margin-bottom: 1rem; overflow: hidden; border-left: 5px solid var(--lab-color, var(--primary)); }
+.rs-lab-head { display: flex; align-items: center; gap: .625rem; padding: .875rem 1.125rem .5rem; }
+.rs-lab-name { font-size: 1.0625rem; font-weight: 700; }
+.rs-lab-count { margin-left: auto; font-size: .75rem; color: var(--text3); font-weight: 600; }
+.rs-shift { display: flex; gap: .875rem; padding: .625rem 1.125rem; border-top: 1px dashed var(--border); align-items: flex-start; }
+.rs-shift-label { width: 100px; flex-shrink: 0; }
+.rs-shift-name { font-weight: 700; font-size: .875rem; }
+.rs-shift-time { font-size: .72rem; color: var(--text2); white-space: nowrap; }
+.rs-people { display: flex; flex-wrap: wrap; gap: .375rem; flex: 1; min-height: 30px; align-items: center; }
+.rs-pill {
+  display: inline-flex; align-items: center; gap: .375rem; padding: .25rem .625rem .25rem .25rem;
+  border-radius: 99px; font-size: .8125rem; font-weight: 600; line-height: 1.3;
+}
+.rs-pill .avatar { width: 22px; height: 22px; font-size: .625rem; }
+.rs-pill.me { outline: 2px solid var(--primary); outline-offset: 1px; }
+.rs-pill.on-leave { opacity: .75; text-decoration: line-through; }
+.rs-pill-x { border: none; background: none; cursor: pointer; color: inherit; opacity: .6; font-size: .875rem; padding: 0 0 0 .125rem; }
+.rs-pill-x:hover { opacity: 1; }
+.rs-add { border: 1px dashed var(--border); background: none; color: var(--text2); border-radius: 99px; padding: .25rem .75rem; font-size: .8125rem; font-weight: 600; cursor: pointer; }
+.rs-add:hover { border-color: var(--primary); color: var(--primary); }
+.rs-empty-shift { font-size: .8125rem; color: var(--text3); }
+.rs-pick-list { max-height: 50vh; overflow-y: auto; margin-top: .75rem; }
+.rs-pick {
+  display: flex; align-items: center; gap: .75rem; padding: .5rem .25rem; border-bottom: 1px solid var(--border);
+  cursor: pointer; font-size: .9rem;
+}
+.rs-pick input { width: 18px; height: 18px; flex-shrink: 0; }
+.rs-pick-sub { font-size: .75rem; color: var(--text2); }
+.rs-pick-sub.warn { color: var(--warning); }
+.rs-time-cell { display: flex; align-items: center; gap: .25rem; min-width: 0; }
+.rs-time-cell label { display: inline-flex; align-items: center; gap: .125rem; font-size: .75rem; color: var(--text2); cursor: pointer; flex-shrink: 0; }
+.rs-time-cell input[type="text"] { min-width: 0; }
+.rs-time-cell.off input[type="text"] { opacity: .4; text-decoration: line-through; }
+.rs-lab-edit { display: flex; flex-direction: column; gap: .5rem; padding-bottom: .75rem; margin-bottom: .75rem; border-bottom: 1px solid var(--border); }
+.rs-lab-edit-top { display: flex; gap: .5rem; align-items: center; }
+.rs-lab-edit-top .rs-lab-name-in { flex: 1; min-width: 0; }
+.rs-lab-edit-times { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.rs-time-cell { flex-direction: column; align-items: stretch !important; }
+.rs-lab-edit input[type="color"] { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; padding: 2px; background: none; }
+.rs-lab-edit-head { font-size: .75rem; color: var(--text3); font-weight: 600; }
+@media (max-width: 600px) {
+  .rs-lab-edit-head { display: none; }
+  .rs-shift-label { width: 92px; }
+  .rs-shift { gap: .5rem; padding: .625rem .875rem; }
+  .rs-day-num { font-size: 1.125rem; }
+}
 </style>
 </head>
 <body>
@@ -6044,6 +6206,12 @@ function rerenderExtras() {
   if (!currentUser) return;
   renderSidebar();
   if (['feed', 'raspored', 'raspored-pregled', 'dashboard', 'trebovanje'].includes(currentPage)) renderPage();
+  // Keep an open requisition current — but not while an admin is typing
+  // quantities to approve, which a refresh would wipe.
+  if (trebDetailId && document.getElementById('tb-detail')) {
+    const o = extraGet('treb_orders')[trebDetailId];
+    if (!o || o.status !== 'sent' || !isAdmin()) openTrebDetail(trebDetailId);
+  }
 }
 
 const FEED_LIMIT = 100;
@@ -7443,9 +7611,32 @@ function trebListHtml() {
     </div>`;
 }
 
+// The detail dialog re-renders after every tick in the packing checklist;
+// update it in place (keeping scroll position and the focused field)
+// instead of closing and reopening it, which made it flash and jump to
+// the top.
+let trebDetailId = null;
+function trebShowDetail(id, title, body, footer) {
+  const ov = document.getElementById('tb-detail');
+  if (ov && trebDetailId === id) {
+    const modalBody = ov.querySelector('.modal-body');
+    const scroll = modalBody.scrollTop;
+    const focusedId = document.activeElement && ov.contains(document.activeElement) ? document.activeElement.id : null;
+    ov.querySelector('.modal-title').innerHTML = title;
+    modalBody.innerHTML = body;
+    const foot = ov.querySelector('.modal-footer');
+    if (foot) foot.innerHTML = footer;
+    modalBody.scrollTop = scroll;
+    if (focusedId) { const el = document.getElementById(focusedId); if (el) el.focus({ preventScroll: true }); }
+    return;
+  }
+  trebDetailId = id;
+  openExtraModal('tb-detail', title, body, footer).classList.add('tb-detail-ov');
+}
+
 function openTrebDetail(id) {
   const o = extraGet('treb_orders')[id];
-  if (!o) return;
+  if (!o) { closeExtraModal('tb-detail'); return; }
   const admin = isAdmin();
   const mine = o.createdByUserId === currentUser.id;
   const editable = admin && o.status === 'sent';
@@ -7455,7 +7646,7 @@ function openTrebDetail(id) {
   const packing = showApproved;
   const canPack = packing && trebCanSeeAll();
   const prog = trebPackProgress(o);
-  openExtraModal('tb-detail', `${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
+  trebShowDetail(id, `${escapeHtml(o.labName || '')} ${trebStatusPill(o.status)}`,
     `<div class="tb-detail-meta">${escapeHtml(o.createdByName || '')} · ${trebDate(o.createdAt)}</div>
      ${o.note ? `<div class="tb-note-box">📝 ${escapeHtml(o.note)}</div>` : ''}
      ${o.rejectReason ? `<div class="tb-note-box danger">Razlog odbijanja: ${escapeHtml(o.rejectReason)}</div>` : ''}
@@ -7463,16 +7654,17 @@ function openTrebDetail(id) {
          <span>📦 Spakovano: <strong>${prog.done}/${prog.total}</strong></span>
          <div class="tb-recv-bar"><span style="width:${prog.total ? Math.round(prog.done / prog.total * 100) : 0}%"></span></div>
        </div>` : ''}
-     <table class="tb-table"><thead><tr>${packing ? '<th class="tb-recv-cb"></th>' : ''}<th>Artikal</th><th class="num">Traženo</th>${editable || showApproved ? `<th class="num">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}${packing ? '<th class="num">Spakovano</th>' : ''}</tr></thead><tbody>
+     <table class="tb-table ${packing ? 'tb-packing' : ''}"><thead><tr>${packing ? '<th class="tb-recv-cb"></th>' : ''}<th>Artikal</th><th class="num tb-col-qty">Traženo</th>${editable || showApproved ? `<th class="num tb-col-qty">${editable ? 'Odobravam' : 'Odobreno'}</th>` : ''}${packing ? '<th class="num">Spakovano</th>' : ''}</tr></thead><tbody>
       ${ids.map(iid => { const it = o.items[iid]; const ap = it.approvedQty != null ? it.approvedQty : it.qty;
         const rq = it.packedQty != null ? it.packedQty : (it.packed ? ap : '');
         return `<tr class="${packing && it.packed ? 'tb-recv-done' : ''} ${packing && !ap ? 'tb-recv-zero' : ''}">
-        ${packing ? `<td class="tb-recv-cb">${ap ? `<input type="checkbox" ${it.packed ? 'checked' : ''} ${canPack ? '' : 'disabled'} onchange="trebMarkPacked('${id}', '${iid}', this.checked)" aria-label="Spakovano">` : ''}</td>` : ''}
-        <td>${escapeHtml(it.name)} <span class="tb-unit">${escapeHtml(it.unit || 'kom')}</span></td>
-        <td class="num">${it.qty}</td>
-        ${editable ? `<td class="num"><input type="number" min="0" inputmode="numeric" class="tb-approve-in" data-item="${iid}" value="${it.qty}" onfocus="this.select()"></td>` : showApproved ? `<td class="num ${ap !== it.qty ? 'changed' : ''}">${ap}</td>` : ''}
+        ${packing ? `<td class="tb-recv-cb">${ap ? `<input type="checkbox" id="tbc-${iid}" ${it.packed ? 'checked' : ''} ${canPack ? '' : 'disabled'} onchange="trebMarkPacked('${id}', '${iid}', this.checked)" aria-label="Spakovano">` : ''}</td>` : ''}
+        <td>${escapeHtml(it.name)} <span class="tb-unit">${escapeHtml(it.unit || 'kom')}</span>
+          ${packing ? `<span class="tb-mobile-sub">odobreno <strong>${ap}</strong>${ap !== it.qty ? ` · traženo ${it.qty}` : ''}</span>` : ''}</td>
+        <td class="num tb-col-qty">${it.qty}</td>
+        ${editable ? `<td class="num"><input type="number" min="0" inputmode="numeric" class="tb-approve-in" data-item="${iid}" value="${it.qty}" onfocus="this.select()"></td>` : showApproved ? `<td class="num tb-col-qty ${ap !== it.qty ? 'changed' : ''}">${ap}</td>` : ''}
         ${packing ? `<td class="num">${!ap ? '—' : canPack
-          ? `<input type="number" min="0" inputmode="numeric" class="tb-approve-in ${rq !== '' && rq < ap ? 'short' : ''}" value="${rq}" placeholder="${ap}" onfocus="this.select()" onchange="trebSetPackedQty('${id}', '${iid}', this.value)">`
+          ? `<input type="number" min="0" inputmode="numeric" id="tbp-${iid}" class="tb-approve-in ${rq !== '' && rq < ap ? 'short' : ''}" value="${rq}" placeholder="${ap}" onfocus="this.select()" onchange="trebSetPackedQty('${id}', '${iid}', this.value)">`
           : `<span class="${rq !== '' && rq < ap ? 'tb-short' : ''}">${rq === '' ? '—' : rq}</span>`}</td>` : ''}
       </tr>`; }).join('')}
      </tbody></table>
