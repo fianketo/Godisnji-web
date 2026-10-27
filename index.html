@@ -1726,6 +1726,7 @@ textarea { resize: vertical; min-height: 80px; }
 .tb-lab-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .5rem; margin-bottom: .75rem; }
 .tb-lab-tile { border: 2px solid var(--border); background: var(--surface); color: var(--text); border-radius: 14px; padding: .875rem .5rem; font: inherit; font-weight: 800; font-size: .9375rem; cursor: pointer; border-top: 6px solid var(--lab-color); }
 .tb-lab-tile.active { border-color: var(--lab-color); background: var(--lab-color); color: #fff; }
+.tb-lab-add { border-style: dashed; border-top-width: 2px; color: var(--primary); font-weight: 700; }
 .tb-tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; }
 @media (min-width: 560px) { .tb-tiles { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 900px) { .tb-tiles { grid-template-columns: repeat(4, 1fr); } }
@@ -7332,15 +7333,9 @@ function trebNewHtml() {
     </div>`;
   }
 
-  const labPicker = labs.length
-    ? `<div class="tb-lab-tiles">${labs.map(l => `<button class="tb-lab-tile ${trebLab === l.id ? 'active' : ''}" style="--lab-color:${escapeHtml(l.color || 'var(--primary)')}" onclick="trebLab='${l.id}'; trebCat = null; trebSaveDraft(); renderPage()">${escapeHtml(l.name)}</button>`).join('')}</div>`
-    : `<div class="tb-head">
-      <label class="tb-lab-label" for="tb-lab">Laboratorija</label>
-      <select id="tb-lab" class="tb-lab-select ${trebLab ? '' : 'empty'}" onchange="trebLab = this.value || null; trebCat = null; trebSaveDraft(); renderPage()">
-        <option value="">— izaberite —</option>
-        ${labs.map(l => `<option value="${l.id}" ${trebLab === l.id ? 'selected' : ''}>${escapeHtml(l.name)}</option>`).join('')}
-      </select>
-    </div>`;
+  const labPicker = `<div class="tb-lab-tiles">${labs.map(l => `<button class="tb-lab-tile ${trebLab === l.id ? 'active' : ''}" style="--lab-color:${escapeHtml(l.color || 'var(--primary)')}" onclick="trebLab='${l.id}'; trebCat = null; trebSaveDraft(); renderPage()">${escapeHtml(l.name)}</button>`).join('')}
+    ${isAdmin() ? `<button class="tb-lab-tile tb-lab-add" onclick="trebAddLab()" title="Dodaj ili izmeni laboratorije">➕ Laboratorija</button>` : ''}
+    ${!labs.length && !isAdmin() ? '<span class="text-sm text-muted">Još nema laboratorija — admin ih dodaje.</span>' : ''}</div>`;
 
   return `
     ${labPicker}
@@ -7351,6 +7346,16 @@ function trebNewHtml() {
     <div class="tb-chips" id="tb-cat-chips" onscroll="trebChipsScroll = this.scrollLeft">${chips}</div>
     ${itemsHtml}
     ${trebCartBarHtml()}`;
+}
+
+// Admin shortcut from Trebovanje to the shared lab editor (same labs as
+// Raspored), opened with a fresh empty row ready for the new name.
+function trebAddLab() {
+  openLabsManager();
+  const last = labsDraft[labsDraft.length - 1];
+  if (last && last.name.trim()) { labsDraft.push(blankLab(labsDraft.length)); renderLabsDraft(); }
+  const inputs = document.querySelectorAll('#rs-labs .rs-lab-name-in');
+  if (inputs.length) inputs[inputs.length - 1].focus();
 }
 
 function trebCartBarHtml() {
