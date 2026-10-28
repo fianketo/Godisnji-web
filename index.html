@@ -2423,16 +2423,36 @@ function emailErrorText(err) {
   return err.message || String(err);
 }
 
+// EmailJS (free plan) accepts about one email per second and rejects the
+// rest with 429 "Too Many Requests" — so firing a batch at once (an
+// important Feed post to everyone, a week's schedule) lost all but the
+// first. Every send goes through this queue instead: one at a time, spaced
+// out, with a couple of retries if EmailJS still says "too many".
+const EMAIL_GAP_MS = 1200;
+let emailQueue = Promise.resolve();
+let emailQueueLength = 0;
+const emailSleep = ms => new Promise(r => setTimeout(r, ms));
+
 function sendEmailRaw(toEmail, toName, subject, message) {
   if (typeof emailjs === 'undefined') {
     return Promise.reject(new Error('EmailJS biblioteka nije učitana (proverite internet ili blokator reklama).'));
   }
-  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-    to_email: toEmail,
-    to_name: toName,
-    subject,
-    message
-  });
+  const params = { to_email: toEmail, to_name: toName, subject, message };
+  const attempt = async () => {
+    for (let tryNo = 0; ; tryNo++) {
+      try {
+        return await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, params);
+      } catch (err) {
+        if (err && err.status === 429 && tryNo < 3) { await emailSleep(3000 * (tryNo + 1)); continue; }
+        throw err;
+      }
+    }
+  };
+  emailQueueLength++;
+  const result = emailQueue.then(attempt);
+  // The next email waits for this one (success or not) plus the gap.
+  emailQueue = result.catch(() => {}).then(() => emailSleep(EMAIL_GAP_MS)).then(() => { emailQueueLength--; });
+  return result;
 }
 
 function sendLeaveEmail(emp, subject, message) {
@@ -6875,6 +6895,8 @@ function notifyManyEmployees(items, subject, withEmail) {
     toast('Niko od njih nema email adresu — poslato je samo obaveštenje u aplikaciji.', 'info', 5000);
     return;
   }
+  const secs = Math.ceil((withAddr.length + emailQueueLength) * EMAIL_GAP_MS / 1000);
+  if (withAddr.length > 1) toast(`✉️ Šaljem ${withAddr.length} mejlova, jedan po jedan (oko ${secs} s) — ne zatvarajte aplikaciju dok ne stigne potvrda.`, 'info', 8000);
   Promise.allSettled(withAddr.map(({ emp, message }) => sendEmailRaw(emp.email, emp.name, subject, message)))
     .then(results => {
       const ok = results.filter(r => r.status === 'fulfilled').length;
