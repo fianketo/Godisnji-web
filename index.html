@@ -7,12 +7,15 @@
 
 <!-- PWA: lets phones show a real app icon/name when someone taps
      "Add to Home Screen", instead of a generic browser bookmark. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <!-- iOS Safari doesn't rasterize SVG for the home-screen icon, so this
      needs an actual PNG (icon.svg alone silently produces no icon). -->
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#06b6d4">
+<meta name="theme-color" content="#070B16">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1976,6 +1979,168 @@ html, body { overscroll-behavior-x: none; }
   .rs-shift { gap: .5rem; padding: .625rem .875rem; }
   .rs-day-num { font-size: 1.125rem; }
 }
+
+/* ================================================================
+   GLASS THEME — the redesign layer (direction „A · Staklo”, dark
+   first). It only re-skins: palette tokens plus a handful of shared
+   component overrides, so every page keeps its markup and behaviour.
+   Light theme gets frosted white glass on a pale blue ground.
+   ================================================================ */
+:root {
+  --bg: #EDF2F8;
+  --surface: rgba(255,255,255,.72);
+  --surface2: rgba(255,255,255,.9);
+  --border: rgba(15,23,42,.08);
+  --text: #0F1B2D;
+  --text2: #4F5D73;
+  --text3: #74819A;
+  --primary: #0891B2;
+  --primary-dark: #0E7490;
+  --primary-light: rgba(8,145,178,.12);
+  --on-primary: #FFFFFF;
+  --accent2: #7C3AED;
+  --radius: 22px;
+  --radius-sm: 14px;
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.06);
+  --shadow-lg: 0 18px 48px rgba(15,23,42,.16);
+  --glass-blur: blur(18px) saturate(1.3);
+  --dropdown-surface: #FFFFFF;
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --glow-1: rgba(8,145,178,.18);
+  --glow-2: rgba(124,58,237,.12);
+  --nav-bg: rgba(255,255,255,.78);
+  --nav-border: rgba(15,23,42,.08);
+  --nav-icon: #5B6B84;
+  --packed-bg: rgba(8,145,178,.14);
+  --packed-text: #0B4F63;
+}
+[data-theme="dark"] {
+  --bg: #070B16;
+  --surface: rgba(255,255,255,.055);
+  --surface2: rgba(255,255,255,.085);
+  --border: rgba(255,255,255,.10);
+  --text: #E6EDF7;
+  --text2: #A3B1C6;
+  --text3: #74829A;
+  --primary: #22D3EE;
+  --primary-dark: #06B6D4;
+  --primary-light: rgba(34,211,238,.14);
+  --on-primary: #06121F;
+  --accent2: #A78BFA;
+  --shadow: none;
+  --shadow-lg: 0 24px 60px rgba(0,0,0,.55);
+  --dropdown-surface: #121A2C;
+  --glow-1: rgba(34,211,238,.16);
+  --glow-2: rgba(139,92,246,.14);
+  --nav-bg: rgba(18,26,44,.72);
+  --nav-border: rgba(255,255,255,.12);
+  --nav-icon: #94A3B8;
+  --packed-bg: rgba(34,211,238,.16);
+  --packed-text: #CFFAFE;
+}
+
+/* Ground: deep navy with two soft glows that stay put while scrolling */
+body, [data-theme="dark"] body { background: var(--bg); }
+.main, [data-theme="dark"] .main { background: transparent; }
+#app::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(520px 420px at 8% -6%, var(--glow-1), transparent 70%),
+    radial-gradient(480px 420px at 100% 38%, var(--glow-2), transparent 70%);
+}
+
+/* Type: Space Grotesk for headings and big numbers */
+.page-title, .card-title, .header-title, .modal-title, .stat-value, .sidebar-brand-text,
+.empty-state-title, .rs-lab-name, .rs-day-num, .rs-month, .feed-post-author, .tb-cart-n,
+.ms-day-label, .tb-tile-name, .tb-lab-tile { font-family: var(--font-display); }
+.page-title { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.6px; }
+.card-title { font-weight: 700; letter-spacing: -0.2px; }
+
+/* Frosted glass surfaces with a hairline border */
+.card, .stat-card, .modal {
+  border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+}
+.modal { background: var(--dropdown-surface); }
+.card-header { border-bottom-color: var(--border); }
+.stat-card::before { display: none; }
+.stat-card.blue, .stat-card.green, .stat-card.yellow, .stat-card.purple, .stat-card.red { background: var(--surface); }
+.stat-card:hover { transform: none; box-shadow: var(--shadow); }
+.stats-grid { gap: .75rem; }
+.stat-card { padding: 1.25rem; display: flex; flex-direction: column; }
+.stat-icon { width: 40px; height: 40px; border-radius: 14px; margin-bottom: 1rem; color: var(--text2); background: var(--surface2) !important; border: 1px solid var(--border); }
+.stat-icon svg { width: 20px; height: 20px; }
+.stat-value { font-size: 2.6rem; font-weight: 700; letter-spacing: -1.2px; line-height: 1; margin-bottom: .375rem; }
+/* The first tile of a stats row glows in the accent */
+.stats-grid > .stat-card:first-child { background: var(--primary-light); border-color: color-mix(in srgb, var(--primary) 45%, transparent); }
+.stats-grid > .stat-card:first-child .stat-value { color: var(--primary); }
+.stats-grid > .stat-card:first-child .stat-icon { background: var(--primary) !important; color: var(--on-primary); border-color: transparent; }
+.stat-card.yellow .stat-value { color: var(--warning); }
+
+/* Buttons and fields */
+.btn { border-radius: var(--radius-sm); font-weight: 700; }
+.btn-primary { background: var(--primary); color: var(--on-primary); box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 30%, transparent); }
+.btn-primary:hover { background: var(--primary-dark); transform: none; }
+.btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+.btn-secondary:hover { background: var(--surface2); color: var(--text); }
+input[type="text"], input[type="email"], input[type="number"], input[type="date"], input[type="password"], select, textarea {
+  border-radius: var(--radius-sm); background: var(--surface); border-color: var(--border);
+}
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+/* Filled-accent bits get dark text on bright cyan */
+.cal-day.today .cal-day-num, .year-btn.current-year, .tb-tile-qty, .tb-seg-btn.active, .tb-cart-n { color: var(--on-primary); }
+.tb-seg-btn.active { box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 30%, transparent); }
+.tb-seg { background: var(--surface); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+
+/* Header: transparent glass over the glow */
+.header { background: color-mix(in srgb, var(--bg) 70%, transparent); border-bottom-color: var(--border); }
+.header-title { font-size: 1.125rem; }
+
+/* Sidebar */
+.sidebar { background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-right-color: var(--border); }
+.sidebar-brand-icon { background: linear-gradient(135deg, var(--primary), var(--accent2)); border-radius: 12px; }
+.sidebar-brand-text { background: none; -webkit-text-fill-color: currentColor; color: var(--text); font-weight: 700; }
+.nav-btn { border-radius: var(--radius-sm); font-weight: 600; }
+.nav-btn.active { background: var(--primary-light); color: var(--primary); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 35%, transparent); }
+.nav-btn .nav-icon, .bottom-nav-btn .bn-icon { display: inline-flex; align-items: center; justify-content: center; }
+.nav-btn .nav-icon svg { width: 19px; height: 19px; }
+
+/* Floating frosted tab bar on phones: icons only, active = accent tile */
+@media (max-width: 768px) {
+  .bottom-nav {
+    left: 14px; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    height: 68px; border-radius: 24px; padding: 8px; gap: 4px; align-items: center; justify-content: space-around;
+    background: var(--nav-bg); border: 1px solid var(--nav-border); box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(20px) saturate(1.4); -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+  .bottom-nav-btn { flex: 0 0 52px; width: 52px; height: 52px; min-height: 52px; padding: 0; border-radius: 18px; color: var(--nav-icon); background: transparent; }
+  .bottom-nav-btn .bn-icon svg { width: 22px; height: 22px; }
+  .bottom-nav-btn .bn-label { display: none; }
+  .bottom-nav-btn.active { background: var(--primary); color: var(--on-primary); box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 40%, transparent); }
+  .bottom-nav-btn .bn-badge { top: 4px; right: 4px; border: 2px solid var(--bg); }
+  .main { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)) !important; }
+  .tb-cartbar { bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Header icon buttons */
+.header-actions .btn-sm { min-width: 40px; justify-content: center; }
+.header-actions svg { flex-shrink: 0; }
+@media (max-width: 768px) {
+  .header-actions .btn-label { display: none; }
+  .header-actions .btn-sm { padding-left: 0; padding-right: 0; width: 42px; }
+  /* Bento grid: two tiles per row, the accent tile spans the row */
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .625rem; }
+  .stats-grid > .stat-card:first-child { grid-column: 1 / -1; }
+  /* With the accent tile on its own row, an even total leaves the last tile alone: let it span too. */
+  .stats-grid > .stat-card:first-child:nth-last-child(even) ~ .stat-card:last-child { grid-column: 1 / -1; }
+  .stat-card { padding: 1rem; }
+  .stat-icon { width: 36px; height: 36px; margin-bottom: .75rem; }
+  .stat-value { font-size: 2.25rem; }
+  .stats-grid > .stat-card:first-child .stat-value { font-size: 3rem; }
+  .stat-label { font-size: .75rem; line-height: 1.3; }
+  .page-title { font-size: 1.625rem; }
+}
 </style>
 </head>
 <body>
@@ -2093,11 +2258,11 @@ html, body { overscroll-behavior-x: none; }
     <div class="header-title" id="header-title">Dashboard</div>
     <div class="header-actions">
       <button class="btn btn-secondary btn-sm" id="cmd-palette-btn" title="Pretraga (Ctrl+K)">
-        🔍 <span class="btn-label">Pretraga</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg> <span class="btn-label">Pretraga</span>
       </button>
       <div class="notif-wrap">
-        <button class="btn btn-secondary btn-sm notif-bell" id="notif-bell-btn" title="Obaveštenja">
-          🔔
+        <button class="btn btn-secondary btn-sm notif-bell" id="notif-bell-btn" title="Obaveštenja" aria-label="Obaveštenja">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         </button>
         <span class="notif-badge hidden" id="notif-badge">0</span>
         <div class="notif-dropdown hidden" id="notif-dropdown">
@@ -2106,7 +2271,7 @@ html, body { overscroll-behavior-x: none; }
         </div>
       </div>
       <button class="btn btn-secondary btn-sm" id="theme-toggle">🌙</button>
-      <button class="btn btn-secondary btn-sm" id="logout-btn">Odjava</button>
+      <button class="btn btn-secondary btn-sm" id="logout-btn" title="Odjava" aria-label="Odjava"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span class="btn-label">Odjava</span></button>
     </div>
   </header>
 
@@ -3303,6 +3468,49 @@ function pendingCount() {
   return getEmployees().reduce((sum, e) => sum + (e.leave_requests || []).filter(r => r.status === 'pending').length, 0);
 }
 
+/* ================================================================
+   ICONS — line icons instead of emoji (Bento redesign)
+   ================================================================ */
+const ICON_PATHS = {
+  home: '<path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  feed: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  calendar: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  box: '<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  clipboard: '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6M9 16h4"/>',
+  archive: '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
+  chart: '<path d="M3 3v18h18"/><path d="M7 16v-4M12 16V8M17 16v-7"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h10"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  plusSquare: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>',
+  thermo: '<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/>'
+};
+function svgIcon(name, size = 20) {
+  const p = ICON_PATHS[name];
+  return p ? `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>` : '';
+}
+const NAV_ICON = {
+  'dashboard': 'home', 'feed': 'feed', 'raspored': 'calendar', 'trebovanje': 'box', 'employees': 'users',
+  'add-employee': 'userPlus', 'requests': 'clipboard', 'history': 'archive', 'reports': 'chart',
+  'settings': 'settings', 'help': 'help', 'my-calendar': 'calendar', 'my-request': 'edit', 'my-profile': 'user'
+};
+function navIcon(item) { return NAV_ICON[item.id] ? svgIcon(NAV_ICON[item.id]) : item.icon; }
+// Dashboard stat tiles are written with emoji; swap them for line icons.
+const STAT_EMOJI_ICON = { '👥': 'users', '⏳': 'clock', '✅': 'check', '🏖️': 'sun', '🩹': 'plusSquare', '🤒': 'thermo', '📅': 'calendar', '🗓️': 'calendar' };
+function swapStatIcons(root) {
+  root.querySelectorAll('.stat-icon').forEach(el => {
+    const name = STAT_EMOJI_ICON[el.textContent.trim()];
+    if (name) el.innerHTML = svgIcon(name);
+  });
+}
+
 function renderSidebar() {
   const nav = document.getElementById('sidebar-nav');
   const items = navItemsFor(currentUser);
@@ -3320,7 +3528,7 @@ function renderSidebar() {
       ? `<span class="badge-count">${pending}</span>`
       : feedUnread > 0 ? `<span class="badge-count">${feedUnread}</span>` : '';
     html += `<button class="nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}">
-      <span class="nav-icon">${item.icon}</span>
+      <span class="nav-icon">${navIcon(item)}</span>
       ${item.label}
       ${badge}
     </button>`;
@@ -3361,16 +3569,16 @@ function renderBottomNav() {
     const feedUnread = item.feedBadge ? feedUnreadCount() : item.trebBadge ? trebPendingCount() : 0;
     const badge = item.badge && pending > 0 ? `<span class="bn-badge">${pending}</span>`
       : feedUnread > 0 ? `<span class="bn-badge">${feedUnread}</span>` : '';
-    return `<button class="bottom-nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}">
-      <span class="bn-icon">${item.icon}</span>
-      ${item.label}
+    return `<button class="bottom-nav-btn ${isActive ? 'active' : ''}" data-page="${item.id}" aria-label="${item.label}">
+      <span class="bn-icon">${navIcon(item)}</span>
+      <span class="bn-label">${item.label}</span>
       ${badge}
     </button>`;
   }).join('');
 
-  html += `<button class="bottom-nav-btn" id="bottom-nav-more">
-    <span class="bn-icon">☰</span>
-    Meni
+  html += `<button class="bottom-nav-btn" id="bottom-nav-more" aria-label="Meni">
+    <span class="bn-icon">${svgIcon('menu')}</span>
+    <span class="bn-label">Meni</span>
   </button>`;
 
   bn.innerHTML = html;
@@ -3582,10 +3790,19 @@ document.addEventListener('touchcancel', () => { swipeStart = null; });
 /* ================================================================
    THEME
    ================================================================ */
+// Sun in dark mode (switch to light), moon in light mode.
+function setThemeToggleIcon(theme) {
+  const btn = document.getElementById('theme-toggle');
+  btn.setAttribute('aria-label', theme === 'dark' ? 'Svetla tema' : 'Tamna tema');
+  btn.innerHTML = theme === 'dark'
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+}
+
 function initTheme() {
   const saved = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', saved);
-  document.getElementById('theme-toggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+  setThemeToggleIcon(saved);
 }
 
 document.getElementById('theme-toggle').addEventListener('click', () => {
@@ -3593,7 +3810,7 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
   const next = current === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
-  document.getElementById('theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+  setThemeToggleIcon(next);
 });
 
 /* ================================================================
@@ -3645,6 +3862,7 @@ function renderPage() {
     default: renderDashboard();
   }
   applyRipple();
+  swapStatIcons(main);
   restoreFocusInMain();
 }
 
@@ -3666,7 +3884,7 @@ function renderDashboard() {
     main.innerHTML = `
       <div class="page-header">
         <div>
-          <div class="page-title">Dobrodošli, ${currentUser.name.split(' ')[0]}! 👋</div>
+          <div class="page-title">Dobrodošli, ${currentUser.name.split(' ')[0]}!</div>
           <div class="page-subtitle">${formatDate(new Date())} · Pregled sistema</div>
         </div>
       </div>
@@ -3726,7 +3944,7 @@ function renderDashboard() {
     main.innerHTML = `
       <div class="page-header">
         <div>
-          <div class="page-title">Dobrodošli, ${emp.name.split(' ')[0]}! 👋</div>
+          <div class="page-title">Dobrodošli, ${emp.name.split(' ')[0]}!</div>
           <div class="page-subtitle">${formatDate(new Date())} · Vaš odmor</div>
         </div>
       </div>
@@ -6153,7 +6371,7 @@ document.addEventListener('keydown', e => {
    HELPERS
    ================================================================ */
 function formatDate(d) {
-  return d.toLocaleDateString('sr-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return d.toLocaleDateString('sr-Latn-RS', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function statusSr(s) {
