@@ -1907,6 +1907,9 @@ html, body { overscroll-behavior-x: none; }
 .ms-what { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
 .ms-shift { border-left: 3px solid var(--lab-color); padding-left: .5rem; }
 .ms-off { color: var(--text3); }
+.ms-leave { font-weight: 700; color: var(--warning); }
+.ms-leave.pending { font-weight: 600; }
+.ms-shift-maybe { opacity: .6; }
 
 /* ---------- BETA: Raspored po laboratorijama ---------- */
 .rs-top { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .75rem; flex-wrap: wrap; }
@@ -2759,8 +2762,18 @@ let cmdResults = [];
 /* ================================================================
    DATA HELPERS
    ================================================================ */
+// Firebase hands nested lists back as objects when their indexes have gaps
+// ({"0": …, "2": …}); every caller expects arrays, so normalize on read.
+const EMP_LIST_FIELDS = ['leave_history', 'leave_requests', 'notifications'];
+function normalizeEmpLists(e) {
+  EMP_LIST_FIELDS.forEach(k => {
+    if (e[k] && !Array.isArray(e[k]) && typeof e[k] === 'object') e[k] = Object.values(e[k]).filter(Boolean);
+  });
+  return e;
+}
+
 function getEmployees() {
-  return JSON.parse(localStorage.getItem('employees') || '[]').filter(e => e && e.name);
+  return JSON.parse(localStorage.getItem('employees') || '[]').filter(e => e && e.name).map(normalizeEmpLists);
 }
 
 function saveEmployees(arr) {
@@ -6817,10 +6830,18 @@ function shiftEmpIds(dateStr, labId, shiftId) {
   return Object.keys(lab[shiftId] || {}).filter(id => SAFE_ID.test(id));
 }
 
-function approvedLeaveOn(emp, dateStr) {
-  const covers = r => r.status === 'approved' && r.startDate <= dateStr && (r.ongoing || r.endDate >= dateStr);
-  return (emp.leave_history || []).find(covers) || (emp.leave_requests || []).find(covers) || null;
+// Leave lists can come back from the database as objects instead of arrays
+// (Firebase does that when indexes have gaps), so read them either way.
+function leaveList(v) { return Array.isArray(v) ? v : (v && typeof v === 'object' ? Object.values(v) : []); }
+
+function leaveOnWithStatus(emp, dateStr, statuses) {
+  if (!emp) return null;
+  const covers = r => r && statuses.includes(r.status) && r.startDate && r.startDate <= dateStr && (r.ongoing || !r.endDate || r.endDate >= dateStr);
+  return leaveList(emp.leave_history).find(covers) || leaveList(emp.leave_requests).find(covers) || null;
 }
+function approvedLeaveOn(emp, dateStr) { return leaveOnWithStatus(emp, dateStr, ['approved']); }
+// A requested (not yet approved) absence — shown, but doesn't count as away yet.
+function pendingLeaveOn(emp, dateStr) { return leaveOnWithStatus(emp, dateStr, ['pending']); }
 
 function isMeScheduledOn(dateStr) {
   const myEmp = currentUser.employeeId;
@@ -6891,9 +6912,10 @@ function renderRaspored() {
         const emp = empById[id];
         const c = personColor(emp.name);
         const leave = approvedLeaveOn(emp, sel);
+        const pending = !leave && pendingLeaveOn(emp, sel);
         return `<span class="rs-pill ${id === myEmp ? 'me' : ''} ${leave ? 'on-leave' : ''}" style="background:${c.bg};color:${c.text}"
-            title="${escapeHtml(emp.name)}${leave ? ' — na odsustvu: ' + escapeHtml(leave.leaveType) : ''}">
-          ${makeAvatar(emp.name)}${escapeHtml(emp.name)}${leave ? ' 🌴' : ''}
+            title="${escapeHtml(emp.name)}${leave ? ' — na odsustvu: ' + escapeHtml(leave.leaveType) : pending ? ' — traži odsustvo (na čekanju): ' + escapeHtml(pending.leaveType) : ''}">
+          ${makeAvatar(emp.name)}${escapeHtml(emp.name)}${leave ? ' 🌴' : pending ? ' ⏳' : ''}
           ${admin ? `<button class="rs-pill-x" onclick="rsUnassign('${lab.id}','${s.id}','${id}')" title="Ukloni iz smene">✕</button>` : ''}
         </span>`;
       }).join('');
@@ -7045,20 +7067,22 @@ function renderShiftPickerList() {
     .filter(e => !q || e.name.toLowerCase().includes(q))
     .map(e => {
       const leave = approvedLeaveOn(e, date);
+      const pendingLeave = !leave && pendingLeaveOn(e, date);
       const elsewhere = [];
       labs.forEach(l => labShifts(l).forEach(s => {
         if ((l.id !== labId || s.id !== shiftId) && day[l.id] && day[l.id][s.id] && day[l.id][s.id][e.id]) elsewhere.push(`${l.name}, ${s.label}`);
       }));
-      return { e, leave, elsewhere, checked: assigned.has(e.id) };
+      return { e, leave, pendingLeave, elsewhere, checked: assigned.has(e.id) };
     })
     .sort((a, b) => (b.checked - a.checked) || (!!a.leave - !!b.leave) || a.e.name.localeCompare(b.e.name));
-  box.innerHTML = rows.length ? rows.map(({ e, leave, elsewhere, checked }) => `
+  box.innerHTML = rows.length ? rows.map(({ e, leave, pendingLeave, elsewhere, checked }) => `
     <label class="rs-pick">
       <input type="checkbox" ${checked ? 'checked' : ''} onchange="rsToggleAssign('${e.id}', this.checked)">
       ${makeAvatar(e.name, 'avatar-sm')}
       <div>
         <div>${escapeHtml(e.name)}</div>
         ${leave ? `<div class="rs-pick-sub warn">🌴 Na odsustvu: ${escapeHtml(leave.leaveType)}</div>` : ''}
+        ${pendingLeave ? `<div class="rs-pick-sub warn">⏳ Traži odsustvo (na čekanju): ${escapeHtml(pendingLeave.leaveType)}</div>` : ''}
         ${elsewhere.length ? `<div class="rs-pick-sub warn">${checked ? '⚠️ Takođe u' : '↪️ Biće premešten/a iz'}: ${escapeHtml(elsewhere.join('; '))}</div>` : ''}
         ${!leave && !elsewhere.length && e.department ? `<div class="rs-pick-sub">${escapeHtml(e.department)}</div>` : ''}
       </div>
@@ -7147,10 +7171,13 @@ function myShiftsCardHtml() {
     const label = i === 0 ? 'Danas' : i === 1 ? 'Sutra' : DAYS_FULL_SR[dd.getDay()];
     const shifts = myShiftsOn(d);
     const leave = emp ? approvedLeaveOn(emp, d) : null;
+    const pending = !leave && emp ? pendingLeaveOn(emp, d) : null;
+    const shiftHtml = shifts.map(({ lab, shift }) =>
+      `<span class="ms-shift ${pending ? 'ms-shift-maybe' : ''}" style="--lab-color:${escapeHtml(lab.color || 'var(--primary)')}"><strong>${escapeHtml(lab.name)}</strong> · ${shift.label} · ${escapeHtml(lab[shift.timeKey] || shift.defaultTime)}</span>`).join('');
     let what;
-    if (leave) what = `<span class="ms-off">🌴 ${escapeHtml(leave.leaveType)}</span>`;
-    else if (shifts.length) what = shifts.map(({ lab, shift }) =>
-      `<span class="ms-shift" style="--lab-color:${escapeHtml(lab.color || 'var(--primary)')}"><strong>${escapeHtml(lab.name)}</strong> · ${shift.label} · ${escapeHtml(lab[shift.timeKey] || shift.defaultTime)}</span>`).join('');
+    if (leave) what = `<span class="ms-leave">🌴 ${escapeHtml(leave.leaveType)}</span>`;
+    else if (pending) what = `<span class="ms-leave pending">⏳ ${escapeHtml(pending.leaveType)} · zahtev na čekanju</span>${shiftHtml}`;
+    else if (shifts.length) what = shiftHtml;
     else what = '<span class="ms-off">Nije raspoređeno</span>';
     return `<button class="ms-row ${i === 0 ? 'today' : ''}" onclick="rasporedDate='${d}'; navigateTo('raspored')">
       <span class="ms-day"><span class="ms-day-label">${label}</span><span class="ms-date">${dd.getDate()}.${dd.getMonth() + 1}.</span></span>
