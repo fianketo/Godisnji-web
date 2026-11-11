@@ -2144,6 +2144,19 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
   .stat-label { font-size: .75rem; line-height: 1.3; }
   .page-title { font-size: 1.625rem; }
 }
+
+.feed-seen { margin-left: auto; }
+.feed-seen-row { display: flex; align-items: center; gap: .625rem; padding: .5rem .25rem; border-bottom: 1px solid var(--border); font-size: .9rem; }
+.feed-seen-row.muted { color: var(--text2); }
+.feed-seen-time { margin-left: auto; font-size: .75rem; color: var(--text3); font-variant-numeric: tabular-nums; }
+.email-log { display: flex; flex-direction: column; gap: .5rem; }
+.email-log-row { border: 1px solid var(--border); border-radius: 12px; padding: .625rem .75rem; background: var(--surface); }
+.email-log-row.failed { border-color: color-mix(in srgb, var(--danger) 50%, transparent); }
+.email-log-top { display: flex; justify-content: space-between; gap: .5rem; font-size: .9rem; }
+.email-log-status { font-size: .75rem; font-weight: 700; white-space: nowrap; }
+.email-log-sub { font-size: .75rem; color: var(--text3); }
+.email-log-subject { font-size: .8125rem; color: var(--text2); margin-top: .125rem; }
+.email-log-err { font-size: .75rem; color: var(--danger); margin-top: .125rem; }
 </style>
 </head>
 <body>
@@ -2618,9 +2631,63 @@ function sendEmailRaw(toEmail, toName, subject, message) {
   };
   emailQueueLength++;
   const result = emailQueue.then(attempt);
+  result.then(() => logEmail(params, true), err => logEmail(params, false, emailErrorText(err)));
   // The next email waits for this one (success or not) plus the gap.
   emailQueue = result.catch(() => {}).then(() => emailSleep(EMAIL_GAP_MS)).then(() => { emailQueueLength--; });
   return result;
+}
+
+// Email history for admins (Podešavanja → Istorija mejlova). EmailJS can't
+// report whether a message was opened, so this records what was sent and
+// whether EmailJS accepted it.
+function logEmail(params, ok, error) {
+  try {
+    const entry = {
+      at: new Date().toISOString(),
+      to: params.to_email || '', toName: params.to_name || '',
+      subject: params.subject || '',
+      preview: String(params.message || '').slice(0, 160),
+      ok: !!ok,
+      by: (currentUser && currentUser.name) || ''
+    };
+    if (error) entry.error = String(error).slice(0, 200);
+    const id = newExtraId('m', 'email_log');
+    if (firebaseDB) firebaseDB.ref('email_log/' + id).set(entry).catch(err => console.error('email_log:', err));
+    else extraApplyLocal('email_log/' + id, entry);
+  } catch (ex) { console.error('email_log:', ex); }
+}
+
+async function openEmailLog() {
+  let log = {};
+  try {
+    log = firebaseDB
+      ? ((await firebaseDB.ref('email_log').orderByKey().limitToLast(150).once('value')).val() || {})
+      : extraGet('email_log');
+  } catch (ex) { toast('Istorija mejlova nije dostupna: ' + (ex.message || ex), 'error'); return; }
+  const rows = Object.values(log).filter(e => e && e.at).sort((a, b) => b.at.localeCompare(a.at));
+  const sent = rows.filter(r => r.ok).length;
+  openExtraModal('email-log', '📬 Istorija mejlova',
+    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Poslednjih ${rows.length} mejlova · uspešno poslato ${sent}${rows.length - sent ? `, neuspešno ${rows.length - sent}` : ''}. „Poslato” znači da je EmailJS primio i prosledio mejl; da li ga je primalac otvorio ne može da se zna.</p>
+     ${rows.length ? `<div class="email-log">${rows.map(r => `
+       <div class="email-log-row ${r.ok ? '' : 'failed'}">
+         <div class="email-log-top">
+           <strong>${escapeHtml(r.toName || r.to)}</strong>
+           <span class="email-log-status">${r.ok ? '✅ Poslato' : '❌ Nije poslato'}</span>
+         </div>
+         <div class="email-log-sub">${escapeHtml(r.to)} · ${new Date(r.at).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}${r.by ? ' · poslao/la ' + escapeHtml(r.by) : ''}</div>
+         <div class="email-log-subject">${escapeHtml(r.subject)}</div>
+         ${r.error ? `<div class="email-log-err">${escapeHtml(r.error)}</div>` : ''}
+       </div>`).join('')}</div>` : '<div class="tb-empty">Još nema poslatih mejlova.</div>'}`,
+    `${rows.length ? '<button class="btn btn-secondary" onclick="clearEmailLog()">🗑️ Obriši istoriju</button>' : ''}
+     <button class="btn btn-primary" onclick="closeExtraModal(\'email-log\')">Zatvori</button>`);
+}
+
+function clearEmailLog() {
+  if (!confirm('Obrisati celu istoriju mejlova?')) return;
+  if (firebaseDB) firebaseDB.ref('email_log').remove().catch(err => toast('Brisanje nije uspelo: ' + err.message, 'error'));
+  else extraApplyLocal('email_log', null);
+  closeExtraModal('email-log');
+  toast('Istorija mejlova je obrisana.', 'success');
 }
 
 function sendLeaveEmail(emp, subject, message) {
@@ -3110,12 +3177,20 @@ const DATABASE_RULES = (() => {
         }
       },
       treb_settings: adminWrite,
+      // Every sent email is logged (who, when, subject, delivered or not);
+      // anyone sending may add an entry, only admins read or clear it.
+      email_log: {
+        '.read': `${signedIn} && ${admin}`,
+        '.write': `${signedIn} && ${admin}`,
+        '$logId': { '.write': `${signedIn} && !data.exists() && newData.child('at').exists()` }
+      },
       feed: {
         '.read': signedIn,
         '.write': `${signedIn} && ${admin}`,
         '$postId': {
           '.write': `${signedIn} && ((!data.exists() && newData.child('authorUserId').val() === ${me}) || (data.exists() && data.child('authorUserId').val() === ${me}))`,
           likes: { '$userId': { '.write': `${signedIn} && $userId === ${me}` } },
+          seenBy: { '$userId': { '.write': `${signedIn} && $userId === ${me}` } },
           comments: { '$commentId': { '.write': `${signedIn} && ((!data.exists() && newData.child('authorUserId').val() === ${me}) || (data.exists() && data.child('authorUserId').val() === ${me}))` } }
         }
       }
@@ -5406,7 +5481,8 @@ function renderSettings() {
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podešavanja</div></div>
     <div class="card" style="margin-bottom:1.5rem">
-      <div class="card-header"><div class="card-title">✉️ Probni mejl</div></div>
+      <div class="card-header"><div class="card-title">✉️ Probni mejl</div>
+        <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="openEmailLog()">📬 Istorija mejlova</button></div>
       <div class="card-body">
         <p class="text-sm text-muted" style="margin-bottom:.75rem">Pošaljite probni mejl da proverite da li slanje radi. Ako ne radi, ovde će pisati tačna greška.</p>
         <div style="display:flex;gap:.5rem;flex-wrap:wrap">
@@ -6635,6 +6711,7 @@ function renderFeed() {
         <div class="feed-post-bar">
           <button class="feed-react ${liked ? 'liked' : ''}" onclick="toggleFeedLike('${p.id}')">${liked ? '❤️' : '🤍'} ${likeCount || ''} Sviđa mi se</button>
           <button class="feed-react" onclick="toggleFeedComments('${p.id}')">💬 ${comments.length || ''} Komentari</button>
+          ${isAdmin() || p.authorUserId === me.id ? (() => { const st = feedSeenStats(p); return `<button class="feed-react feed-seen" onclick="openFeedSeen('${p.id}')" title="Ko je video objavu">👁 ${st.seen.length}/${st.total}</button>`; })() : ''}
         </div>
         ${commentsHtml}
       </article>`;
@@ -6676,6 +6753,45 @@ function renderFeed() {
     </div>`;
 
   if (markFeedSeen()) renderSidebar();
+  recordFeedViews(posts);
+}
+
+// „Ko je video”: opening the Feed marks every loaded post as seen by you.
+function recordFeedViews(posts) {
+  if (!currentUser) return;
+  const now = new Date().toISOString();
+  const updates = {};
+  posts.forEach(p => {
+    if (p.authorUserId === currentUser.id) return;
+    if (p.seenBy && p.seenBy[currentUser.id]) return;
+    updates[`feed/${p.id}/seenBy/${currentUser.id}`] = now;
+  });
+  if (!Object.keys(updates).length) return;
+  // Applied quietly (no re-render) — the realtime listener catches up.
+  Object.keys(updates).forEach(path => extraApplyLocal(path, updates[path]));
+  if (firebaseDB) firebaseDB.ref().update(updates).catch(err => console.error('seenBy:', err));
+}
+
+function feedSeenStats(p) {
+  const users = getUsers().filter(u => u && u.id && u.id !== p.authorUserId);
+  const seenBy = p.seenBy || {};
+  const seen = users.filter(u => seenBy[u.id]).sort((a, b) => String(seenBy[a.id]).localeCompare(String(seenBy[b.id])));
+  const notSeen = users.filter(u => !seenBy[u.id]).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  return { seen, notSeen, seenBy, total: users.length };
+}
+
+function openFeedSeen(id) {
+  const post = extraGet('feed')[id];
+  if (!post) return;
+  const { seen, notSeen, seenBy, total } = feedSeenStats(Object.assign({}, post, { id }));
+  const when = iso => new Date(iso).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+  openExtraModal('feed-seen', `👁 Videlo ${seen.length} od ${total}`,
+    `<div class="tb-group" style="border-radius:10px">Videli (${seen.length})</div>
+     ${seen.length ? seen.map(u => `<div class="feed-seen-row">${makeAvatar(u.name || '?', 'avatar-sm')}<span>${escapeHtml(u.name || '')}</span><span class="feed-seen-time">${when(seenBy[u.id])}</span></div>`).join('') : '<div class="tb-empty">Još niko.</div>'}
+     <div class="tb-group" style="border-radius:10px;margin-top:.75rem">Nisu videli (${notSeen.length})</div>
+     ${notSeen.length ? notSeen.map(u => `<div class="feed-seen-row muted">${makeAvatar(u.name || '?', 'avatar-sm')}<span>${escapeHtml(u.name || '')}</span></div>`).join('') : '<div class="tb-empty">Svi su videli. 🎉</div>'}
+     <p class="text-xs text-muted mt-2">Objava se računa kao viđena kad osoba otvori Feed u aplikaciji.</p>`,
+    `<button class="btn btn-primary" onclick="closeExtraModal('feed-seen')">Zatvori</button>`);
 }
 
 async function pickFeedImage(input) {
