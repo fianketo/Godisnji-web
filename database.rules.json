@@ -31,12 +31,66 @@
       ".read": "auth != null",
       ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'"
     },
+    "treb_items": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      "$itemId": {
+        ".write": "auth != null && !data.exists() && newData.child('createdByUserId').val() === root.child('roles').child(auth.uid).child('userId').val()"
+      }
+    },
+    "treb_orders": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      "$orderId": {
+        ".write": "auth != null && ((!data.exists() && newData.child('createdByUserId').val() === root.child('roles').child(auth.uid).child('userId').val() && newData.child('status').val() === 'sent') || (data.exists() && !newData.exists() && data.child('createdByUserId').val() === root.child('roles').child(auth.uid).child('userId').val() && data.child('status').val() === 'sent'))",
+        "status": {
+          ".write": "auth != null && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && data.val() === 'approved' && newData.val() === 'delivered'"
+        },
+        "history": {
+          "$hId": {
+            ".write": "auth != null && !data.exists() && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && (root.child('treb_orders').child($orderId).child('status').val() === 'approved' || root.child('treb_orders').child($orderId).child('status').val() === 'delivered')"
+          }
+        },
+        "packedAt": {
+          ".write": "auth != null && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && (root.child('treb_orders').child($orderId).child('status').val() === 'approved' || root.child('treb_orders').child($orderId).child('status').val() === 'delivered')"
+        },
+        "packedBy": {
+          ".write": "auth != null && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && (root.child('treb_orders').child($orderId).child('status').val() === 'approved' || root.child('treb_orders').child($orderId).child('status').val() === 'delivered')"
+        },
+        "items": {
+          "$itemId": {
+            "packed": {
+              ".write": "auth != null && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && (root.child('treb_orders').child($orderId).child('status').val() === 'approved' || root.child('treb_orders').child($orderId).child('status').val() === 'delivered')"
+            },
+            "packedQty": {
+              ".write": "auth != null && root.child('treb_settings').child('notifyMode').val() === 'custom' && root.child('treb_settings').child('notifyUserIds').child(root.child('roles').child(auth.uid).child('userId').val()).val() === true && (root.child('treb_orders').child($orderId).child('status').val() === 'approved' || root.child('treb_orders').child($orderId).child('status').val() === 'delivered')"
+            }
+          }
+        }
+      }
+    },
+    "treb_settings": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'"
+    },
+    "email_log": {
+      ".read": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
+      "$logId": {
+        ".write": "auth != null && !data.exists() && newData.child('at').exists()"
+      }
+    },
     "feed": {
       ".read": "auth != null",
       ".write": "auth != null && root.child('roles').child(auth.uid).child('role').val() === 'admin'",
       "$postId": {
         ".write": "auth != null && ((!data.exists() && newData.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()) || (data.exists() && data.child('authorUserId').val() === root.child('roles').child(auth.uid).child('userId').val()))",
         "likes": {
+          "$userId": {
+            ".write": "auth != null && $userId === root.child('roles').child(auth.uid).child('userId').val()"
+          }
+        },
+        "seenBy": {
           "$userId": {
             ".write": "auth != null && $userId === root.child('roles').child(auth.uid).child('userId').val()"
           }
