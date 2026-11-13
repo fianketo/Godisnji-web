@@ -2157,6 +2157,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .email-log-sub { font-size: .75rem; color: var(--text3); }
 .email-log-subject { font-size: .8125rem; color: var(--text2); margin-top: .125rem; }
 .email-log-err { font-size: .75rem; color: var(--danger); margin-top: .125rem; }
+
+.year-summary { display: flex; flex-direction: column; gap: .2rem; padding: .75rem 1rem; margin-bottom: 1rem; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); font-size: .8125rem; color: var(--text2); }
+.year-summary strong { color: var(--text); font-size: .875rem; }
 </style>
 </head>
 <body>
@@ -3677,6 +3680,7 @@ function renderBottomNav() {
 }
 
 function navigateTo(page) {
+  if (page !== currentPage) historyYear = null;
   currentPage = page;
   // Reset the shared calendar viewport on every real navigation, so
   // browsing forward/back on one page's calendar doesn't leave every
@@ -4198,6 +4202,55 @@ function effectiveFreeDaysRemaining(emp) { return freeDaysRemaining(emp) - reser
 //     ali konfigurisani broj dana (freeDaysAllowance) ostaje isti.
 // The `while` loop handles employees who haven't opened the app in more
 // than one calendar year (catches up multiple years at once, one at a time).
+const NEW_YEAR_ANNUAL_DAYS = 20;
+
+function yearSummary(emp, y) {
+  return emp && emp.year_summaries ? emp.year_summaries['y' + y] || null : null;
+}
+// A year is "closed" once the New Year rollover archived it — its
+// entries are kept read-only so the archived balance stays true.
+function isClosedLeaveEntry(emp, r) {
+  return !!(r && r.startDate && yearSummary(emp, new Date(r.startDate).getFullYear()));
+}
+
+// ---- History by year ----
+let historyYear = null; // null = current year
+function selectedHistoryYear() { return historyYear || new Date().getFullYear(); }
+function leaveEntryYears(r) {
+  const s = new Date(r.startDate).getFullYear();
+  const e = r.ongoing ? new Date().getFullYear() : new Date(r.endDate || r.startDate).getFullYear();
+  const out = [];
+  if (!isNaN(s)) for (let y = s; y <= (isNaN(e) ? s : e); y++) out.push(y);
+  return out;
+}
+function entryInYear(r, y) { return leaveEntryYears(r).includes(y); }
+function historyYearsFor(entries, emps) {
+  const set = new Set([new Date().getFullYear()]);
+  entries.forEach(r => leaveEntryYears(r).forEach(y => set.add(y)));
+  (emps || []).forEach(e => Object.values(e.year_summaries || {}).forEach(ys => ys && ys.year && set.add(ys.year)));
+  return [...set].sort((a, b) => b - a);
+}
+function historyYearChips(years) {
+  const sel = selectedHistoryYear();
+  if (years.length < 2) return '';
+  return `<div class="flex gap-2" style="flex-wrap:wrap;margin-bottom:1rem">${years.map(y =>
+    `<button class="year-btn ${y === sel ? 'current-year' : ''}" onclick="historyYear=${y};renderPage()">${y}${y === new Date().getFullYear() ? '' : ' 🔒'}</button>`).join('')}</div>`;
+}
+function carriedOverNote(emp) {
+  const y = new Date().getFullYear();
+  if (!emp.carriedOver || emp.lastRolloverYear !== y) return '';
+  return `<div class="text-xs text-muted" style="margin-top:.15rem">od toga ${emp.carriedOver} preneto iz ${y - 1}. + ${Math.max((emp.annualLeave || 0) - emp.carriedOver, 0)} za ${y}.</div>`;
+}
+function yearSummaryHtml(emp, y) {
+  const ys = yearSummary(emp, y);
+  if (!ys) return '';
+  return `<div class="year-summary">
+    <strong>🔒 ${y}. je zatvorena</strong>
+    <span>Godišnji: imao/la ${ys.annualLeave}, iskorišćeno ${ys.usedLeave}, <b>preneto u ${y + 1}: ${ys.carriedOver}</b></span>
+    <span>Slobodni dani: ${ys.usedFreeDays} / ${ys.freeDaysAllowance} (ne prenose se)</span>
+  </div>`;
+}
+
 function applyYearRollover() {
   const year = new Date().getFullYear();
   const emps = getEmployees();
@@ -4211,14 +4264,39 @@ function applyYearRollover() {
       return;
     }
     while (emp.lastRolloverYear < year) {
+      const closing = emp.lastRolloverYear;
+      // Leave that started in the closing year belongs to it, even if its
+      // deduction hadn't been applied yet (e.g. 29.12–2.1., or nobody opened
+      // the app over the holidays). Settle it now so a December free day
+      // isn't charged against next year's fresh free days.
+      (emp.leave_history || []).forEach(r => {
+        if (r.status !== 'approved' || r.ongoing || r.daysApplied !== false) return;
+        if (new Date(r.startDate).getFullYear() > closing) return;
+        emp.usedLeave = (emp.usedLeave || 0) + (r.annualDaysUsed || 0);
+        emp.usedFreeDays = (emp.usedFreeDays || 0) + (r.freeDaysUsed || 0);
+        r.daysApplied = true;
+      });
       const remainingAnnual = Math.max(0, (emp.annualLeave || 0) - (emp.usedLeave || 0));
-      emp.annualLeave = remainingAnnual + 20;
+      // Keep the closing year's balance so its history stays readable.
+      emp.year_summaries = emp.year_summaries || {};
+      emp.year_summaries['y' + closing] = {
+        year: closing,
+        annualLeave: emp.annualLeave || 0,
+        usedLeave: emp.usedLeave || 0,
+        carriedOver: remainingAnnual,
+        freeDaysAllowance: freeDaysAllowance(emp),
+        usedFreeDays: emp.usedFreeDays || 0,
+        closedAt: new Date().toISOString()
+      };
+      emp.annualLeave = remainingAnnual + NEW_YEAR_ANNUAL_DAYS;
+      emp.carriedOver = remainingAnnual;
       emp.usedLeave = 0;
       // Only the used-count resets — freeDaysAllowance is a per-employee
       // configured limit (admins can set it above/below the default 3),
       // not a per-year counter, so it must survive rollover unchanged.
       emp.usedFreeDays = 0;
       emp.lastRolloverYear++;
+      addNotification(emp, `Srećna Nova ${emp.lastRolloverYear}. godina! 🎉 Godišnji odmor: ${remainingAnnual} dan(a) preneto iz ${closing}. + ${NEW_YEAR_ANNUAL_DAYS} novih = ${emp.annualLeave}. Slobodni dani su ponovo ${freeDaysAllowance(emp)}.`);
       changed = true;
     }
   });
@@ -4568,7 +4646,10 @@ function renderEmployeeDetail(id) {
   if (!emp) { main.innerHTML = '<p>Radnik nije pronađen.</p>'; return; }
   const remaining = (emp.annualLeave||20) - (emp.usedLeave||0);
   const effAnnual = effectiveAnnualRemaining(emp);
-  const allHistory = [...(emp.leave_history||[]), ...(emp.leave_requests||[])].sort((a,b) => new Date(b.startDate)-new Date(a.startDate));
+  const allEntries = [...(emp.leave_history||[]), ...(emp.leave_requests||[])];
+  const histYears = historyYearsFor(allEntries, [emp]);
+  const selYear = selectedHistoryYear();
+  const allHistory = allEntries.filter(r => entryInYear(r, selYear)).sort((a,b) => new Date(b.startDate)-new Date(a.startDate));
 
   const ringBlue = progressRing(emp.usedLeave||0, emp.annualLeave||20, '#3b82f6', 64);
   const ringGreen = progressRing(remaining, emp.annualLeave||20, '#22c55e', 64);
@@ -4588,12 +4669,13 @@ function renderEmployeeDetail(id) {
         ${r.note ? ' · ' + r.note : ''}
         ${r.enteredByAdmin ? ' · <span class="text-xs text-muted">upisao admin</span>' : ''}
         ${r.ongoing ? `<button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openCloseSickModal('${emp.id}','${r.id}')">🩹 Zatvori</button>` : ''}
-        ${!r.ongoing && r.status !== 'pending' ? `
+        ${!r.ongoing && r.status !== 'pending' && isClosedLeaveEntry(emp, r) ? ' · <span class="text-xs text-muted">🔒 zatvorena godina</span>' : ''}
+        ${!r.ongoing && r.status !== 'pending' && !isClosedLeaveEntry(emp, r) ? `
           <button class="btn btn-secondary btn-sm" style="margin-left:.5rem" onclick="openEditHistoryModal('${emp.id}','${r.id}')">✏️ Izmeni</button>
           <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${r.id}')">🗑️</button>` : ''}
       </div>
     </div>`).join('') :
-    `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema istorije</div></div>`;
+    `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-title">Nema odsustva u ${selYear}.</div></div>`;
 
   main.innerHTML = `
     <div class="page-header">
@@ -4621,6 +4703,7 @@ function renderEmployeeDetail(id) {
           <div class="detail-item">
             <div class="detail-label">Godišnji odmor</div>
             <div class="detail-value">${emp.annualLeave||20} dana</div>
+            ${carriedOverNote(emp)}
           </div>
           <div class="detail-item">
             <div class="detail-label">Iskorišćeno</div>
@@ -4651,8 +4734,9 @@ function renderEmployeeDetail(id) {
       </div>
     </div>
     <div class="card">
-      <div class="card-header"><div class="card-title">📅 Istorija odsustva</div></div>
+      <div class="card-header"><div class="card-title">📅 Istorija odsustva · ${selYear}</div></div>
       <div class="card-body">
+        ${historyYearChips(histYears)}${yearSummaryHtml(emp, selYear)}
         <div class="timeline">${timelineHtml}</div>
       </div>
     </div>`;
@@ -5241,6 +5325,7 @@ function deleteHistoryEntry(empId, reqId) {
   const emp0 = getEmployees().find(e => e.id === empId);
   const req0 = emp0 && (emp0.leave_history||[]).find(r => r.id === reqId);
   if (!req0) return;
+  if (isClosedLeaveEntry(emp0, req0)) { toast('Ova godina je zatvorena — zapis se čuva kao arhiva.', 'error'); return; }
   if (!confirm(`Obrisati ovaj zapis (${req0.leaveType}, ${req0.startDate} → ${req0.ongoing ? 'u toku' : req0.endDate})?${req0.status === 'approved' && req0.daysApplied ? ' Iskorišćeni dani će biti vraćeni.' : ''}`)) return;
 
   const emp = mutateEmployee(empId, e => {
@@ -5265,6 +5350,7 @@ function openEditHistoryModal(empId, reqId) {
   const emp = getEmployees().find(e => e.id === empId);
   const req = emp && (emp.leave_history||[]).find(r => r.id === reqId);
   if (!req || req.ongoing) return;
+  if (isClosedLeaveEntry(emp, req)) { toast('Ova godina je zatvorena — zapis se čuva kao arhiva.', 'error'); return; }
   editHistoryTarget = { empId, reqId };
   document.getElementById('edit-history-type').value = req.leaveType;
   document.getElementById('edit-history-start').value = req.startDate;
@@ -5347,15 +5433,28 @@ function renderHistory() {
   const main = document.getElementById('main-content');
   const emps = getEmployees();
   const allHistory = [];
+  const selYear = selectedHistoryYear();
+  const histYears = historyYearsFor(emps.flatMap(e => e.leave_history || []), emps);
   emps.forEach(e => {
-    (e.leave_history||[]).forEach(r => allHistory.push({ emp: e, req: r }));
+    (e.leave_history||[]).forEach(r => { if (entryInYear(r, selYear)) allHistory.push({ emp: e, req: r }); });
   });
   allHistory.sort((a,b) => new Date(b.req.startDate) - new Date(a.req.startDate));
+  const closedRows = emps.map(e => ({ e, ys: yearSummary(e, selYear) })).filter(x => x.ys);
 
   main.innerHTML = `
     <div class="page-header">
-      <div class="page-title">Istorija odsustva</div>
+      <div class="page-title">Istorija odsustva · ${selYear}</div>
     </div>
+    ${historyYearChips(histYears)}
+    ${closedRows.length ? `<div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">🔒 Stanje na kraju ${selYear}.</div></div>
+      <div class="table-wrap"><table class="responsive-stack">
+        <thead><tr><th>Radnik</th><th>Godišnji (imao/la)</th><th>Iskorišćeno</th><th>Preneto u ${selYear + 1}</th><th>Slobodni dani</th></tr></thead>
+        <tbody>${closedRows.sort((a, b) => a.e.name.localeCompare(b.e.name)).map(({ e, ys }) => `<tr>
+          <td class="td-primary"><div class="flex items-center gap-2">${makeAvatar(e.name)}<span style="font-weight:600">${e.name}</span></div></td>
+          <td data-label="Imao/la">${ys.annualLeave}</td><td data-label="Iskorišćeno">${ys.usedLeave}</td>
+          <td data-label="Preneto"><strong>${ys.carriedOver}</strong></td><td data-label="Slobodni">${ys.usedFreeDays} / ${ys.freeDaysAllowance}</td></tr>`).join('')}</tbody>
+      </table></div></div>` : ''}
     <div class="card">
       <div class="table-wrap">
         ${allHistory.length ? `<table class="responsive-stack">
@@ -5378,7 +5477,7 @@ function renderHistory() {
                 <td data-label="Status"><span class="badge badge-${req.status==='approved'?'approved':'rejected'}">${statusSr(req.status)}</span></td>
                 <td class="text-sm text-muted" data-label="Razlog">${req.rejectionReason || (req.ongoing ? '🩹 bolovanje u toku' : '—')}</td>
                 <td data-label="Akcije" class="td-actions">
-                  ${!req.ongoing ? `
+                  ${!req.ongoing && isClosedLeaveEntry(emp, req) ? '🔒' : !req.ongoing ? `
                     <button class="btn btn-secondary btn-sm" onclick="openEditHistoryModal('${emp.id}','${req.id}')">✏️</button>
                     <button class="btn btn-danger btn-sm" style="margin-left:.25rem" onclick="deleteHistoryEntry('${emp.id}','${req.id}')">🗑️</button>` : '—'}
                 </td>
@@ -5387,7 +5486,7 @@ function renderHistory() {
         </table>` : `
           <div class="empty-state">
             <div class="empty-state-icon">📭</div>
-            <div class="empty-state-title">Nema istorije</div>
+            <div class="empty-state-title">Nema istorije za ${selYear}.</div>
             <div class="empty-state-sub">Obrađeni zahtevi će se pojaviti ovde</div>
           </div>`}
       </div>
@@ -5632,6 +5731,7 @@ function renderHelp() {
         ${helpRow('👥', 'Radnici', 'pregled svih radnika, sa opcijom da izmenite podatke (sektor, pozicija, dani odmora) ili obrišete radnika.')}
         ${helpRow('📋', 'Zahtevi', 'odobrite ili odbijte zahteve na čekanju — upozorenje se prikazuje ako se period preklapa sa nekim ko je već odsutan, a kalendar ispod pokazuje ko je sve trenutno na odmoru.')}
         ${helpRow('📁', 'Istorija', 'svaki već obrađen zahtev može naknadno da se izmeni ili obriše, npr. ako radnik promeni planove nakon odobrenja.')}
+        ${helpRow('🎆', 'Nova godina', '1. januara (pri prvom otvaranju aplikacije) neiskorišćeni godišnji se prenosi i dodaje se 20 novih dana; slobodni dani se ne prenose i kreću ispočetka. Istorija se prikazuje po godinama, a prošla godina ostaje sačuvana i zaključana sa stanjem na kraju godine.')}
         ${helpRow('📈', 'Izveštaji', 'grafikon iskorišćenosti odmora i tabela svih radnika, sa izvozom u CSV/PDF.')}
         ${helpRow('⚙️', 'Podešavanja', 'pregled svih korisničkih naloga i uloga, izvoz/uvoz kompletnih podataka aplikacije u JSON. Dugme „✉️ Email” menja adresu za prijavu korisnika (stara prestaje da važi); lozinka ostaje ista ili postavite novu.')}
       </div>
@@ -6307,6 +6407,7 @@ function renderMyProfile() {
           <div class="detail-item">
             <div class="detail-label">Preostalo odmora</div>
             <div class="detail-value" style="${remaining<5?'color:var(--danger)':''}">${remaining} dana</div>
+            ${carriedOverNote(emp)}
             ${effAnnual !== remaining ? `<div class="text-xs text-muted" style="margin-top:.15rem">Sa rezervacijama: ${effAnnual} dana</div>` : ''}
           </div>
           <div class="detail-item">
@@ -6330,10 +6431,11 @@ function renderMyProfile() {
       </div>
     </div>
     <div class="card" style="margin-top:1.5rem">
-      <div class="card-header"><div class="card-title">📅 Istorija</div></div>
+      <div class="card-header"><div class="card-title">📅 Istorija · ${selectedHistoryYear()}</div></div>
       <div class="card-body">
+        ${historyYearChips(historyYearsFor(emp.leave_history || [], [emp]))}${yearSummaryHtml(emp, selectedHistoryYear())}
         <div class="timeline">
-          ${[...(emp.leave_history||[])].sort((a,b)=>new Date(b.startDate)-new Date(a.startDate))
+          ${[...(emp.leave_history||[])].filter(r => entryInYear(r, selectedHistoryYear())).sort((a,b)=>new Date(b.startDate)-new Date(a.startDate))
             .map(r => `
               <div class="timeline-item ${r.status}">
                 <div class="timeline-date">${r.startDate} → ${r.ongoing ? 'u toku' : r.endDate}</div>
