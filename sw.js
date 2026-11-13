@@ -5,7 +5,7 @@
 // changes often) and only falls back to the cached shell when there's no
 // connection at all. Doesn't cache Firebase calls or the login video —
 // those need to be live/fresh, not stale-cached.
-const CACHE_NAME = 'odmorpro-shell-v6';
+const CACHE_NAME = 'odmorpro-shell-v7';
 const SHELL_ASSETS = [
   './',
   './index.html',
