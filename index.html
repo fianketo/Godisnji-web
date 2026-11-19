@@ -2620,7 +2620,7 @@ const emailSleep = ms => new Promise(r => setTimeout(r, ms));
 // ---- Gmail via Google Apps Script (Podešavanja → 📮 Mejlovi preko Gmail-a)
 // ~100 free emails a day from the owner's Gmail, tried first; EmailJS stays
 // as the fallback (script not set up, daily limit used up, script error).
-const MAIL_SCRIPT_URL_DEFAULT = '';
+const MAIL_SCRIPT_URL_DEFAULT = 'https://script.google.com/macros/s/AKfycbzTc-zITh_pT2OuGYS3e2odDGCE3gOJdHN0JzzAAaT01WZ_sxjHr6sS5TLRt_p_pSGaBA/exec';
 const GAS_URL_RE = /^https:\/\/script\.google\.com\/(a\/[^/]+\/)?macros\/s\/[\w-]+\/exec$/;
 let gasSkipUntil = 0;
 let gasQuotaLeft = null;
