@@ -2617,12 +2617,54 @@ let emailQueue = Promise.resolve();
 let emailQueueLength = 0;
 const emailSleep = ms => new Promise(r => setTimeout(r, ms));
 
-function sendEmailRaw(toEmail, toName, subject, message) {
-  if (typeof emailjs === 'undefined') {
-    return Promise.reject(new Error('EmailJS biblioteka nije učitana (proverite internet ili blokator reklama).'));
+// ---- Gmail via Google Apps Script (Podešavanja → 📮 Mejlovi preko Gmail-a)
+// ~100 free emails a day from the owner's Gmail, tried first; EmailJS stays
+// as the fallback (script not set up, daily limit used up, script error).
+const MAIL_SCRIPT_URL_DEFAULT = '';
+const GAS_URL_RE = /^https:\/\/script\.google\.com\/(a\/[^/]+\/)?macros\/s\/[\w-]+\/exec$/;
+let gasSkipUntil = 0;
+let gasQuotaLeft = null;
+function mailScriptUrl() {
+  const s = extraGet('app_settings') || {};
+  return s.mailScriptUrl || MAIL_SCRIPT_URL_DEFAULT || '';
+}
+// Resolves with the script's answer, or null when Gmail isn't available
+// (not set up / not signed in / limit reached today) so EmailJS is used.
+async function sendViaGmailScript(params) {
+  const url = mailScriptUrl();
+  if (!url || Date.now() < gasSkipUntil || !firebaseAuth || !firebaseAuth.currentUser) return null;
+  const idToken = await firebaseAuth.currentUser.getIdToken();
+  const res = await fetch(url, { method: 'POST', body: JSON.stringify({
+    idToken, to: params.to_email, toName: params.to_name, subject: params.subject, message: params.message }) });
+  const data = await res.json();
+  if (typeof data.quota === 'number') gasQuotaLeft = data.quota;
+  if (!data.ok) {
+    if (data.quota === 0) gasSkipUntil = Date.now() + 60 * 60 * 1000;
+    throw new Error('Gmail: ' + (data.error || 'greška'));
   }
+  return data;
+}
+async function checkMailScript(url) {
+  const res = await fetch(url, { method: 'GET' });
+  const data = await res.json();
+  if (!data || !data.ok || data.app !== 'OdmorPro mail') throw new Error('Na ovoj adresi nije OdmorPro skripta.');
+  gasQuotaLeft = data.quota;
+  return data;
+}
+
+function sendEmailRaw(toEmail, toName, subject, message) {
   const params = { to_email: toEmail, to_name: toName, subject, message };
+  const meta = { via: '' };
   const attempt = async () => {
+    let gmailErr = null;
+    try {
+      const r = await sendViaGmailScript(params);
+      if (r) { meta.via = 'gmail'; return r; }
+    } catch (err) { gmailErr = err; console.warn(err); }
+    if (typeof emailjs === 'undefined') {
+      throw gmailErr || new Error('EmailJS biblioteka nije učitana (proverite internet ili blokator reklama).');
+    }
+    meta.via = 'emailjs';
     for (let tryNo = 0; ; tryNo++) {
       try {
         return await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, params);
@@ -2634,16 +2676,17 @@ function sendEmailRaw(toEmail, toName, subject, message) {
   };
   emailQueueLength++;
   const result = emailQueue.then(attempt);
-  result.then(() => logEmail(params, true), err => logEmail(params, false, emailErrorText(err)));
-  // The next email waits for this one (success or not) plus the gap.
-  emailQueue = result.catch(() => {}).then(() => emailSleep(EMAIL_GAP_MS)).then(() => { emailQueueLength--; });
+  result.then(() => logEmail(params, true, null, meta.via), err => logEmail(params, false, emailErrorText(err), meta.via));
+  // The next email waits for this one (success or not) plus the gap —
+  // Gmail has no per-second limit, EmailJS does.
+  emailQueue = result.catch(() => {}).then(() => emailSleep(meta.via === 'gmail' ? 250 : EMAIL_GAP_MS)).then(() => { emailQueueLength--; });
   return result;
 }
 
 // Email history for admins (Podešavanja → Istorija mejlova). EmailJS can't
 // report whether a message was opened, so this records what was sent and
 // whether EmailJS accepted it.
-function logEmail(params, ok, error) {
+function logEmail(params, ok, error, via) {
   try {
     const entry = {
       at: new Date().toISOString(),
@@ -2654,6 +2697,7 @@ function logEmail(params, ok, error) {
       by: (currentUser && currentUser.name) || ''
     };
     if (error) entry.error = String(error).slice(0, 200);
+    if (via) entry.via = via;
     const id = newExtraId('m', 'email_log');
     if (firebaseDB) firebaseDB.ref('email_log/' + id).set(entry).catch(err => console.error('email_log:', err));
     else extraApplyLocal('email_log/' + id, entry);
@@ -2670,14 +2714,14 @@ async function openEmailLog() {
   const rows = Object.values(log).filter(e => e && e.at).sort((a, b) => b.at.localeCompare(a.at));
   const sent = rows.filter(r => r.ok).length;
   openExtraModal('email-log', '📬 Istorija mejlova',
-    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Poslednjih ${rows.length} mejlova · uspešno poslato ${sent}${rows.length - sent ? `, neuspešno ${rows.length - sent}` : ''}. „Poslato” znači da je EmailJS primio i prosledio mejl; da li ga je primalac otvorio ne može da se zna.</p>
+    `<p class="text-sm text-muted" style="margin-bottom:.75rem">Poslednjih ${rows.length} mejlova · uspešno poslato ${sent}${rows.length - sent ? `, neuspešno ${rows.length - sent}` : ''}. „Poslato” znači da je mejl otišao (preko Gmail-a ili EmailJS-a); da li ga je primalac otvorio ne može da se zna.</p>
      ${rows.length ? `<div class="email-log">${rows.map(r => `
        <div class="email-log-row ${r.ok ? '' : 'failed'}">
          <div class="email-log-top">
            <strong>${escapeHtml(r.toName || r.to)}</strong>
            <span class="email-log-status">${r.ok ? '✅ Poslato' : '❌ Nije poslato'}</span>
          </div>
-         <div class="email-log-sub">${escapeHtml(r.to)} · ${new Date(r.at).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}${r.by ? ' · poslao/la ' + escapeHtml(r.by) : ''}</div>
+         <div class="email-log-sub">${escapeHtml(r.to)}${r.via ? ' · ' + (r.via === 'gmail' ? 'Gmail' : 'EmailJS') : ''} · ${new Date(r.at).toLocaleString('sr-Latn-RS', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}${r.by ? ' · poslao/la ' + escapeHtml(r.by) : ''}</div>
          <div class="email-log-subject">${escapeHtml(r.subject)}</div>
          ${r.error ? `<div class="email-log-err">${escapeHtml(r.error)}</div>` : ''}
        </div>`).join('')}</div>` : '<div class="tb-empty">Još nema poslatih mejlova.</div>'}`,
@@ -2737,6 +2781,45 @@ function notifyAdminsOfRequest(emp, req) {
   });
 }
 
+async function mailScriptCode() {
+  const res = await fetch('google-apps-script/Code.gs', { cache: 'no-store' });
+  if (!res.ok) throw new Error('kod skripte nije dostupan');
+  return (await res.text()).replace('OVDE_FIREBASE_API_KEY', FIREBASE_CONFIG.apiKey);
+}
+async function copyMailScript() {
+  let code;
+  try { code = await mailScriptCode(); } catch (ex) { toast('Ne mogu da učitam kod skripte: ' + ex.message, 'error'); return; }
+  const ta = document.getElementById('gas-code');
+  try { await navigator.clipboard.writeText(code); toast('Kod skripte je kopiran — nalepite ga u Apps Script editor.', 'success'); }
+  catch (ex) { if (ta) { ta.value = code; ta.style.display = 'block'; ta.select(); } toast('Označite tekst ispod i kopirajte ga (Ctrl+C).', 'info'); }
+}
+async function saveMailScriptUrl(remove) {
+  const input = document.getElementById('gas-url');
+  const url = remove ? '' : (input.value || '').trim();
+  if (url && !GAS_URL_RE.test(url)) { toast('To nije Web app URL — treba da počinje sa https://script.google.com/macros/s/ i završava se sa /exec.', 'error', 6000); return; }
+  if (url) {
+    try { await checkMailScript(url); }
+    catch (ex) { toast('Skripta se ne javlja: ' + (ex.message || ex) + ' Proverite da je „Who has access” = Anyone.', 'error', 7000); return; }
+  }
+  try {
+    if (firebaseDB) await firebaseDB.ref('app_settings/mailScriptUrl').set(url || null);
+    extraApplyLocal('app_settings/mailScriptUrl', url || null);
+    gasSkipUntil = 0;
+    toast(url ? '✅ Mejlovi sada idu preko Gmail-a.' : 'Gmail isključen — mejlovi idu preko EmailJS-a.', 'success');
+    renderPage();
+  } catch (ex) {
+    toast('Nije sačuvano (' + (ex.message || ex) + '). Objavite nova pravila baze (🔒 Zaštita baze) i probajte ponovo.', 'error', 8000);
+  }
+}
+function refreshMailScriptStatus() {
+  const el = document.getElementById('gas-status');
+  const url = mailScriptUrl();
+  if (!el || !url) return;
+  checkMailScript(url)
+    .then(d => { el.innerHTML = `✅ <strong>Uključeno</strong> — danas je preostalo još <strong>${d.quota}</strong> Gmail mejlova.`; })
+    .catch(ex => { el.innerHTML = `⚠️ Skripta se ne javlja (${escapeHtml(ex.message || String(ex))}) — mejlovi idu preko EmailJS-a.`; });
+}
+
 function sendTestEmail() {
   const input = document.getElementById('test-email-to');
   const out = document.getElementById('test-email-result');
@@ -2745,7 +2828,7 @@ function sendTestEmail() {
   if (!EMAILJS_ENABLED) { out.textContent = 'EmailJS nije podešen (EMAILJS_CONFIG u index.html).'; out.style.color = 'var(--danger)'; return; }
   out.textContent = 'Šaljem…'; out.style.color = 'var(--text2)';
   sendEmailRaw(to, currentUser.name || 'OdmorPro', 'Probni mejl iz OdmorPro', 'Ovo je probni mejl. Ako ga vidite, slanje mejlova iz aplikacije radi.')
-    .then(() => { out.textContent = `✅ Poslato na ${to} — proverite inbox (i Spam).`; out.style.color = 'var(--success)'; })
+    .then(r => { out.textContent = `✅ Poslato na ${to} preko ${r && r.quota != null ? `Gmail-a (danas preostalo ${r.quota})` : 'EmailJS-a'} — proverite inbox (i Spam).`; out.style.color = 'var(--success)'; })
     .catch(err => { console.error(err); out.textContent = `❌ Nije poslato: ${emailErrorText(err)}`; out.style.color = 'var(--danger)'; });
 }
 
@@ -3180,6 +3263,8 @@ const DATABASE_RULES = (() => {
         }
       },
       treb_settings: adminWrite,
+      // App-wide settings, e.g. the Gmail (Apps Script) mail URL.
+      app_settings: adminWrite,
       // Every sent email is logged (who, when, subject, delivered or not);
       // anyone sending may add an entry, only admins read or clear it.
       email_log: {
@@ -5580,6 +5665,29 @@ function renderSettings() {
   main.innerHTML = `
     <div class="page-header"><div class="page-title">Podešavanja</div></div>
     <div class="card" style="margin-bottom:1.5rem">
+      <div class="card-header"><div class="card-title">📮 Mejlovi preko Gmail-a</div></div>
+      <div class="card-body text-sm">
+        <p class="text-muted" style="margin-bottom:.75rem">Besplatno oko <strong>100 mejlova dnevno</strong> sa vašeg Gmail naloga (EmailJS daje samo 200 mesečno). Kad je ovo uključeno, mejlovi idu preko Gmail-a, a EmailJS ostaje kao rezerva.</p>
+        <div id="gas-status" style="margin-bottom:.75rem">${mailScriptUrl() ? 'Proveravam…' : '⚪ Nije podešeno — mejlovi idu preko EmailJS-a.'}</div>
+        <ol style="padding-left:1.25rem;margin-bottom:.75rem;color:var(--text2);display:flex;flex-direction:column;gap:.35rem">
+          <li>Otvorite <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> (Gmail nalog sa kog će ići mejlovi) — otvoriće se novi projekat.</li>
+          <li>Kliknite <strong>📋 Kopiraj kod skripte</strong>, u editoru obrišite sve, nalepite i sačuvajte (💾).</li>
+          <li>Gore izaberite funkciju <strong>probniMejl</strong> i kliknite <strong>▶ Run</strong>. Dozvolite pristup: <em>Review permissions</em> → vaš nalog → <em>Advanced</em> → <em>Go to … (unsafe)</em> → <em>Allow</em>. Stići će vam probni mejl.</li>
+          <li><strong>Deploy</strong> → <strong>New deployment</strong> → ⚙️ <strong>Web app</strong>; <em>Execute as</em>: <strong>Me</strong>, <em>Who has access</em>: <strong>Anyone</strong> → <strong>Deploy</strong> → kopirajte <strong>Web app URL</strong>.</li>
+          <li>Nalepite URL ovde i kliknite <strong>Sačuvaj</strong>.</li>
+        </ol>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem">
+          <button class="btn btn-secondary btn-sm" onclick="copyMailScript()">📋 Kopiraj kod skripte</button>
+        </div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <input type="text" id="gas-url" placeholder="https://script.google.com/macros/s/…/exec" style="flex:1;min-width:200px" value="${escapeHtml(mailScriptUrl())}">
+          <button class="btn btn-primary" onclick="saveMailScriptUrl()">Sačuvaj</button>
+          ${mailScriptUrl() ? '<button class="btn btn-secondary" onclick="saveMailScriptUrl(true)">Isključi</button>' : ''}
+        </div>
+        <textarea id="gas-code" readonly style="display:none;margin-top:.75rem;font-family:monospace;font-size:.75rem;min-height:200px;width:100%"></textarea>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
       <div class="card-header"><div class="card-title">✉️ Probni mejl</div>
         <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="openEmailLog()">📬 Istorija mejlova</button></div>
       <div class="card-body">
@@ -5658,6 +5766,7 @@ function renderSettings() {
 }
 
 function fillSecurityStatus() {
+  refreshMailScriptStatus();
   const el = document.getElementById('security-status');
   if (!el) return;
   securityStatusHtml().then(html => { const cur = document.getElementById('security-status'); if (cur) cur.innerHTML = html; });
@@ -6662,6 +6771,7 @@ function startExtraListeners() {
   firebaseDB.ref('treb_items').on('value', onValue('treb_items'));
   firebaseDB.ref('treb_orders').on('value', onValue('treb_orders'));
   firebaseDB.ref('treb_settings').on('value', onValue('treb_settings'));
+  firebaseDB.ref('app_settings').on('value', onValue('app_settings'), err => console.warn('app_settings:', err && err.message));
 }
 
 function newExtraId(prefix, key) {
@@ -7448,7 +7558,7 @@ function rsPublishWeek() {
 
   openExtraModal('rs-publish', '📣 Obavesti radnike',
     `<p class="text-sm" style="margin-bottom:.75rem">Svako od <strong>${items.length}</strong> raspoređenih radnika dobija obaveštenje sa svojim smenama za nedelju <strong>${weekLabel(start)}</strong>.</p>
-     <label class="rs-pick" style="border:none;padding:0"><input type="checkbox" id="rs-publish-email" ${EMAILJS_ENABLED ? 'checked' : 'disabled'}> Pošalji i mejlom (troši ${items.filter(x => hasRealEmail(x.emp)).length} od mesečnih besplatnih mejlova)</label>`,
+     <label class="rs-pick" style="border:none;padding:0"><input type="checkbox" id="rs-publish-email" ${EMAILJS_ENABLED ? 'checked' : 'disabled'}> Pošalji i mejlom (${items.filter(x => hasRealEmail(x.emp)).length} mejlova)</label>`,
     `<button class="btn btn-secondary" onclick="closeExtraModal('rs-publish')">Otkaži</button>
      <button class="btn btn-primary" id="rs-publish-go">Pošalji</button>`);
   document.getElementById('rs-publish-go').onclick = () => {
