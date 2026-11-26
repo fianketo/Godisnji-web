@@ -4074,7 +4074,7 @@ function renderPage() {
    It hides itself after `hideAfter`; delete this block afterwards.
    ================================================================ */
 const EVENT_COUNTDOWN = {
-  title: 'Žurka',
+  title: 'Biofest žurka',
   at: '2026-12-12T21:00:00',       // local time
   hideAfter: '2026-12-13T05:00:00',
   where: ''                         // e.g. 'Restoran …' — shown when filled in
@@ -4092,7 +4092,7 @@ function eventCountdownState(now = new Date()) {
 function eventCountdownInner(st) {
   const ev = EVENT_COUNTDOWN;
   const when = new Date(ev.at).toLocaleDateString('sr-Latn-RS', { weekday: 'long', day: 'numeric', month: 'long' }) + ' u 21h';
-  if (st.live) return `<div class="evc-live">🥳 Žurka je počela! <span>Vidimo se ${ev.where ? 'u ' + escapeHtml(ev.where) : 'tamo'} 🎶</span></div>`;
+  if (st.live) return `<div class="evc-live">🥳 ${escapeHtml(ev.title)} je počela! <span>Vidimo se ${ev.where ? 'u ' + escapeHtml(ev.where) : 'tamo'} 🎶</span></div>`;
   const pad = n => String(n).padStart(2, '0');
   const unit = (n, label) => `<div class="evc-unit"><b>${label === 'dana' ? n : pad(n)}</b><span>${label}</span></div>`;
   return `<div class="evc-top">
