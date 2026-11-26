@@ -2160,6 +2160,29 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 
 .year-summary { display: flex; flex-direction: column; gap: .2rem; padding: .75rem 1rem; margin-bottom: 1rem; border-radius: 12px; border: 1px solid var(--border); background: var(--surface2); font-size: .8125rem; color: var(--text2); }
 .year-summary strong { color: var(--text); font-size: .875rem; }
+
+/* ---------- Event countdown (temporary) ---------- */
+.evc { position: relative; overflow: hidden; margin-bottom: 1.25rem; padding: 1.125rem 1.25rem 1.25rem; border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--accent2) 45%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent2) 30%, transparent), color-mix(in srgb, var(--primary) 22%, transparent));
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
+.evc-top { position: relative; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .25rem .75rem; margin-bottom: .875rem; }
+.evc-title { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+.evc-title em { font-style: normal; color: var(--primary); }
+.evc-when { font-size: .8125rem; color: var(--text2); text-transform: none; }
+.evc-units { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: .5rem; }
+.evc-unit { display: flex; flex-direction: column; align-items: center; padding: .625rem .25rem; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--dropdown-surface) 88%, transparent); border: 1px solid var(--border); }
+.evc-unit b { font-family: var(--font-display); font-size: 2rem; font-weight: 700; line-height: 1.05; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.evc-unit span { font-size: .6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--text3); }
+.evc-units .evc-unit:first-child b { color: var(--primary); }
+.evc-live { position: relative; font-family: var(--font-display); font-size: 1.375rem; font-weight: 700; display: flex; flex-direction: column; gap: .25rem; }
+.evc-live span { font-family: inherit; font-size: .9375rem; font-weight: 500; color: var(--text2); }
+.evc-confetti { position: absolute; inset: 0; pointer-events: none; }
+.evc-confetti i { position: absolute; top: -12px; left: calc(var(--i) * 7.3% + 2%); width: 6px; height: 10px; border-radius: 2px; opacity: .55;
+  background: hsl(calc(var(--i) * 47deg) 85% 62%); animation: evc-fall calc(5s + var(--i) * .37s) linear infinite; animation-delay: calc(var(--i) * -.83s); }
+@keyframes evc-fall { to { transform: translateY(190px) rotate(540deg); } }
+@media (prefers-reduced-motion: reduce) { .evc-confetti { display: none; } }
+@media (max-width: 480px) { .evc-unit b { font-size: 1.625rem; } .evc-title { font-size: 1.125rem; } }
 </style>
 </head>
 <body>
@@ -4046,6 +4069,53 @@ function renderPage() {
 /* ================================================================
    DASHBOARD
    ================================================================ */
+/* ================================================================
+   EVENT COUNTDOWN — temporary Dashboard banner for the team party.
+   It hides itself after `hideAfter`; delete this block afterwards.
+   ================================================================ */
+const EVENT_COUNTDOWN = {
+  title: 'Žurka',
+  at: '2026-12-12T21:00:00',       // local time
+  hideAfter: '2026-12-13T05:00:00',
+  where: ''                         // e.g. 'Restoran …' — shown when filled in
+};
+function eventCountdownState(now = new Date()) {
+  const ev = EVENT_COUNTDOWN;
+  if (!ev || now >= new Date(ev.hideAfter)) return null;
+  const at = new Date(ev.at);
+  const ms = at - now;
+  if (ms <= 0) return { live: true };
+  const sec = Math.floor(ms / 1000);
+  return { d: Math.floor(sec / 86400), h: Math.floor(sec / 3600) % 24, m: Math.floor(sec / 60) % 60, s: sec % 60,
+    today: at.toDateString() === now.toDateString() };
+}
+function eventCountdownInner(st) {
+  const ev = EVENT_COUNTDOWN;
+  const when = new Date(ev.at).toLocaleDateString('sr-Latn-RS', { weekday: 'long', day: 'numeric', month: 'long' }) + ' u 21h';
+  if (st.live) return `<div class="evc-live">🥳 Žurka je počela! <span>Vidimo se ${ev.where ? 'u ' + escapeHtml(ev.where) : 'tamo'} 🎶</span></div>`;
+  const pad = n => String(n).padStart(2, '0');
+  const unit = (n, label) => `<div class="evc-unit"><b>${label === 'dana' ? n : pad(n)}</b><span>${label}</span></div>`;
+  return `<div class="evc-top">
+      <div class="evc-title">🎉 ${escapeHtml(ev.title)}${st.today ? ' je <em>večeras</em>!' : ''}</div>
+      <div class="evc-when">${when}${ev.where ? ' · ' + escapeHtml(ev.where) : ''}</div>
+    </div>
+    <div class="evc-units">${st.d ? unit(st.d, st.d === 1 ? 'dan' : 'dana') : ''}${unit(st.h, 'sati')}${unit(st.m, 'min')}${unit(st.s, 'sek')}</div>`;
+}
+function eventCountdownHtml() {
+  const st = eventCountdownState();
+  if (!st) return '';
+  return `<div class="evc" id="evc" aria-label="Odbrojavanje do žurke">
+    <div class="evc-confetti" aria-hidden="true">${Array.from({ length: 14 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div>
+    <div id="evc-body">${eventCountdownInner(st)}</div></div>`;
+}
+setInterval(() => {
+  const body = document.getElementById('evc-body');
+  if (!body) return;
+  const st = eventCountdownState();
+  if (!st) { const box = document.getElementById('evc'); if (box) box.remove(); return; }
+  body.innerHTML = eventCountdownInner(st);
+}, 1000);
+
 function renderDashboard() {
   const main = document.getElementById('main-content');
   const emps = getEmployees();
@@ -4065,6 +4135,7 @@ function renderDashboard() {
           <div class="page-subtitle">${formatDate(new Date())} · Pregled sistema</div>
         </div>
       </div>
+      ${eventCountdownHtml()}
       <div class="stats-grid">
         <div class="stat-card blue">
           <div class="stat-icon">👥</div>
@@ -4125,6 +4196,7 @@ function renderDashboard() {
           <div class="page-subtitle">${formatDate(new Date())} · Vaš odmor</div>
         </div>
       </div>
+      ${eventCountdownHtml()}
       ${remaining < 5 ? `<div class="leave-warning">⚠️ Upozorenje: Imate samo <strong>${remaining} dana</strong> godišnjeg odmora!</div>` : ''}
       <div class="stats-grid">
         <div class="stat-card blue">
