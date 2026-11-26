@@ -2183,6 +2183,21 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 @keyframes evc-fall { to { transform: translateY(190px) rotate(540deg); } }
 @media (prefers-reduced-motion: reduce) { .evc-confetti { display: none; } }
 @media (max-width: 480px) { .evc-unit b { font-size: 1.625rem; } .evc-title { font-size: 1.125rem; } }
+
+.evc-pop-overlay { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: rgba(3,6,14,.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: evc-fade .25s ease-out; }
+.evc.evc-pop { width: 100%; max-width: 420px; margin: 0; padding: 1.75rem 1.25rem 1.25rem; text-align: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent2) 38%, var(--dropdown-surface)), color-mix(in srgb, var(--primary) 26%, var(--dropdown-surface)));
+  box-shadow: var(--shadow-lg); animation: evc-pop-in .35s cubic-bezier(.2,1.3,.4,1); }
+.evc-pop .evc-top { flex-direction: column; align-items: center; margin-bottom: 1.125rem; }
+.evc-pop .evc-title { font-size: 1.5rem; }
+.evc-pop .evc-live { align-items: center; }
+.evc-pop-emoji { position: relative; font-size: 3rem; line-height: 1; margin-bottom: .5rem; }
+.evc-pop-btn { position: relative; width: 100%; margin-top: 1.25rem; justify-content: center; }
+.evc-pop .evc-ico { display: none; }
+@keyframes evc-fade { from { opacity: 0; } }
+@keyframes evc-pop-in { from { opacity: 0; transform: scale(.85) translateY(12px); } }
+@media (prefers-reduced-motion: reduce) { .evc-pop-overlay, .evc.evc-pop { animation: none; } }
 </style>
 </head>
 <body>
@@ -4092,11 +4107,11 @@ function eventCountdownState(now = new Date()) {
 function eventCountdownInner(st) {
   const ev = EVENT_COUNTDOWN;
   const when = new Date(ev.at).toLocaleDateString('sr-Latn-RS', { weekday: 'long', day: 'numeric', month: 'long' }) + ' u 21h';
-  if (st.live) return `<div class="evc-live">🥳 ${escapeHtml(ev.title)} je počela! <span>Vidimo se ${ev.where ? 'u ' + escapeHtml(ev.where) : 'tamo'} 🎶</span></div>`;
+  if (st.live) return `<div class="evc-live"><div><span class="evc-ico">🥳 </span>${escapeHtml(ev.title)} je počela!</div><span>Vidimo se ${ev.where ? 'u ' + escapeHtml(ev.where) : 'tamo'} 🎶</span></div>`;
   const pad = n => String(n).padStart(2, '0');
   const unit = (n, label) => `<div class="evc-unit"><b>${label === 'dana' ? n : pad(n)}</b><span>${label}</span></div>`;
   return `<div class="evc-top">
-      <div class="evc-title">🎉 ${escapeHtml(ev.title)}${st.today ? ' je <em>večeras</em>!' : ''}</div>
+      <div class="evc-title"><span class="evc-ico">🎉 </span>${escapeHtml(ev.title)}${st.today ? ' je <em>večeras</em>!' : ''}</div>
       <div class="evc-when">${when}${ev.where ? ' · ' + escapeHtml(ev.where) : ''}</div>
     </div>
     <div class="evc-units">${st.d ? unit(st.d, st.d === 1 ? 'dan' : 'dana') : ''}${unit(st.h, 'sati')}${unit(st.m, 'min')}${unit(st.s, 'sek')}</div>`;
@@ -4106,15 +4121,47 @@ function eventCountdownHtml() {
   if (!st) return '';
   return `<div class="evc" id="evc" aria-label="Odbrojavanje do žurke">
     <div class="evc-confetti" aria-hidden="true">${Array.from({ length: 14 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div>
-    <div id="evc-body">${eventCountdownInner(st)}</div></div>`;
+    <div class="evc-body">${eventCountdownInner(st)}</div></div>`;
 }
 setInterval(() => {
-  const body = document.getElementById('evc-body');
-  if (!body) return;
+  const bodies = document.querySelectorAll('.evc-body');
+  if (!bodies.length) return;
   const st = eventCountdownState();
-  if (!st) { const box = document.getElementById('evc'); if (box) box.remove(); return; }
-  body.innerHTML = eventCountdownInner(st);
+  if (!st) { ['evc', 'evc-pop'].forEach(id => { const el = document.getElementById(id); if (el) el.remove(); }); return; }
+  const html = eventCountdownInner(st);
+  bodies.forEach(b => { b.innerHTML = html; });
 }, 1000);
+
+// Pops up once a day (per device) when someone opens the app, so nobody
+// misses it even if they never look at the Dashboard.
+function maybeShowEventPopup() {
+  const st = eventCountdownState();
+  if (!st || document.getElementById('evc-pop')) return;
+  const key = 'evc-popup-' + EVENT_COUNTDOWN.at;
+  let seen = null;
+  try { seen = localStorage.getItem(key); } catch (ex) {}
+  if (seen === todayStr()) return;
+  try { localStorage.setItem(key, todayStr()); } catch (ex) {}
+  const wrap = document.createElement('div');
+  wrap.className = 'evc-pop-overlay';
+  wrap.id = 'evc-pop';
+  wrap.onclick = e => { if (e.target === wrap) closeEventPopup(); };
+  wrap.innerHTML = `<div class="evc evc-pop" role="dialog" aria-modal="true" aria-label="${escapeHtml(EVENT_COUNTDOWN.title)}">
+    <div class="evc-confetti" aria-hidden="true">${Array.from({ length: 18 }, (_, i) => `<i style="--i:${i}"></i>`).join('')}</div>
+    <div class="evc-pop-emoji" aria-hidden="true">${st.live ? '🥳' : '🎉'}</div>
+    <div class="evc-body">${eventCountdownInner(st)}</div>
+    <button class="btn btn-primary evc-pop-btn" onclick="closeEventPopup()">${st.live ? 'Idemo! 🎶' : 'Jedva čekam! 🥳'}</button>
+  </div>`;
+  document.body.appendChild(wrap);
+  document.addEventListener('keydown', eventPopupKey);
+  setTimeout(() => { const b = wrap.querySelector('.evc-pop-btn'); if (b) b.focus(); }, 50);
+}
+function eventPopupKey(e) { if (e.key === 'Escape') closeEventPopup(); }
+function closeEventPopup() {
+  const el = document.getElementById('evc-pop');
+  if (el) el.remove();
+  document.removeEventListener('keydown', eventPopupKey);
+}
 
 function renderDashboard() {
   const main = document.getElementById('main-content');
@@ -9046,6 +9093,7 @@ async function startApp() {
   sendUpcomingLeaveReminders();
   renderSidebar();
   renderPage();
+  setTimeout(maybeShowEventPopup, 700);
   startCloudListeners();
   startPasswordListener();
   adminSecurityMaintenance();
